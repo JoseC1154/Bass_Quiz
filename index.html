@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Scale Driller</title>
+  <meta name="description" content="Scale Driller – A number system quiz for bass players to practice scale degrees by key.">
   <style>
     body {
       font-family: sans-serif;
@@ -73,7 +74,18 @@
   <input type="number" id="secondsInput" min="1" value="10" style="width: 60px;">
 </div>
 
+<div>
+  <label for="questionCountInput">Number of questions:</label>
+  <input type="number" id="questionCountInput" min="1" value="5" style="width: 60px;">
+</div>
+
 <button onclick="startQuiz()">Start Quiz</button>
+
+<div>
+  <button onclick="toggleChart()" id="toggleChartBtn">Hide Scale Chart</button>
+</div>
+
+<div id="scaleDisplay" style="margin-top: 1rem; display: inline-block; text-align: left;"></div>
 
 <div id="quiz">
   <p id="question"></p>
@@ -111,17 +123,25 @@ let correctNote = '';
 let timer;
 let timeLeft = 10;
 let secondsPerQuestion = 10;
-const totalQuestions = 5;
+let totalQuestions = 5;
+
+document.getElementById('key').addEventListener('change', updateScaleDisplay);
 
 function startQuiz() {
   const inputVal = parseInt(document.getElementById('secondsInput').value);
   secondsPerQuestion = isNaN(inputVal) || inputVal < 1 ? 10 : inputVal;
+
+  const questionInput = parseInt(document.getElementById('questionCountInput').value);
+  totalQuestions = isNaN(questionInput) || questionInput < 1 ? 5 : questionInput;
 
   score = 0;
   questionCount = 0;
   document.getElementById('result').style.display = 'none';
   document.getElementById('quiz').style.display = 'block';
   document.getElementById('feedback').textContent = '';
+  document.getElementById('scaleDisplay').style.display = 'none';
+  document.getElementById('toggleChartBtn').style.display = 'none';
+
   nextQuestion();
 }
 
@@ -143,19 +163,11 @@ function nextQuestion() {
   choicesContainer.innerHTML = '';
   document.getElementById('feedback').textContent = '';
 
-  // Ensure correctNote is in the answer options
   let options = [...degrees];
   shuffleArray(options);
-
-  if (!options.includes(correctNote)) {
-    options[0] = correctNote;
-  }
-
+  if (!options.includes(correctNote)) options[0] = correctNote;
   options = shuffleArray(options).slice(0, 4);
-
-  if (!options.includes(correctNote)) {
-    options[Math.floor(Math.random() * 4)] = correctNote;
-  }
+  if (!options.includes(correctNote)) options[Math.floor(Math.random() * 4)] = correctNote;
 
   options.forEach(option => {
     const btn = document.createElement('button');
@@ -248,6 +260,54 @@ function endQuiz() {
   document.getElementById('score').textContent = `${score} / ${totalQuestions}`;
 }
 
+function updateScaleDisplay() {
+  clearInterval(timer);
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('toggleChartBtn').style.display = 'inline-block';
+
+  const key = document.getElementById('key').value;
+  const scale = noteMap[key];
+  const container = document.getElementById('scaleDisplay');
+  container.style.display = 'inline-block';
+
+  if (!scale) {
+    container.innerHTML = '';
+    return;
+  }
+
+  let html = `
+    <div style="
+      background: white;
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      font-size: 1rem;
+      max-width: 300px;
+      margin: auto;
+    ">
+      <h3 style="margin-top: 0;">Key of ${key}</h3>
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr><th style="text-align: left;">Degree</th><th style="text-align: left;">Note</th></tr>`;
+  scale.forEach((note, i) => {
+    html += `<tr><td>${i + 1}</td><td>${note}</td></tr>`;
+  });
+  html += `</table></div>`;
+  container.innerHTML = html;
+}
+
+function toggleChart() {
+  const card = document.getElementById('scaleDisplay');
+  const btn = document.getElementById('toggleChartBtn');
+  if (card.style.display === 'none') {
+    card.style.display = 'inline-block';
+    btn.textContent = 'Hide Scale Chart';
+  } else {
+    card.style.display = 'none';
+    btn.textContent = 'Show Scale Chart';
+  }
+}
+
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -255,6 +315,8 @@ function shuffleArray(array) {
   }
   return array;
 }
+
+updateScaleDisplay();
 </script>
 
 </body>
