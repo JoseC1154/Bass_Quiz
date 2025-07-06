@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bass Number System Quiz</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background: #f0f0f0;
+      padding: 2rem;
+    }
+    select, input, button {
+      padding: 0.5rem;
+      font-size: 1rem;
+      margin: 0.5rem;
+    }
+    #quiz, #result {
+      margin-top: 2rem;
+      display: none;
+    }
+    .choice {
+      display: block;
+      margin: 0.5rem auto;
+      padding: 0.75rem;
+      width: 200px;
+      background: #ddd;
+      border: none;
+      cursor: pointer;
+    }
+    .correct {
+      background-color: #90ee90 !important;
+    }
+    .disabled {
+      background-color: #bbb;
+      cursor: not-allowed;
+    }
+    #timer {
+      font-weight: bold;
+      font-size: 1.5rem;
+    }
+    #feedback {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Bass Number System Quiz</h1>
+
+<div>
+  <label for="key">Select a key:</label>
+  <select id="key">
+    <option value="C">C</option>
+    <option value="D">D</option>
+    <option value="E">E</option>
+    <option value="F">F</option>
+    <option value="G">G</option>
+    <option value="A">A</option>
+    <option value="B">B</option>
+    <option value="F#">F#</option>
+    <option value="Ab">Ab</option>
+    <option value="Bb">Bb</option>
+    <option value="Db">Db</option>
+    <option value="Eb">Eb</option>
+  </select>
+</div>
+
+<div>
+  <label for="secondsInput">Seconds per question:</label>
+  <input type="number" id="secondsInput" min="1" value="10" style="width: 60px;">
+</div>
+
+<button onclick="startQuiz()">Start Quiz</button>
+
+<div id="quiz">
+  <p id="question"></p>
+  <p>⏱️ Time left: <span id="timer">10</span> seconds</p>
+  <button onclick="showAnswer()" id="showAnswerBtn">Show Answer</button>
+  <div id="choices"></div>
+  <p id="feedback"></p>
+</div>
+
+<div id="result">
+  <h2>Quiz Complete!</h2>
+  <p>Your Score: <span id="score"></span></p>
+  <button onclick="startQuiz()">Play Again</button>
+</div>
+
+<script>
+const noteMap = {
+  'C':  ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
+  'D':  ['D', 'E', 'F#', 'G', 'A', 'B', 'Db'],
+  'E':  ['E', 'F#', 'Ab', 'A', 'B', 'Db', 'Eb'],
+  'F':  ['F', 'G', 'A', 'Bb', 'C', 'D', 'E'],
+  'G':  ['G', 'A', 'B', 'C', 'D', 'E', 'F#'],
+  'A':  ['A', 'B', 'Db', 'D', 'E', 'F#', 'Ab'],
+  'B':  ['B', 'Db', 'Eb', 'E', 'F#', 'Ab', 'Bb'],
+  'F#': ['F#', 'Ab', 'Bb', 'B', 'Db', 'Eb', 'F'],
+  'Ab': ['Ab', 'Bb', 'C', 'Db', 'Eb', 'F', 'G'],
+  'Bb': ['Bb', 'C', 'D', 'Eb', 'F', 'G', 'A'],
+  'Db': ['Db', 'Eb', 'F', 'F#', 'Ab', 'Bb', 'C'],
+  'Eb': ['Eb', 'F', 'G', 'Ab', 'Bb', 'C', 'D'],
+};
+
+let score = 0;
+let questionCount = 0;
+let correctNote = '';
+let timer;
+let timeLeft = 10;
+let secondsPerQuestion = 10;
+const totalQuestions = 5;
+
+function startQuiz() {
+  const inputVal = parseInt(document.getElementById('secondsInput').value);
+  secondsPerQuestion = isNaN(inputVal) || inputVal < 1 ? 10 : inputVal;
+
+  score = 0;
+  questionCount = 0;
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  document.getElementById('feedback').textContent = '';
+  nextQuestion();
+}
+
+function nextQuestion() {
+  if (questionCount >= totalQuestions) {
+    endQuiz();
+    return;
+  }
+
+  const key = document.getElementById('key').value;
+  const degrees = noteMap[key];
+  const correctIndex = Math.floor(Math.random() * 7);
+  correctNote = degrees[correctIndex];
+  const questionText = `What is the ${correctIndex + 1} in the key of ${key}?`;
+
+  document.getElementById('question').textContent = questionText;
+
+  const choicesContainer = document.getElementById('choices');
+  choicesContainer.innerHTML = '';
+  document.getElementById('feedback').textContent = '';
+
+  // Ensure correctNote is in the answer options
+  let options = [...degrees];
+  shuffleArray(options);
+
+  if (!options.includes(correctNote)) {
+    options[0] = correctNote;
+  }
+
+  options = shuffleArray(options).slice(0, 4);
+
+  if (!options.includes(correctNote)) {
+    options[Math.floor(Math.random() * 4)] = correctNote;
+  }
+
+  options.forEach(option => {
+    const btn = document.createElement('button');
+    btn.textContent = option;
+    btn.className = 'choice';
+    btn.onclick = () => handleAnswer(option === correctNote, btn);
+    choicesContainer.appendChild(btn);
+  });
+
+  timeLeft = secondsPerQuestion;
+  document.getElementById('timer').textContent = timeLeft;
+  clearInterval(timer);
+  timer = setInterval(() => {
+    timeLeft--;
+    document.getElementById('timer').textContent = timeLeft;
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      showAnswer(true);
+    }
+  }, 1000);
+
+  document.getElementById('showAnswerBtn').disabled = false;
+  questionCount++;
+}
+
+function handleAnswer(correct, btn) {
+  clearInterval(timer);
+  const feedback = document.getElementById('feedback');
+
+  if (correct) {
+    score++;
+    btn.classList.add('correct');
+    feedback.textContent = "✅ Correct!";
+    feedback.style.color = "green";
+  } else {
+    feedback.textContent = "❌ Incorrect";
+    feedback.style.color = "red";
+  }
+
+  disableChoices();
+  setTimeout(() => {
+    feedback.textContent = "";
+    nextQuestion();
+  }, 1000);
+}
+
+function showAnswer(wasTimeout = false) {
+  clearInterval(timer);
+  const feedback = document.getElementById('feedback');
+  const buttons = document.querySelectorAll('.choice');
+  let found = false;
+
+  buttons.forEach(btn => {
+    if (btn.textContent.trim() === correctNote.trim()) {
+      btn.classList.add('correct');
+      found = true;
+    } else {
+      btn.disabled = true;
+      btn.classList.add('disabled');
+    }
+  });
+
+  if (!found) {
+    feedback.textContent = `⚠️ Correct note (${correctNote}) not found.`;
+    feedback.style.color = "orange";
+  } else {
+    feedback.textContent = "⏳ Showing answer...";
+    feedback.style.color = "black";
+  }
+
+  document.getElementById('showAnswerBtn').disabled = true;
+
+  setTimeout(() => {
+    feedback.textContent = "";
+    if (!wasTimeout) nextQuestion();
+  }, 1500);
+}
+
+function disableChoices() {
+  const buttons = document.querySelectorAll('.choice');
+  buttons.forEach(btn => {
+    btn.disabled = true;
+    btn.classList.add('disabled');
+  });
+}
+
+function endQuiz() {
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('result').style.display = 'block';
+  document.getElementById('score').textContent = `${score} / ${totalQuestions}`;
+}
+
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+</script>
+
+</body>
+</html>
