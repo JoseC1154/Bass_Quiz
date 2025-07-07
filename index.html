@@ -52,6 +52,15 @@
 <h1>Scale Driller</h1>
 
 <div>
+  <label for="level">Select quiz level:</label>
+  <select id="level" onchange="updateLevel()">
+    <option value="easy">Easy</option>
+    <option value="intermediate">Intermediate</option>
+    <option value="hard">Hard</option>
+  </select>
+</div>
+
+<div id="keyContainer">
   <label for="key">Select a key:</label>
   <select id="key">
     <option value="C">C</option>
@@ -124,8 +133,24 @@ let timer;
 let timeLeft = 10;
 let secondsPerQuestion = 10;
 let totalQuestions = 5;
+let quizLevel = 'easy';
 
 document.getElementById('key').addEventListener('change', updateScaleDisplay);
+
+document.getElementById('level').addEventListener('change', updateLevel);
+
+function updateLevel() {
+  quizLevel = document.getElementById('level').value;
+  const keyContainer = document.getElementById('keyContainer');
+  if (quizLevel === 'easy') {
+    keyContainer.style.display = 'block';
+    updateScaleDisplay();
+  } else {
+    keyContainer.style.display = 'none';
+    document.getElementById('scaleDisplay').style.display = 'none';
+    document.getElementById('toggleChartBtn').style.display = 'none';
+  }
+}
 
 function startQuiz() {
   const inputVal = parseInt(document.getElementById('secondsInput').value);
