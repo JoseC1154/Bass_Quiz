@@ -186,6 +186,8 @@ function startQuiz() {
   questionCount = 0;
   document.getElementById('result').style.display = 'none';
   document.getElementById('quiz').style.display = 'block';
+  document.getElementById('quizOverlay').style.display = 'block';
+  document.getElementById('setupContainer').style.display = 'none';
   document.getElementById('feedback').textContent = '';
   document.getElementById('scaleDisplay').style.display = 'none';
   document.getElementById('toggleChartBtn').style.display = 'none';
@@ -297,7 +299,12 @@ function endQuiz() {
   document.getElementById('result').style.display = 'block';
   document.getElementById('score').textContent = `${score} / ${totalQuestions}`;
 }
-
+function closeQuiz() {
+  clearInterval(timer);
+  document.getElementById('quizOverlay').style.display = 'none';
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('setupContainer').style.display = 'block';
+}
 function toggleChart() {
   const chart = document.getElementById('scaleDisplay');
   const btn = document.getElementById('toggleChartBtn');
