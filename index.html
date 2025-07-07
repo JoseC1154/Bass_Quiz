@@ -134,9 +134,9 @@ let timeLeft = 10;
 let secondsPerQuestion = 10;
 let totalQuestions = 5;
 let quizLevel = 'easy';
+let currentKey = 'C';
 
 document.getElementById('key').addEventListener('change', updateScaleDisplay);
-
 document.getElementById('level').addEventListener('change', updateLevel);
 
 function updateLevel() {
@@ -176,11 +176,17 @@ function nextQuestion() {
     return;
   }
 
-  const key = document.getElementById('key').value;
-  const degrees = noteMap[key];
+  if (quizLevel === 'easy') {
+    currentKey = document.getElementById('key').value;
+  } else {
+    const keys = Object.keys(noteMap);
+    currentKey = keys[Math.floor(Math.random() * keys.length)];
+  }
+
+  const degrees = noteMap[currentKey];
   const correctIndex = Math.floor(Math.random() * 7);
   correctNote = degrees[correctIndex];
-  const questionText = `What is the ${correctIndex + 1} in the key of ${key}?`;
+  const questionText = `What is the ${correctIndex + 1} in the key of ${currentKey}?`;
 
   document.getElementById('question').textContent = questionText;
 
@@ -218,65 +224,24 @@ function nextQuestion() {
   questionCount++;
 }
 
-function handleAnswer(correct, btn) {
+function showAnswer(timeout = false) {
   clearInterval(timer);
-  const feedback = document.getElementById('feedback');
-
-  if (correct) {
-    score++;
-    btn.classList.add('correct');
-    feedback.textContent = "✅ Correct!";
-    feedback.style.color = "green";
-  } else {
-    feedback.textContent = "❌ Incorrect";
-    feedback.style.color = "red";
-  }
-
-  disableChoices();
-  setTimeout(() => {
-    feedback.textContent = "";
-    nextQuestion();
-  }, 1000);
-}
-
-function showAnswer(wasTimeout = false) {
-  clearInterval(timer);
-  const feedback = document.getElementById('feedback');
   const buttons = document.querySelectorAll('.choice');
-  let found = false;
-
   buttons.forEach(btn => {
-    if (btn.textContent.trim() === correctNote.trim()) {
+    if (btn.textContent === correctNote) {
       btn.classList.add('correct');
-      found = true;
     } else {
-      btn.disabled = true;
       btn.classList.add('disabled');
     }
+    btn.disabled = true;
   });
-
-  if (!found) {
-    feedback.textContent = `⚠️ Correct note (${correctNote}) not found.`;
-    feedback.style.color = "orange";
-  } else {
-    feedback.textContent = "⏳ Showing answer...";
-    feedback.style.color = "black";
-  }
 
   document.getElementById('showAnswerBtn').disabled = true;
+  document.getElementById('feedback').textContent = timeout ? '⏰ Time\'s up!' : '✅ Answer shown';
 
-  setTimeout(() => {
-    feedback.textContent = "";
-    if (!wasTimeout) nextQuestion();
-  }, 1500);
-}
+  if (!timeout) score++;
 
-function disableChoices() {
-  const buttons = document.querySelectorAll('.choice');
-  buttons.forEach(btn => {
-    btn.disabled = true;
-    btn.classList.add('disabled');
-  });
+  setTimeout(() => nextQuestion(), 1000);
 }
 
 function endQuiz() {
@@ -285,15 +250,19 @@ function endQuiz() {
   document.getElementById('score').textContent = `${score} / ${totalQuestions}`;
 }
 
-function updateScaleDisplay() {
-  clearInterval(timer);
-  document.getElementById('quiz').style.display = 'none';
-  document.getElementById('result').style.display = 'none';
-  document.getElementById('toggleChartBtn').style.display = 'inline-block';
+function toggleChart() {
+  const chart = document.getElementById('scaleDisplay');
+  const btn = document.getElementById('toggleChartBtn');
+  const visible = chart.style.display !== 'none';
+  chart.style.display = visible ? 'none' : 'inline-block';
+  btn.textContent = visible ? 'Show Scale Chart' : 'Hide Scale Chart';
+}
 
+function updateScaleDisplay() {
   const key = document.getElementById('key').value;
   const scale = noteMap[key];
   const container = document.getElementById('scaleDisplay');
+
   container.style.display = 'inline-block';
 
   if (!scale) {
@@ -301,36 +270,15 @@ function updateScaleDisplay() {
     return;
   }
 
-  let html = `
-    <div style="
-      background: white;
-      border-radius: 12px;
-      padding: 1rem 1.5rem;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      font-size: 1rem;
-      max-width: 300px;
-      margin: auto;
-    ">
-      <h3 style="margin-top: 0;">Key of ${key}</h3>
-      <table style="width: 100%; border-collapse: collapse;">
-        <tr><th style="text-align: left;">Degree</th><th style="text-align: left;">Note</th></tr>`;
+  let html = `<div style="background: white; border-radius: 12px; padding: 1rem 1.5rem; box-shadow: 0 4px 8px rgba(0,0,0,0.1); font-size: 1rem; max-width: 300px; margin: auto;">
+    <h3 style="margin-top: 0;">Key of ${key}</h3>
+    <table style="width: 100%; border-collapse: collapse;">
+      <tr><th style="text-align: left;">Degree</th><th style="text-align: left;">Note</th></tr>`;
   scale.forEach((note, i) => {
     html += `<tr><td>${i + 1}</td><td>${note}</td></tr>`;
   });
   html += `</table></div>`;
   container.innerHTML = html;
-}
-
-function toggleChart() {
-  const card = document.getElementById('scaleDisplay');
-  const btn = document.getElementById('toggleChartBtn');
-  if (card.style.display === 'none') {
-    card.style.display = 'inline-block';
-    btn.textContent = 'Hide Scale Chart';
-  } else {
-    card.style.display = 'none';
-    btn.textContent = 'Show Scale Chart';
-  }
 }
 
 function shuffleArray(array) {
@@ -340,8 +288,6 @@ function shuffleArray(array) {
   }
   return array;
 }
-
-updateScaleDisplay();
 </script>
 
 </body>
