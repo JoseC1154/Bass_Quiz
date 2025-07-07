@@ -244,6 +244,31 @@ function showAnswer(timeout = false) {
   setTimeout(() => nextQuestion(), 1000);
 }
 
+function handleAnswer(isCorrect, button) {
+  clearInterval(timer);
+  const buttons = document.querySelectorAll('.choice');
+  buttons.forEach(btn => {
+    if (btn.textContent === correctNote) {
+      btn.classList.add('correct');
+    } else {
+      btn.classList.add('disabled');
+    }
+    btn.disabled = true;
+  });
+
+  button.classList.add(isCorrect ? 'correct' : 'disabled');
+  document.getElementById('showAnswerBtn').disabled = true;
+
+  if (isCorrect) {
+    document.getElementById('feedback').textContent = '✅ Correct!';
+    score++;
+  } else {
+    document.getElementById('feedback').textContent = '❌ Incorrect.';
+  }
+
+  setTimeout(() => nextQuestion(), 1000);
+}
+
 function endQuiz() {
   document.getElementById('quiz').style.display = 'none';
   document.getElementById('result').style.display = 'block';
