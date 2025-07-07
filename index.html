@@ -27,12 +27,22 @@
       min-height: 100vh;
       padding: 1rem;
     }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      width: 80%;
+      max-width: 300px;
+      margin: 0.5rem 0;
+    }
+    label {
+      font-size: 1rem;
+      margin-bottom: 0.25rem;
+    }
     select, input, button {
       padding: 0.75rem;
       font-size: 1rem;
-      margin: 0.5rem;
-      width: 80%;
-      max-width: 300px;
+      width: 100%;
     }
     .choice {
       display: block;
@@ -70,16 +80,17 @@
       background-color: white;
       z-index: 9999;
       box-sizing: border-box;
-      padding: 2rem 1rem 1rem;
+      padding: 3rem 1rem 1rem;
     }
     #closeQuizBtn {
-      position: absolute;
+      position: fixed;
       top: 10px;
       left: 10px;
       font-size: 2rem;
       background: none;
       border: none;
       cursor: pointer;
+      z-index: 10000;
     }
   </style>
 </head>
@@ -88,7 +99,7 @@
 <h1>Scale Driller</h1>
 
 <div id="setupContainer">
-  <div>
+  <div class="input-group">
     <label for="level">Select quiz level:</label>
     <select id="level" onchange="updateLevel()">
       <option value="easy">Easy</option>
@@ -97,7 +108,7 @@
     </select>
   </div>
 
-  <div id="keyContainer">
+  <div id="keyContainer" class="input-group">
     <label for="key">Select a key:</label>
     <select id="key">
       <option value="C">C</option>
@@ -115,12 +126,12 @@
     </select>
   </div>
 
-  <div>
+  <div class="input-group">
     <label for="secondsInput">Seconds per question:</label>
     <input type="number" id="secondsInput" min="1" value="10">
   </div>
 
-  <div>
+  <div class="input-group">
     <label for="questionCountInput">Number of questions:</label>
     <input type="number" id="questionCountInput" min="1" value="5">
   </div>
@@ -128,10 +139,10 @@
   <button onclick="startQuiz()">Start Quiz</button>
 
   <div>
-    <button onclick="toggleChart()" id="toggleChartBtn">Hide Scale Chart</button>
+    <button onclick="toggleChart()" id="toggleChartBtn">Show Scale Chart</button>
   </div>
 
-  <div id="scaleDisplay" style="margin-top: 1rem; text-align: left; max-width: 300px;"></div>
+  <div id="scaleDisplay" style="margin-top: 1rem; text-align: left; max-width: 300px; display: none;"></div>
 </div>
 
 <div id="quizOverlay">
@@ -152,9 +163,13 @@
 </div>
 
 <script>
-// Ensure the chart toggle button is visible on load
+// Ensure the chart toggle button is visible and syncs with chart state
 window.onload = () => {
-  document.getElementById('toggleChartBtn').style.display = 'inline-block';
+  const chart = document.getElementById('scaleDisplay');
+  const btn = document.getElementById('toggleChartBtn');
+  chart.style.display = 'none';
+  btn.textContent = 'Show Scale Chart';
+  btn.style.display = 'inline-block';
 };
 
 const noteMap = {
