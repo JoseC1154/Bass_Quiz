@@ -10,15 +10,33 @@
       text-align: center;
       background: #f0f0f0;
       padding: 2rem;
+      margin: 0;
     }
     select, input, button {
       padding: 0.5rem;
       font-size: 1rem;
       margin: 0.5rem;
     }
-    #quiz, #result {
-      margin-top: 2rem;
+    #quizOverlay {
       display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: white;
+      z-index: 9999;
+      padding: 2rem;
+      box-sizing: border-box;
+    }
+    #closeQuizBtn {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 1.5rem;
+      background: none;
+      border: none;
+      cursor: pointer;
     }
     .choice {
       display: block;
@@ -51,60 +69,65 @@
 
 <h1>Scale Driller</h1>
 
-<div>
-  <label for="level">Select quiz level:</label>
-  <select id="level" onchange="updateLevel()">
-    <option value="easy">Easy</option>
-    <option value="intermediate">Intermediate</option>
-    <option value="hard">Hard</option>
-  </select>
+<div id="setupContainer">
+  <div>
+    <label for="level">Select quiz level:</label>
+    <select id="level" onchange="updateLevel()">
+      <option value="easy">Easy</option>
+      <option value="intermediate">Intermediate</option>
+      <option value="hard">Hard</option>
+    </select>
+  </div>
+
+  <div id="keyContainer">
+    <label for="key">Select a key:</label>
+    <select id="key">
+      <option value="C">C</option>
+      <option value="D">D</option>
+      <option value="E">E</option>
+      <option value="F">F</option>
+      <option value="G">G</option>
+      <option value="A">A</option>
+      <option value="B">B</option>
+      <option value="F#">F#</option>
+      <option value="Ab">Ab</option>
+      <option value="Bb">Bb</option>
+      <option value="Db">Db</option>
+      <option value="Eb">Eb</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="secondsInput">Seconds per question:</label>
+    <input type="number" id="secondsInput" min="1" value="10" style="width: 60px;">
+  </div>
+
+  <div>
+    <label for="questionCountInput">Number of questions:</label>
+    <input type="number" id="questionCountInput" min="1" value="5" style="width: 60px;">
+  </div>
+
+  <button onclick="startQuiz()">Start Quiz</button>
+
+  <div>
+    <button onclick="toggleChart()" id="toggleChartBtn">Hide Scale Chart</button>
+  </div>
+
+  <div id="scaleDisplay" style="margin-top: 1rem; display: inline-block; text-align: left;"></div>
 </div>
 
-<div id="keyContainer">
-  <label for="key">Select a key:</label>
-  <select id="key">
-    <option value="C">C</option>
-    <option value="D">D</option>
-    <option value="E">E</option>
-    <option value="F">F</option>
-    <option value="G">G</option>
-    <option value="A">A</option>
-    <option value="B">B</option>
-    <option value="F#">F#</option>
-    <option value="Ab">Ab</option>
-    <option value="Bb">Bb</option>
-    <option value="Db">Db</option>
-    <option value="Eb">Eb</option>
-  </select>
+<div id="quizOverlay">
+  <button id="closeQuizBtn" onclick="closeQuiz()">&times;</button>
+  <div id="quiz">
+    <p id="question"></p>
+    <p>⏱️ Time left: <span id="timer">10</span> seconds</p>
+    <button onclick="showAnswer()" id="showAnswerBtn">Show Answer</button>
+    <div id="choices"></div>
+    <p id="feedback"></p>
+  </div>
 </div>
 
-<div>
-  <label for="secondsInput">Seconds per question:</label>
-  <input type="number" id="secondsInput" min="1" value="10" style="width: 60px;">
-</div>
-
-<div>
-  <label for="questionCountInput">Number of questions:</label>
-  <input type="number" id="questionCountInput" min="1" value="5" style="width: 60px;">
-</div>
-
-<button onclick="startQuiz()">Start Quiz</button>
-
-<div>
-  <button onclick="toggleChart()" id="toggleChartBtn">Hide Scale Chart</button>
-</div>
-
-<div id="scaleDisplay" style="margin-top: 1rem; display: inline-block; text-align: left;"></div>
-
-<div id="quiz">
-  <p id="question"></p>
-  <p>⏱️ Time left: <span id="timer">10</span> seconds</p>
-  <button onclick="showAnswer()" id="showAnswerBtn">Show Answer</button>
-  <div id="choices"></div>
-  <p id="feedback"></p>
-</div>
-
-<div id="result">
+<div id="result" style="display: none;">
   <h2>Quiz Complete!</h2>
   <p>Your Score: <span id="score"></span></p>
   <button onclick="startQuiz()">Play Again</button>
