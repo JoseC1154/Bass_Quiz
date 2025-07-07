@@ -2,47 +2,41 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Scale Driller</title>
   <meta name="description" content="Scale Driller – A number system quiz for bass players to practice scale degrees by key.">
   <style>
-    body {
+    html, body {
       font-family: sans-serif;
       text-align: center;
       background: #f0f0f0;
-      padding: 2rem;
       margin: 0;
-    }
-    select, input, button {
-      padding: 0.5rem;
-      font-size: 1rem;
-      margin: 0.5rem;
-    }
-    #quizOverlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: white;
-      z-index: 9999;
-      padding: 2rem;
+      padding: 0;
+      height: 100%;
+      width: 100%;
       box-sizing: border-box;
     }
-    #closeQuizBtn {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      font-size: 1.5rem;
-      background: none;
-      border: none;
-      cursor: pointer;
+    #setupContainer, #quizOverlay {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      padding: 1rem;
+    }
+    select, input, button {
+      padding: 0.75rem;
+      font-size: 1rem;
+      margin: 0.5rem;
+      width: 80%;
+      max-width: 300px;
     }
     .choice {
       display: block;
       margin: 0.5rem auto;
       padding: 0.75rem;
-      width: 200px;
+      width: 80%;
+      max-width: 300px;
       background: #ddd;
       border: none;
       cursor: pointer;
@@ -62,6 +56,26 @@
       font-size: 1.2rem;
       font-weight: bold;
       margin-top: 1rem;
+    }
+    #quizOverlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: white;
+      z-index: 9999;
+      box-sizing: border-box;
+    }
+    #closeQuizBtn {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 2rem;
+      background: none;
+      border: none;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -99,12 +113,12 @@
 
   <div>
     <label for="secondsInput">Seconds per question:</label>
-    <input type="number" id="secondsInput" min="1" value="10" style="width: 60px;">
+    <input type="number" id="secondsInput" min="1" value="10">
   </div>
 
   <div>
     <label for="questionCountInput">Number of questions:</label>
-    <input type="number" id="questionCountInput" min="1" value="5" style="width: 60px;">
+    <input type="number" id="questionCountInput" min="1" value="5">
   </div>
 
   <button onclick="startQuiz()">Start Quiz</button>
@@ -113,7 +127,7 @@
     <button onclick="toggleChart()" id="toggleChartBtn">Hide Scale Chart</button>
   </div>
 
-  <div id="scaleDisplay" style="margin-top: 1rem; display: inline-block; text-align: left;"></div>
+  <div id="scaleDisplay" style="margin-top: 1rem; text-align: left; max-width: 300px;"></div>
 </div>
 
 <div id="quizOverlay">
