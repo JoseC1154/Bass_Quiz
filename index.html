@@ -8,7 +8,6 @@
   <style>
     html, body {
       font-family: sans-serif;
-      text-align: center;
       background: #f0f0f0;
       margin: 0;
       padding: 0;
@@ -16,12 +15,16 @@
       width: 100%;
       box-sizing: border-box;
     }
+    h1 {
+      text-align: center;
+      margin: 1rem 0 0.5rem;
+    }
     #setupContainer, #quizOverlay {
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      height: 100vh;
+      justify-content: flex-start;
+      min-height: 100vh;
       padding: 1rem;
     }
     select, input, button {
@@ -67,6 +70,7 @@
       background-color: white;
       z-index: 9999;
       box-sizing: border-box;
+      padding: 2rem 1rem 1rem;
     }
     #closeQuizBtn {
       position: absolute;
@@ -148,6 +152,11 @@
 </div>
 
 <script>
+// Ensure the chart toggle button is visible on load
+window.onload = () => {
+  document.getElementById('toggleChartBtn').style.display = 'inline-block';
+};
+
 const noteMap = {
   'C':  ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
   'D':  ['D', 'E', 'F#', 'G', 'A', 'B', 'Db'],
