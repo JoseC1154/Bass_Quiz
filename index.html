@@ -57,8 +57,10 @@
 
     <!-- Quiz Card -->
     <section id="quiz-card" class="card hidden">
-      <button id="close-quiz" style="position: absolute; top: 16px; left: 16px;">x</button>
-      <button id="help-btn" style="position: absolute; top: 16px; right: 16px;">?</button>
+      <div id="quiz-header">
+        <button id="close-quiz" style="background: transparent; color: #333; font-size: 24px; border: none; cursor: pointer;">x</button>
+        <button id="help-btn" style="background: transparent; color: yellow; font-size: 30px; border: none; cursor: pointer;">?</button>
+      </div>
       <div id="quiz-question"></div>
       <div id="answer-buttons"></div>
       <div id="feedback" class="feedback"></div>
