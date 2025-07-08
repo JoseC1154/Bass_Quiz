@@ -23,7 +23,7 @@ main {
   background-color: rgba(255, 255, 255, 0.6);
   border-radius: 16px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  padding: 24px;
+  padding: 24px 8%;
   margin-bottom: 20px;
   display: flex;
   flex-direction: column;
@@ -32,16 +32,52 @@ main {
   text-align: center;
 }
 
-label {
-  font-weight: bold;
-  margin-top: 10px;
-  text-align: left;
-  align-self: flex-start;
+.setting-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
 }
 
-select,
-input[type="number"] {
+.setting-group label {
+  font-weight: bold;
   width: 100%;
+  margin-top: 10px;
+  text-align: left;
+}
+
+.setting-group select,
+.setting-group input[type="number"] {
+  width: 90%;
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+#results-card .setting-group,
+#quiz-card .setting-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+#results-card .setting-group label,
+#quiz-card .setting-group label {
+  font-weight: bold;
+  width: 100%;
+  text-align: left;
+  margin-top: 10px;
+}
+
+#results-card .setting-group select,
+#results-card .setting-group input,
+#quiz-card .setting-group select,
+#quiz-card .setting-group input {
+  width: 90%;
   padding: 8px;
   font-size: 16px;
   border: 1px solid #ccc;
@@ -58,6 +94,7 @@ button {
   cursor: pointer;
   transition: background-color 0.3s ease;
   text-align: center;
+  width: 90%;
 }
 
 button:hover {
@@ -83,11 +120,12 @@ button:hover {
 
 #close-quiz {
   position: absolute;
+  width: 10%;
   top: 12px;
   left: 12px;
   background: transparent;
-  color: #333;
-  font-size: 24px;
+  color: red;
+  font-size: 30px;
   border: none;
   cursor: pointer;
   transition: transform 0.2s ease, color 0.2s ease;
@@ -95,6 +133,25 @@ button:hover {
 
 #close-quiz:hover {
   color: red;
+  transform: scale(1.2);
+}
+
+#help-btn {
+  position: absolute;
+  width: 10%;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  color: yellow;
+  font-size: 30px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+#help-btn:hover {
+  background: transparent;
+  color: yellow;
   transform: scale(1.2);
 }
 
