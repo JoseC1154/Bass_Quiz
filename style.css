@@ -1,118 +1,144 @@
-html, body {
-  font-family: sans-serif;
-  background: #f0f0f0;
+/* style.css */
+
+body {
   margin: 0;
   padding: 0;
-  height: 100%;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.centered-wrapper {
+  font-family: Arial, sans-serif;
+  background: url('background.png') no-repeat center center fixed;
+  background-size: cover;
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
   min-height: 100vh;
-  padding: 2rem 1rem;
+}
+
+main {
+  width: 100%;
+  max-width: 500px;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .card {
-  background: white;
+  background-color: rgba(255, 255, 255, 0.6);
   border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 2rem;
-  width: 100%;
-  max-width: 400px;
-  position: relative;
-}
-
-h1, h2 {
-  text-align: center;
-  margin-top: 0;
-}
-
-.input-group {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  padding: 24px;
+  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
-  width: 100%;
-  margin: 0.5rem 0;
+  gap: 12px;
+  align-items: center;
+  text-align: center;
 }
 
 label {
-  font-size: 1rem;
-  margin-bottom: 0.25rem;
+  font-weight: bold;
+  margin-top: 10px;
+  text-align: left;
+  align-self: flex-start;
 }
 
-select, input, button {
-  padding: 0.75rem;
-  font-size: 1rem;
+select,
+input[type="number"] {
   width: 100%;
-  box-sizing: border-box;
-  border-radius: 8px;
+  padding: 8px;
+  font-size: 16px;
   border: 1px solid #ccc;
+  border-radius: 8px;
 }
 
-.choice {
-  display: block;
-  margin: 0.5rem auto;
-  padding: 0.75rem;
-  width: 80%;
-  max-width: 300px;
-  background: #ddd;
+button {
+  padding: 10px;
+  font-size: 16px;
   border: none;
   border-radius: 8px;
+  background-color: #4CAF50;
+  color: white;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-align: center;
 }
 
-.correct {
-  background-color: #90ee90 !important;
+button:hover {
+  background-color: #45a049;
 }
 
-.disabled {
-  background-color: #bbb;
-  cursor: not-allowed;
+#toggle-chart {
+  background-color: #2196F3;
 }
 
-#timer {
-  font-weight: bold;
-  font-size: 1.5rem;
+#toggle-chart:hover {
+  background-color: #1976D2;
 }
 
-#feedback {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-top: 1rem;
-}
-
-#quizOverlay {
+.hidden {
   display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(240, 240, 240, 1);
-  z-index: 9999;
-  box-sizing: border-box;
-  overflow-y: auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 2rem;
 }
 
-#quizOverlay .card {
+#quiz-card {
   position: relative;
+  align-items: center;
 }
 
-#closeQuizBtn {
+#close-quiz {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  font-size: 1.5rem;
-  background: none;
+  top: 12px;
+  left: 12px;
+  background: transparent;
+  color: #333;
+  font-size: 24px;
   border: none;
   cursor: pointer;
-  z-index: 10000;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+#close-quiz:hover {
+  color: red;
+  transform: scale(1.2);
+}
+
+#answer-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+#answer-buttons button {
+  width: 100%;
+}
+
+.feedback {
+  margin-top: 16px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+#countdown {
+  font-weight: bold;
+  text-align: center;
+  margin-top: 10px;
+}
+
+#pause-btn {
+  margin-top: 12px;
+  background-color: #f57c00;
+  width: 100%;
+}
+
+#pause-btn:hover {
+  background-color: #ef6c00;
+}
+
+@media (max-width: 600px) {
+  main {
+    padding: 10px;
+  }
+
+  .card {
+    padding: 16px;
+  }
 }
