@@ -2,97 +2,61 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Scale Driller</title>
-  <meta name="description" content="Scale Driller – A number system quiz for bass players to practice scale degrees by key.">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="overlay"></div>
 
-<div class="centered-wrapper">
-  <div class="card" id="setupContainer" style="width: 100%; max-width: 500px; box-sizing: border-box;">
-    <h1>Scale Driller</h1>
+  <main>
+    <!-- Settings Card -->
+    <section id="settings-card" class="card">
+      <h1>Scale Driller</h1>
 
-    <div class="input-group">
-      <label for="level">Select quiz level:</label>
-      <select id="level" onchange="updateLevel()">
+      <label for="level-select">Quiz Level</label>
+      <select id="level-select">
         <option value="easy">Easy</option>
         <option value="intermediate">Intermediate</option>
         <option value="hard">Hard</option>
       </select>
-    </div>
 
-    <div class="input-group">
-      <label for="key">Select a key:</label>
-      <select id="key">
-        <option value="C">C</option>
-        <option value="Db">Db</option>
-        <option value="D">D</option>
-        <option value="Eb">Eb</option>
-        <option value="E">E</option>
-        <option value="F">F</option>
-        <option value="F#">F#</option>
-        <option value="G">G</option>
-        <option value="Ab">Ab</option>
-        <option value="A">A</option>
-        <option value="Bb">Bb</option>
-        <option value="B">B</option>
-      </select>
-    </div>
+      <div id="key-select-container">
+        <label for="key-select">Key</label>
+        <select id="key-select">
+          <!-- JS will populate this -->
+        </select>
+      </div>
 
-    <div class="input-group">
-      <label for="secondsInput">Seconds per question:</label>
-      <input type="number" id="secondsInput" min="1" value="10">
-    </div>
+      <label for="time-limit">Seconds per Question</label>
+      <input type="number" id="time-limit" min="1" max="60" value="10" />
 
-    <div class="input-group">
-      <label for="questionCountInput">Number of questions:</label>
-      <input type="number" id="questionCountInput" min="1" value="5">
-    </div>
+      <label for="question-count">Number of Questions</label>
+      <input type="number" id="question-count" min="1" max="50" value="10" />
 
-    <div class="input-group">
-      <button onclick="startQuiz()">Start Quiz</button>
-    </div>
+      <button id="start-btn">Start Quiz</button>
+      <button id="toggle-chart">Show Scale Chart</button>
 
-    <div class="input-group">
-      <button onclick="toggleChart()" id="toggleChartBtn">Show Scale Chart</button>
-    </div>
+      <!-- Chart Section -->
+      <div id="scale-chart" class="card hidden"></div>
+    </section>
 
-    <div id="scaleDisplay" style="margin-top: 1rem; text-align: left; max-width: 300px; display: none;"></div>
-  </div>
-</div>
+    <!-- Quiz Card -->
+    <section id="quiz-card" class="card hidden">
+      <button id="close-quiz">❌</button>
+      <div id="quiz-question"></div>
+      <div id="answer-buttons"></div>
+      <div id="feedback" class="feedback"></div>
+    </section>
 
-<div id="quizOverlay" class="centered-wrapper">
-  <div class="card" style="position: relative; width: 100%; max-width: 500px; box-sizing: border-box;">
-    <button id="closeQuizBtn" onclick="closeQuiz()" style="position: absolute; top: 0.5rem; left: 0.5rem; font-size: 1.5rem; background: none; border: none; cursor: pointer; width: 2rem; height: 2rem; line-height: 1.5rem; text-align: center; padding: 0;">&times;</button>
-    <div id="quiz">
+    <!-- Results Card -->
+    <section id="results-card" class="card hidden">
+      <h2>Quiz Complete!</h2>
+      <p id="score-summary"></p>
+      <button id="play-again">Play Again</button>
+    </section>
+  </main>
 
-      <p id="question"></p>
-      <p>⏱️ Time left: <span id="timer">10</span> seconds</p>
-      <div id="choices"></div>
-
-      <p id="feedback"></p>
-    </div>
-  </div>
-</div>
-
-<div class="centered-wrapper">
-  <div class="card" id="result" style="display: none; width: 100%; max-width: 500px; box-sizing: border-box;">
-    <h2>Quiz Complete!</h2>
-    <p>Your Score: <span id="score"></span></p>
-    <button onclick="startQuiz()">Play Again</button>
-  </div>
-</div>
-
-<script src="script.js"></script>
-<script>
-  document.getElementById("key").addEventListener("change", () => {
-    const chart = document.getElementById("scaleDisplay");
-    if (chart.style.display !== "none") {
-      updateScaleChart();
-    }
-  });
-</script>
-
+  <script src="script.js"></script>
 </body>
 </html>
