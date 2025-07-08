@@ -8,21 +8,21 @@ let questionSet = [];
 
 const noteMap = {
   "C":  ["C", "D", "E", "F", "G", "A", "B"],
-  "Db": ["Db", "Eb", "F", "Gb", "Ab", "Bb", "C"],
-  "D":  ["D", "E", "F#", "G", "A", "B", "C#"],
+  "Db": ["Db", "Eb", "F", "F#", "Ab", "Bb", "C"],
+  "D":  ["D", "E", "F#", "G", "A", "B", "Db"],
   "Eb": ["Eb", "F", "G", "Ab", "Bb", "C", "D"],
-  "E":  ["E", "F#", "G#", "A", "B", "C#", "D#"],
+  "E":  ["E", "F#", "Ab", "A", "B", "Db", "Eb"],
   "F":  ["F", "G", "A", "Bb", "C", "D", "E"],
-  "F#": ["F#", "G#", "A#", "B", "C#", "D#", "E#"],
+  "F#": ["F#", "Ab", "Bb", "B", "Db", "Eb", "F"],
   "G":  ["G", "A", "B", "C", "D", "E", "F#"],
   "Ab": ["Ab", "Bb", "C", "Db", "Eb", "F", "G"],
-  "A":  ["A", "B", "C#", "D", "E", "F#", "G#"],
+  "A":  ["A", "B", "Db", "D", "E", "F#", "Ab"],
   "Bb": ["Bb", "C", "D", "Eb", "F", "G", "A"],
-  "B":  ["B", "C#", "D#", "E", "F#", "G#", "A#"]
+  "B":  ["B", "Db", "Eb", "E", "F#", "Ab", "Bb"]
 };
 
 function updateLevel() {
-  // Placeholder for future logic
+  // Reserved for future use
 }
 
 function startQuiz() {
@@ -43,6 +43,7 @@ function startQuiz() {
   document.getElementById("quizOverlay").style.display = "flex";
   document.getElementById("scaleDisplay").style.display = "none";
   document.getElementById("toggleChartBtn").style.display = "none";
+  document.getElementById("result").style.display = "none";
 
   askQuestion();
 }
@@ -62,11 +63,11 @@ function askQuestion() {
 
 function renderChoices() {
   const key = document.getElementById("key").value;
-  const scale = [...noteMap[key]]; // make a copy to shuffle
+  const scale = [...noteMap[key]];
   const container = document.getElementById("choices");
   container.innerHTML = "";
 
-  // Fisher-Yates Shuffle
+  // Shuffle note order
   for (let i = scale.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [scale[i], scale[j]] = [scale[j], scale[i]];
@@ -89,31 +90,24 @@ function checkAnswer(choice) {
     feedback.textContent = "✅ Correct!";
     feedback.style.color = "green";
     disableChoices();
-
-    // Show for 1.5 seconds
     setTimeout(() => {
       feedback.textContent = "";
-      currentQuestion++;
-      if (currentQuestion < totalQuestions) {
-        askQuestion();
-      } else {
-        endQuiz();
-      }
+      nextQuestion();
     }, 1500);
   } else {
     feedback.textContent = `❌ Incorrect. Answer: ${correctNote}`;
     feedback.style.color = "red";
     disableChoices();
+    setTimeout(nextQuestion, 3000);
+  }
+}
 
-    // Show for 3 seconds
-    setTimeout(() => {
-      currentQuestion++;
-      if (currentQuestion < totalQuestions) {
-        askQuestion();
-      } else {
-        endQuiz();
-      }
-    }, 3000);
+function nextQuestion() {
+  currentQuestion++;
+  if (currentQuestion < totalQuestions) {
+    askQuestion();
+  } else {
+    endQuiz();
   }
 }
 
@@ -142,14 +136,7 @@ function startTimer() {
       feedback.textContent = `⏰ Time's up! Answer: ${correctNote}`;
       feedback.style.color = "#a00";
       disableChoices();
-      setTimeout(() => {
-        currentQuestion++;
-        if (currentQuestion < totalQuestions) {
-          askQuestion();
-        } else {
-          endQuiz();
-        }
-      }, 3000);
+      setTimeout(nextQuestion, 3000);
     }
   }, 1000);
 }
