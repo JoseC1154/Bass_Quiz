@@ -58,7 +58,14 @@ function playCorrectSound() {
 }
 
 function playIncorrectSound() {
-  playTone(220);
+  const oscillator = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  oscillator.type = 'sine';
+  oscillator.frequency.setValueAtTime(100, audioCtx.currentTime); // deeper tone
+  oscillator.connect(gain);
+  gain.connect(audioCtx.destination);
+  oscillator.start();
+  oscillator.stop(audioCtx.currentTime + 1.0); // longer duration
 }
 
 function populateKeys() {
@@ -256,6 +263,20 @@ closeQuizBtn.addEventListener('click', () => {
 playAgainBtn.addEventListener('click', () => {
   resultsCard.classList.add('hidden');
   settingsCard.classList.remove('hidden');
+});
+
+// ❓ Help Button Logic
+const helpBtn = document.getElementById('help-btn');
+helpBtn.addEventListener('click', () => {
+  if (isPaused) return;
+  isPaused = true;
+  clearTimeout(timer);
+  clearInterval(countdownInterval);
+  feedback.textContent = `ℹ️ Answer: ${quizData[currentIndex].answer}`;
+  setTimeout(() => {
+    isPaused = false;
+    showQuestion();
+  }, 5000);
 });
 
 // Init
