@@ -1,0 +1,118 @@
+html, body {
+  font-family: sans-serif;
+  background: #f0f0f0;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.centered-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+}
+
+.card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+}
+
+h1, h2 {
+  text-align: center;
+  margin-top: 0;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0.5rem 0;
+}
+
+label {
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+select, input, button {
+  padding: 0.75rem;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.choice {
+  display: block;
+  margin: 0.5rem auto;
+  padding: 0.75rem;
+  width: 80%;
+  max-width: 300px;
+  background: #ddd;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.correct {
+  background-color: #90ee90 !important;
+}
+
+.disabled {
+  background-color: #bbb;
+  cursor: not-allowed;
+}
+
+#timer {
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+#feedback {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-top: 1rem;
+}
+
+#quizOverlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(240, 240, 240, 1);
+  z-index: 9999;
+  box-sizing: border-box;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+#quizOverlay .card {
+  position: relative;
+}
+
+#closeQuizBtn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 10000;
+}
