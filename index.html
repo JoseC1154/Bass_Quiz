@@ -5,382 +5,93 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Scale Driller</title>
   <meta name="description" content="Scale Driller – A number system quiz for bass players to practice scale degrees by key.">
-  <style>
-    html, body {
-      font-family: sans-serif;
-      background: #f0f0f0;
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    h1 {
-      text-align: center;
-      margin: 1rem 0 0.5rem;
-    }
-    #setupContainer, #quizOverlay {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      min-height: 100vh;
-      padding: 1rem;
-    }
-    .input-group {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      width: 80%;
-      max-width: 300px;
-      margin: 0.5rem 0;
-    }
-    label {
-      font-size: 1rem;
-      margin-bottom: 0.25rem;
-    }
-    select, input, button {
-      padding: 0.75rem;
-      font-size: 1rem;
-      width: 100%;
-    }
-    .choice {
-      display: block;
-      margin: 0.5rem auto;
-      padding: 0.75rem;
-      width: 80%;
-      max-width: 300px;
-      background: #ddd;
-      border: none;
-      cursor: pointer;
-    }
-    .correct {
-      background-color: #90ee90 !important;
-    }
-    .disabled {
-      background-color: #bbb;
-      cursor: not-allowed;
-    }
-    #timer {
-      font-weight: bold;
-      font-size: 1.5rem;
-    }
-    #feedback {
-      font-size: 1.2rem;
-      font-weight: bold;
-      margin-top: 1rem;
-    }
-    #quizOverlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: white;
-      z-index: 9999;
-      box-sizing: border-box;
-      padding: 3rem 1rem 1rem;
-    }
-    #closeQuizBtn {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      font-size: 2rem;
-      background: none;
-      border: none;
-      cursor: pointer;
-      z-index: 10000;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>Scale Driller</h1>
+<div class="centered-wrapper">
+  <div class="card" id="setupContainer">
+    <h1>Scale Driller</h1>
 
-<div id="setupContainer">
-  <div class="input-group">
-    <label for="level">Select quiz level:</label>
-    <select id="level" onchange="updateLevel()">
-      <option value="easy">Easy</option>
-      <option value="intermediate">Intermediate</option>
-      <option value="hard">Hard</option>
-    </select>
-  </div>
+    <div class="input-group">
+      <label for="level">Select quiz level:</label>
+      <select id="level" onchange="updateLevel()">
+        <option value="easy">Easy</option>
+        <option value="intermediate">Intermediate</option>
+        <option value="hard">Hard</option>
+      </select>
+    </div>
 
-  <div id="keyContainer" class="input-group">
-    <label for="key">Select a key:</label>
-    <select id="key">
-      <option value="C">C</option>
-      <option value="D">D</option>
-      <option value="E">E</option>
-      <option value="F">F</option>
-      <option value="G">G</option>
-      <option value="A">A</option>
-      <option value="B">B</option>
-      <option value="F#">F#</option>
-      <option value="Ab">Ab</option>
-      <option value="Bb">Bb</option>
-      <option value="Db">Db</option>
-      <option value="Eb">Eb</option>
-    </select>
-  </div>
+    <div class="input-group">
+      <label for="key">Select a key:</label>
+      <select id="key">
+        <option value="C">C</option>
+        <option value="Db">Db</option>
+        <option value="D">D</option>
+        <option value="Eb">Eb</option>
+        <option value="E">E</option>
+        <option value="F">F</option>
+        <option value="F#">F#</option>
+        <option value="G">G</option>
+        <option value="Ab">Ab</option>
+        <option value="A">A</option>
+        <option value="Bb">Bb</option>
+        <option value="B">B</option>
+      </select>
+    </div>
 
-  <div class="input-group">
-    <label for="secondsInput">Seconds per question:</label>
-    <input type="number" id="secondsInput" min="1" value="10">
-  </div>
+    <div class="input-group">
+      <label for="secondsInput">Seconds per question:</label>
+      <input type="number" id="secondsInput" min="1" value="10">
+    </div>
 
-  <div class="input-group">
-    <label for="questionCountInput">Number of questions:</label>
-    <input type="number" id="questionCountInput" min="1" value="5">
-  </div>
+    <div class="input-group">
+      <label for="questionCountInput">Number of questions:</label>
+      <input type="number" id="questionCountInput" min="1" value="5">
+    </div>
 
-  <button onclick="startQuiz()">Start Quiz</button>
+    <div class="input-group">
+      <button onclick="startQuiz()">Start Quiz</button>
+    </div>
 
-  <div>
-    <button onclick="toggleChart()" id="toggleChartBtn">Show Scale Chart</button>
-  </div>
+    <div class="input-group">
+      <button onclick="toggleChart()" id="toggleChartBtn">Show Scale Chart</button>
+    </div>
 
-  <div id="scaleDisplay" style="margin-top: 1rem; text-align: left; max-width: 300px; display: none;"></div>
-</div>
-
-<div id="quizOverlay">
-  <button id="closeQuizBtn" onclick="closeQuiz()">&times;</button>
-  <div id="quiz">
-    <p id="question"></p>
-    <p>⏱️ Time left: <span id="timer">10</span> seconds</p>
-    <button onclick="showAnswer()" id="showAnswerBtn">Show Answer</button>
-    <div id="choices"></div>
-    <p id="feedback"></p>
+    <div id="scaleDisplay" style="margin-top: 1rem; text-align: left; max-width: 300px; display: none;"></div>
   </div>
 </div>
 
-<div id="result" style="display: none;">
-  <h2>Quiz Complete!</h2>
-  <p>Your Score: <span id="score"></span></p>
-  <button onclick="startQuiz()">Play Again</button>
+<div id="quizOverlay" class="centered-wrapper">
+  <div class="card" style="position: relative;">
+    <button id="closeQuizBtn" onclick="closeQuiz()" style="position: absolute; top: 0.5rem; left: 0.5rem; font-size: 1.5rem; background: none; border: none; cursor: pointer; width: 2rem; height: 2rem; line-height: 1.5rem; text-align: center; padding: 0;">&times;</button>
+    <div id="quiz">
+
+      <p id="question"></p>
+      <p>⏱️ Time left: <span id="timer">10</span> seconds</p>
+      <div id="choices"></div>
+
+      <p id="feedback"></p>
+    </div>
+  </div>
 </div>
 
+<div class="centered-wrapper">
+  <div class="card" id="result" style="display: none;">
+    <h2>Quiz Complete!</h2>
+    <p>Your Score: <span id="score"></span></p>
+    <button onclick="startQuiz()">Play Again</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
 <script>
-// Ensure the chart toggle button is visible and syncs with chart state
-window.onload = () => {
-  const chart = document.getElementById('scaleDisplay');
-  const btn = document.getElementById('toggleChartBtn');
-  chart.style.display = 'none';
-  btn.textContent = 'Show Scale Chart';
-  btn.style.display = 'inline-block';
-};
-
-const noteMap = {
-  'C':  ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
-  'D':  ['D', 'E', 'F#', 'G', 'A', 'B', 'Db'],
-  'E':  ['E', 'F#', 'Ab', 'A', 'B', 'Db', 'Eb'],
-  'F':  ['F', 'G', 'A', 'Bb', 'C', 'D', 'E'],
-  'G':  ['G', 'A', 'B', 'C', 'D', 'E', 'F#'],
-  'A':  ['A', 'B', 'Db', 'D', 'E', 'F#', 'Ab'],
-  'B':  ['B', 'Db', 'Eb', 'E', 'F#', 'Ab', 'Bb'],
-  'F#': ['F#', 'Ab', 'Bb', 'B', 'Db', 'Eb', 'F'],
-  'Ab': ['Ab', 'Bb', 'C', 'Db', 'Eb', 'F', 'G'],
-  'Bb': ['Bb', 'C', 'D', 'Eb', 'F', 'G', 'A'],
-  'Db': ['Db', 'Eb', 'F', 'F#', 'Ab', 'Bb', 'C'],
-  'Eb': ['Eb', 'F', 'G', 'Ab', 'Bb', 'C', 'D'],
-};
-
-let score = 0;
-let questionCount = 0;
-let correctNote = '';
-let timer;
-let timeLeft = 10;
-let secondsPerQuestion = 10;
-let totalQuestions = 5;
-let quizLevel = 'easy';
-let currentKey = 'C';
-
-document.getElementById('key').addEventListener('change', updateScaleDisplay);
-document.getElementById('level').addEventListener('change', updateLevel);
-
-function updateLevel() {
-  quizLevel = document.getElementById('level').value;
-  const keyContainer = document.getElementById('keyContainer');
-  if (quizLevel === 'easy') {
-    keyContainer.style.display = 'block';
-    updateScaleDisplay();
-  } else {
-    keyContainer.style.display = 'none';
-    document.getElementById('scaleDisplay').style.display = 'none';
-    document.getElementById('toggleChartBtn').style.display = 'none';
-  }
-}
-
-function startQuiz() {
-  const inputVal = parseInt(document.getElementById('secondsInput').value);
-  secondsPerQuestion = isNaN(inputVal) || inputVal < 1 ? 10 : inputVal;
-
-  const questionInput = parseInt(document.getElementById('questionCountInput').value);
-  totalQuestions = isNaN(questionInput) || questionInput < 1 ? 5 : questionInput;
-
-  score = 0;
-  questionCount = 0;
-  document.getElementById('result').style.display = 'none';
-  document.getElementById('quiz').style.display = 'block';
-  document.getElementById('quizOverlay').style.display = 'block';
-  document.getElementById('setupContainer').style.display = 'none';
-  document.getElementById('feedback').textContent = '';
-  document.getElementById('scaleDisplay').style.display = 'none';
-  document.getElementById('toggleChartBtn').style.display = 'none';
-
-  nextQuestion();
-}
-
-function nextQuestion() {
-  if (questionCount >= totalQuestions) {
-    endQuiz();
-    return;
-  }
-
-  if (quizLevel === 'easy') {
-    currentKey = document.getElementById('key').value;
-  } else {
-    const keys = Object.keys(noteMap);
-    currentKey = keys[Math.floor(Math.random() * keys.length)];
-  }
-
-  const degrees = noteMap[currentKey];
-  const correctIndex = Math.floor(Math.random() * 7);
-  correctNote = degrees[correctIndex];
-  const questionText = `What is the ${correctIndex + 1} in the key of ${currentKey}?`;
-
-  document.getElementById('question').textContent = questionText;
-
-  const choicesContainer = document.getElementById('choices');
-  choicesContainer.innerHTML = '';
-  document.getElementById('feedback').textContent = '';
-
-  let options = [...degrees];
-  shuffleArray(options);
-  if (!options.includes(correctNote)) options[0] = correctNote;
-  options = shuffleArray(options).slice(0, 4);
-  if (!options.includes(correctNote)) options[Math.floor(Math.random() * 4)] = correctNote;
-
-  options.forEach(option => {
-    const btn = document.createElement('button');
-    btn.textContent = option;
-    btn.className = 'choice';
-    btn.onclick = () => handleAnswer(option === correctNote, btn);
-    choicesContainer.appendChild(btn);
-  });
-
-  timeLeft = secondsPerQuestion;
-  document.getElementById('timer').textContent = timeLeft;
-  clearInterval(timer);
-  timer = setInterval(() => {
-    timeLeft--;
-    document.getElementById('timer').textContent = timeLeft;
-    if (timeLeft <= 0) {
-      clearInterval(timer);
-      showAnswer(true);
+  document.getElementById("key").addEventListener("change", () => {
+    const chart = document.getElementById("scaleDisplay");
+    if (chart.style.display !== "none") {
+      updateScaleChart();
     }
-  }, 1000);
-
-  document.getElementById('showAnswerBtn').disabled = false;
-  questionCount++;
-}
-
-function showAnswer(timeout = false) {
-  clearInterval(timer);
-  const buttons = document.querySelectorAll('.choice');
-  buttons.forEach(btn => {
-    if (btn.textContent === correctNote) {
-      btn.classList.add('correct');
-    } else {
-      btn.classList.add('disabled');
-    }
-    btn.disabled = true;
   });
-
-  document.getElementById('showAnswerBtn').disabled = true;
-  document.getElementById('feedback').textContent = timeout ? '⏰ Time\'s up!' : '✅ Answer shown';
-
-  if (!timeout) score++;
-
-  setTimeout(() => nextQuestion(), 1000);
-}
-
-function handleAnswer(isCorrect, button) {
-  clearInterval(timer);
-  const buttons = document.querySelectorAll('.choice');
-  buttons.forEach(btn => {
-    if (btn.textContent === correctNote) {
-      btn.classList.add('correct');
-    } else {
-      btn.classList.add('disabled');
-    }
-    btn.disabled = true;
-  });
-
-  button.classList.add(isCorrect ? 'correct' : 'disabled');
-  document.getElementById('showAnswerBtn').disabled = true;
-
-  if (isCorrect) {
-    document.getElementById('feedback').textContent = '✅ Correct!';
-    score++;
-  } else {
-    document.getElementById('feedback').textContent = '❌ Incorrect.';
-  }
-
-  setTimeout(() => nextQuestion(), 1000);
-}
-
-function endQuiz() {
-  document.getElementById('quiz').style.display = 'none';
-  document.getElementById('result').style.display = 'block';
-  document.getElementById('score').textContent = `${score} / ${totalQuestions}`;
-}
-function closeQuiz() {
-  clearInterval(timer);
-  document.getElementById('quizOverlay').style.display = 'none';
-  document.getElementById('result').style.display = 'none';
-  document.getElementById('setupContainer').style.display = 'block';
-}
-function toggleChart() {
-  const chart = document.getElementById('scaleDisplay');
-  const btn = document.getElementById('toggleChartBtn');
-  const visible = chart.style.display !== 'none';
-  chart.style.display = visible ? 'none' : 'inline-block';
-  btn.textContent = visible ? 'Show Scale Chart' : 'Hide Scale Chart';
-}
-
-function updateScaleDisplay() {
-  const key = document.getElementById('key').value;
-  const scale = noteMap[key];
-  const container = document.getElementById('scaleDisplay');
-
-  container.style.display = 'inline-block';
-
-  if (!scale) {
-    container.innerHTML = '';
-    return;
-  }
-
-  let html = `<div style="background: white; border-radius: 12px; padding: 1rem 1.5rem; box-shadow: 0 4px 8px rgba(0,0,0,0.1); font-size: 1rem; max-width: 300px; margin: auto;">
-    <h3 style="margin-top: 0;">Key of ${key}</h3>
-    <table style="width: 100%; border-collapse: collapse;">
-      <tr><th style="text-align: left;">Degree</th><th style="text-align: left;">Note</th></tr>`;
-  scale.forEach((note, i) => {
-    html += `<tr><td>${i + 1}</td><td>${note}</td></tr>`;
-  });
-  html += `</table></div>`;
-  container.innerHTML = html;
-}
-
-function shuffleArray(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
 </script>
 
 </body>
