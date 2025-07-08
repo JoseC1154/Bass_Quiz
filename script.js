@@ -22,7 +22,7 @@ const noteMap = {
 };
 
 function updateLevel() {
-  // Placeholder for difficulty logic
+  // Placeholder for future logic
 }
 
 function startQuiz() {
@@ -62,9 +62,15 @@ function askQuestion() {
 
 function renderChoices() {
   const key = document.getElementById("key").value;
-  const scale = noteMap[key];
+  const scale = [...noteMap[key]]; // make a copy to shuffle
   const container = document.getElementById("choices");
   container.innerHTML = "";
+
+  // Fisher-Yates Shuffle
+  for (let i = scale.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [scale[i], scale[j]] = [scale[j], scale[i]];
+  }
 
   scale.forEach(note => {
     const btn = document.createElement("button");
@@ -82,21 +88,33 @@ function checkAnswer(choice) {
     correctAnswers++;
     feedback.textContent = "✅ Correct!";
     feedback.style.color = "green";
+    disableChoices();
+
+    // Show for 1.5 seconds
+    setTimeout(() => {
+      feedback.textContent = "";
+      currentQuestion++;
+      if (currentQuestion < totalQuestions) {
+        askQuestion();
+      } else {
+        endQuiz();
+      }
+    }, 1500);
   } else {
     feedback.textContent = `❌ Incorrect. Answer: ${correctNote}`;
     feedback.style.color = "red";
+    disableChoices();
+
+    // Show for 3 seconds
+    setTimeout(() => {
+      currentQuestion++;
+      if (currentQuestion < totalQuestions) {
+        askQuestion();
+      } else {
+        endQuiz();
+      }
+    }, 3000);
   }
-
-  disableChoices();
-
-  setTimeout(() => {
-    currentQuestion++;
-    if (currentQuestion < totalQuestions) {
-      askQuestion();
-    } else {
-      endQuiz();
-    }
-  }, 3000);
 }
 
 function disableChoices() {
