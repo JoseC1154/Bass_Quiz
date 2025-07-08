@@ -283,3 +283,4 @@ helpBtn.addEventListener('click', () => {
 populateKeys();
 updateChart();
 keyContainer.style.display = levelSelect.value === 'easy' ? 'block' : 'none';
+ 
