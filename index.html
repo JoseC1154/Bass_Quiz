@@ -7,12 +7,21 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="overlay"></div>
 
   <main>
     <!-- Settings Card -->
     <section id="settings-card" class="card">
       <h1>Scale Driller</h1>
+
+      <!-- Instrument Dropdown (added) -->
+      <div class="setting-group">
+        <label for="instrument-select">Instrument</label>
+        <select id="instrument-select">
+          <option value="piano" selected>Piano</option>
+          <option value="bass" disabled>Bass Guitar</option>
+          <option value="guitar" disabled>Guitar</option>
+        </select>
+      </div>
 
       <div class="setting-group">
         <label for="level-select">Quiz Level</label>
@@ -29,6 +38,14 @@
       </div>
 
       <div class="setting-group">
+        <label for="scale-type">Scale Type</label>
+        <select id="scale-type">
+          <option value="major" selected>Major</option>
+          <option value="minor">Minor</option>
+        </select>
+      </div>
+
+      <div class="setting-group">
         <label for="time-limit">Seconds per Question</label>
         <select id="time-limit">
           <option value="5">5</option>
@@ -41,6 +58,8 @@
       <div class="setting-group">
         <label for="question-count">Number of Questions</label>
         <select id="question-count">
+          <option value="2">2</option>
+          <option value="5">5</option>
           <option value="10" selected>10</option>
           <option value="50">50</option>
           <option value="100">100</option>
@@ -50,16 +69,21 @@
 
       <button id="start-btn">Start Quiz</button>
       <button id="toggle-chart">Show Scale Chart</button>
-
-      <!-- Chart Section -->
-      <div id="scale-chart" class="card hidden"></div>
     </section>
+
+    <!-- Scale Chart Modal (improved) -->
+    <div id="scale-chart-modal" class="modal hidden">
+      <div class="card scale-chart-card">
+        <button id="close-scale-chart" class="close-btn" aria-label="Close Scale Chart">✖</button>
+        <div id="scale-chart"></div>
+      </div>
+    </div>
 
     <!-- Quiz Card -->
     <section id="quiz-card" class="card hidden">
       <div id="quiz-header">
-        <button id="close-quiz" style="background: transparent; color: #333; font-size: 24px; border: none; cursor: pointer;">x</button>
-        <button id="help-btn" style="background: transparent; color: yellow; font-size: 30px; border: none; cursor: pointer;">?</button>
+        <button id="close-quiz" class="close-btn" aria-label="Close Quiz">✖</button>
+        <button id="help-btn" style="background: transparent; color: yellow; font-size: 30px; border: none; cursor: pointer;">&#10068;</button>
       </div>
       <div id="quiz-question"></div>
       <div id="answer-buttons"></div>
@@ -70,7 +94,7 @@
     <section id="results-card" class="card hidden">
       <h2>Quiz Complete!</h2>
       <p id="score-summary"></p>
-      <button id="play-again">Play Again</button>
+      <button id="play-again">Try Again</button>
     </section>
   </main>
 
