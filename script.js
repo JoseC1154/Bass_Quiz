@@ -113,17 +113,25 @@ function generateQuiz(level, count) {
     const scale = getScale(key);
 
     if (level === 'easy' || level === 'intermediate') {
+      let options = scale.filter(n => n !== scale[degree - 1]);
+      options = shuffle(options).slice(0, 4);
+      options.push(scale[degree - 1]);
+      options = shuffle(options);
       quizData.push({
         question: `What is degree ${degree} in the key of ${key}?`,
         answer: scale[degree - 1],
-        options: shuffle(scale.slice())
+        options: options
       });
     } else if (level === 'hard') {
       const note = scale[degree - 1];
+      let options = keys.filter(k => k !== key);
+      options = shuffle(options).slice(0, 4);
+      options.push(key);
+      options = shuffle(options);
       quizData.push({
         question: `${note} is the ${degree} degree of what key?`,
         answer: key,
-        options: shuffle(keys.slice())
+        options: options
       });
     }
   }
