@@ -3,17 +3,18 @@
 body {
   background: rgb(46, 46, 17) url('background.png') no-repeat center center fixed;
   background-size: cover;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   min-height: 100vh;
+  margin: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
 }
+
 
 main {
   width: 100%;
   max-width: 500px;
   padding: 20px;
   box-sizing: border-box;
+  margin: 0 auto;
 }
 
 .card {
@@ -53,53 +54,26 @@ main {
   border-radius: 8px;
 }
 
-#results-card .setting-group,
-#quiz-card .setting-group {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-
-#results-card .setting-group label,
-#quiz-card .setting-group label {
-  font-weight: bold;
-  width: 100%;
-  text-align: left;
-  margin-top: 10px;
-}
-
-#results-card .setting-group select,
-#results-card .setting-group input,
-#quiz-card .setting-group select,
-#quiz-card .setting-group input {
-  width: 90%;
-  padding: 8px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-}
-
 button {
   padding: 10px;
   font-size: 16px;
   border: none;
   border-radius: 8px;
-  background-color: #4CAF50;
-  color: white;
+  background-color: #fbffe0;
+  color: black;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.2s, transform 0.2s;
   text-align: center;
   width: 90%;
 }
 
 button:hover {
-  background-color: #45a049;
+  background-color: #eee;
 }
 
 #toggle-chart {
   background-color: #2196F3;
+  color: #fff;
 }
 
 #toggle-chart:hover {
@@ -107,42 +81,71 @@ button:hover {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
+.modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* Highest */
+}
+
+.scale-chart-card {
+  position: relative;
+  min-width: 260px;
+  min-height: 180px;
+  padding: 32px 8% 24px 8%;
+  background: rgba(255,255,255,0.97);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  text-align: center;
+}
+
+#close-scale-chart {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+}
+
+/* --- Quiz Card --- */
 #quiz-card {
   position: relative;
-  padding-top: 64px;
-  min-height: 400px;
+  z-index: 1001; /* Higher than overlay and modal */
 }
 
-#quiz-question {
-  margin-top: 0;
-}
-
+/* --- Quiz Card Header Buttons --- */
 #quiz-header {
-  position: absolute;
-  top: 5px;
-  left: 0;
-  right: 0;
   display: flex;
   justify-content: space-between;
-  padding: 0 12px;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 12px;
+  position: static; /* Remove absolute positioning */
+  padding: 0;
   z-index: 2;
 }
 
 #close-quiz,
 #help-btn {
   width: 10%;
+  min-width: 36px;
   background: transparent;
   border: none;
   font-size: 30px;
   cursor: pointer;
-  transition: transform 0.2s ease, color 0.2s ease;
+  transition: color 0.2s, transform 0.2s;
+  margin: 0;
+  padding: 0;
 }
 
 #close-quiz {
   color: #333;
+  text-align: left;
 }
 
 #close-quiz:hover {
@@ -152,56 +155,119 @@ button:hover {
 
 #help-btn {
   color: yellow;
+  text-align: right;
 }
 
 #help-btn:hover {
-  color: yellow;
-  transform: scale(1.2);
+  color: gold;
   background: transparent;
+  transform: scale(1.2);
 }
 
+/* Add spacing so question doesn't overlap header */
+#quiz-question {
+  margin-top: 8px;
+}
+
+/* --- Answer Buttons --- */
 #answer-buttons {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 12px;
   width: 100%;
-  gap: 10px;
-  margin-top: 20px;
 }
 
 #answer-buttons button {
   box-sizing: border-box;
-  width: 100%;
+  width: 70%;
+  margin-bottom: 12px;
+  color: #000;
+  background-color: #fbffe0;
+  border: 1px solid #aaa;
+  border-radius: 8px;
+  padding: 10px;
+  transition: background-color 0.3s, color 0.2s, transform 0.2s;
 }
 
+#answer-buttons button:hover {
+  background-color: #eee;
+  transform: scale(1.02);
+}
+
+/* No highlight by default, only on answer */
+.correct {
+  background-color: #4CAF50 !important;
+  color: white !important;
+}
+
+.incorrect {
+  background-color: #f44336 !important;
+  color: white !important;
+}
+
+/* --- Feedback --- */
 .feedback {
   margin-top: 16px;
   font-size: 18px;
   font-weight: bold;
 }
 
+/* --- Countdown --- */
 #countdown {
   font-weight: bold;
   text-align: center;
   margin-top: 10px;
+  font-size: 20px;
 }
 
-#pause-btn {
-  margin-top: 12px;
-  background-color: #f57c00;
-  width: 100%;
+/* --- Shared Close Button Style --- */
+.close-btn {
+  background: transparent;
+  color: #333;
+  font-size: 30px;
+  border: none;
+  cursor: pointer;
+  width: 10%;
+  min-width: 36px;
+  text-align: left;
+  margin: 0;
+  padding: 0;
+  transition: color 0.2s, transform 0.2s;
+  line-height: 1;
 }
 
-#pause-btn:hover {
-  background-color: #ef6c00;
+.close-btn:hover {
+  color: red;
+  background: transparent;
+  transform: scale(1.2);
 }
 
+/* For modal close button positioning */
+#close-scale-chart.close-btn {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+}
+
+/* --- Responsive --- */
 @media (max-width: 600px) {
   main {
     padding: 10px;
   }
-
   .card {
     padding: 16px;
+  }
+  .scale-chart-card {
+    padding: 20px 4% 16px 4%;
+    min-width: 180px;
+  }
+  #answer-buttons button {
+    width: 95%;
+    font-size: 15px;
+  }
+  button {
+    font-size: 15px;
   }
 }
