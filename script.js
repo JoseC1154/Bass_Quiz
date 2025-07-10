@@ -20,8 +20,6 @@ const keyContainer = document.getElementById('key-select-container');
 const degreeContainer = document.getElementById('degree-select-container');
 const chartToggle = document.getElementById('toggle-chart');
 const scaleChart = document.getElementById('scale-chart');
-const scaleChartModal = document.getElementById('scale-chart-modal'); // modal
-const closeScaleChartBtn = document.getElementById('close-scale-chart'); // close btn
 const startBtn = document.getElementById('start-btn');
 const quizCard = document.getElementById('quiz-card');
 const settingsCard = document.getElementById('settings-card');
@@ -69,12 +67,12 @@ function bindUIEvents() {
     if (level === 'easy') {
       keyContainer.classList.remove('hidden');
       degreeContainer.classList.add('hidden');
-    } else if (level === 'intermediate' || level === 'hard') {
-      keyContainer.classList.add('hidden');
-      degreeContainer.classList.add('hidden');
     } else if (level === 'degree-training') {
       keyContainer.classList.add('hidden');
       degreeContainer.classList.remove('hidden');
+    } else {
+      keyContainer.classList.add('hidden');
+      degreeContainer.classList.add('hidden');
     }
 
     updateChart();
@@ -83,19 +81,14 @@ function bindUIEvents() {
   keySelect.addEventListener('change', updateChart);
   document.getElementById('scale-type').addEventListener('change', updateChart);
 
-  chartToggle.addEventListener('click', () => {
-    updateChart();
-    scaleChartModal.classList.remove('hidden');
-  });
-
-  closeScaleChartBtn.addEventListener('click', () => {
-    scaleChartModal.classList.add('hidden');
-  });
-
   startBtn.addEventListener('click', () => {
     resetQuiz();
     quizActive = true;
     generateQuiz(levelSelect.value, +document.getElementById('question-count').value);
+    if (quizData.length === 0) {
+      alert("⚠️ No questions generated. Please check your settings.");
+      return;
+    }
     settingsCard.classList.add('hidden');
     quizCard.classList.remove('hidden');
     showQuestion();
@@ -112,19 +105,6 @@ function bindUIEvents() {
   playAgainBtn.addEventListener('click', () => {
     resultsCard.classList.add('hidden');
     settingsCard.classList.remove('hidden');
-  });
-
-  helpBtn.addEventListener('click', () => {
-    if (isPaused) return;
-    isPaused = true;
-    clearTimeout(timer);
-    clearInterval(countdownInterval);
-    feedback.textContent = `ℹ️ Answer: ${quizData[currentIndex].answer}`;
-    [...answerButtons.querySelectorAll('button')].forEach(btn => btn.disabled = true);
-    setTimeout(() => {
-      isPaused = false;
-      showQuestion();
-    }, 5000);
   });
 }
 
@@ -169,9 +149,12 @@ function populateKeys() {
 }
 
 function getScale(key) {
-  const scaleType = document.getElementById('scale-type').value;
+  const scaleTypeElem = document.getElementById('scale-type');
+  if (!scaleTypeElem) return [];
+  const scaleType = scaleTypeElem.value;
   const steps = scaleType === 'minor' ? scaleStepsMinor : scaleStepsMajor;
   let start = notes.indexOf(key);
+  if (start === -1) return [];
   let scale = [key];
   for (let step of steps) {
     start = (start + step) % 12;
@@ -180,13 +163,18 @@ function getScale(key) {
   return scale.slice(0, 7);
 }
 
-function updateChart() {
+function updateChart(targetElement = scaleChart) {
+  if (!targetElement) return; // Prevent null reference error
+  if (!keySelect || !document.getElementById('scale-type')) return;
+
   const key = keySelect.value;
   const scaleType = document.getElementById('scale-type').value;
+  if (!key || !scaleType) return;
+
   const scale = getScale(key);
-  scaleChart.innerHTML = `<strong>${key} ${scaleType.charAt(0).toUpperCase() + scaleType.slice(1)} Scale</strong><br>`;
+  targetElement.innerHTML = `<strong>${key} ${scaleType.charAt(0).toUpperCase() + scaleType.slice(1)} Scale</strong><br>`;
   scale.forEach((note, idx) => {
-    scaleChart.innerHTML += `<div>${idx + 1}: ${note}</div>`;
+    targetElement.innerHTML += `<div>${idx + 1}: ${note}</div>`;
   });
 }
 
@@ -217,7 +205,9 @@ function generateQuiz(level, count) {
     }
     const scale = getScale(key);
 
-    if (level === 'easy' || level === 'intermediate' || level === 'degree-training') {
+    const isDegreeLevel = level === 'easy' || level === 'intermediate' || level === 'degree-training';
+
+    if (isDegreeLevel) {
       let options = scale.filter(n => n !== scale[degree - 1]);
       options = shuffle(options).slice(0, 4);
       options.push(scale[degree - 1]);
@@ -243,6 +233,10 @@ function generateQuiz(level, count) {
 }
 
 function showQuestion() {
+  if (!quizData[currentIndex]) {
+    console.warn('No question available at current index.');
+    return;
+  }
   clearTimeout(timer);
   clearInterval(countdownInterval);
   feedback.textContent = '';
@@ -361,6 +355,43 @@ function resetQuiz() {
 }
 
 // --- Initialization ---
-initializeUI();
-bindUIEvents();
- 
+document.addEventListener('DOMContentLoaded', () => {
+  const helpChartModal = document.getElementById('help-chart-modal');
+  const closeHelpChartBtn = document.getElementById('close-help-chart');
+  const helpFeedback = document.getElementById('help-feedback');
+
+  initializeUI();
+  bindUIEvents();
+
+  // Attach event listener here since the element is now defined
+  closeHelpChartBtn.addEventListener('click', () => {
+    helpChartModal.classList.add('hidden');
+    const helpScaleChart = document.getElementById('help-scale-chart');
+    if (helpScaleChart) helpScaleChart.classList.add('hidden');
+    isPaused = false;
+    showQuestion();
+  });
+
+  // Modify the helpBtn event binding to use scoped variables
+  helpBtn.addEventListener('click', () => {
+    if (isPaused) return;
+    isPaused = true;
+    clearTimeout(timer);
+    clearInterval(countdownInterval);
+
+    // Update chart for the current question's key and degree, not just selected key
+    const helpScaleChart = document.getElementById('help-scale-chart');
+    const current = quizData[currentIndex];
+    const inferredKey = (levelSelect.value === 'hard')
+      ? current.answer
+      : current.question.match(/key of (\w[#b]?)/)?.[1] || current.answer;
+    const tempKeyIndex = keys.indexOf(inferredKey);
+    if (tempKeyIndex !== -1) {
+      keySelect.value = inferredKey;
+    }
+    updateChart(helpScaleChart);
+    if (helpScaleChart) helpScaleChart.classList.remove('hidden');
+    helpFeedback.textContent = `ℹ️ Answer: ${quizData[currentIndex].answer}`;
+    helpChartModal.classList.remove('hidden');
+  });
+});
