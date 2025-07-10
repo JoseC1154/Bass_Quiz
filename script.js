@@ -12,10 +12,12 @@ let correctAnswers = 0;
 let timer;
 let countdownInterval;
 let isPaused = false;
+let quizActive = false;
 
 const levelSelect = document.getElementById('level-select');
 const keySelect = document.getElementById('key-select');
 const keyContainer = document.getElementById('key-select-container');
+const degreeContainer = document.getElementById('degree-select-container');
 const chartToggle = document.getElementById('toggle-chart');
 const scaleChart = document.getElementById('scale-chart');
 const scaleChartModal = document.getElementById('scale-chart-modal'); // modal
@@ -39,6 +41,95 @@ countdown.style.marginTop = '10px';
 quizCard.appendChild(countdown);
 
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+// --- UI Initialization and Event Binding ---
+
+function initializeUI() {
+  populateKeys();
+  keySelect.selectedIndex = 0;
+  updateChart();
+
+  const level = levelSelect.value;
+  if (level === 'easy') {
+    keyContainer.classList.remove('hidden');
+    degreeContainer.classList.add('hidden');
+  } else if (level === 'degree-training') {
+    keyContainer.classList.add('hidden');
+    degreeContainer.classList.remove('hidden');
+  } else {
+    keyContainer.classList.add('hidden');
+    degreeContainer.classList.add('hidden');
+  }
+}
+
+function bindUIEvents() {
+  levelSelect.addEventListener('change', () => {
+    const level = levelSelect.value;
+
+    if (level === 'easy') {
+      keyContainer.classList.remove('hidden');
+      degreeContainer.classList.add('hidden');
+    } else if (level === 'intermediate' || level === 'hard') {
+      keyContainer.classList.add('hidden');
+      degreeContainer.classList.add('hidden');
+    } else if (level === 'degree-training') {
+      keyContainer.classList.add('hidden');
+      degreeContainer.classList.remove('hidden');
+    }
+
+    updateChart();
+  });
+
+  keySelect.addEventListener('change', updateChart);
+  document.getElementById('scale-type').addEventListener('change', updateChart);
+
+  chartToggle.addEventListener('click', () => {
+    updateChart();
+    scaleChartModal.classList.remove('hidden');
+  });
+
+  closeScaleChartBtn.addEventListener('click', () => {
+    scaleChartModal.classList.add('hidden');
+  });
+
+  startBtn.addEventListener('click', () => {
+    resetQuiz();
+    quizActive = true;
+    generateQuiz(levelSelect.value, +document.getElementById('question-count').value);
+    settingsCard.classList.add('hidden');
+    quizCard.classList.remove('hidden');
+    showQuestion();
+  });
+
+  closeQuizBtn.addEventListener('click', () => {
+    clearTimeout(timer);
+    clearInterval(countdownInterval);
+    resetQuiz();
+    quizCard.classList.add('hidden');
+    settingsCard.classList.remove('hidden');
+  });
+
+  playAgainBtn.addEventListener('click', () => {
+    resultsCard.classList.add('hidden');
+    settingsCard.classList.remove('hidden');
+  });
+
+  helpBtn.addEventListener('click', () => {
+    if (isPaused) return;
+    isPaused = true;
+    clearTimeout(timer);
+    clearInterval(countdownInterval);
+    feedback.textContent = `ℹ️ Answer: ${quizData[currentIndex].answer}`;
+    [...answerButtons.querySelectorAll('button')].forEach(btn => btn.disabled = true);
+    setTimeout(() => {
+      isPaused = false;
+      showQuestion();
+    }, 5000);
+  });
+}
+
+// --- Audio Functions ---
+
 function playTone(freq, duration = 0.2) {
   const oscillator = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
@@ -64,6 +155,8 @@ function playIncorrectSound() {
   oscillator.start();
   oscillator.stop(audioCtx.currentTime + 1.0); // longer duration
 }
+
+// --- UI Update Functions ---
 
 function populateKeys() {
   keySelect.innerHTML = '';
@@ -97,6 +190,8 @@ function updateChart() {
   });
 }
 
+// --- Utility Functions ---
+
 function randomChoice(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
@@ -105,14 +200,24 @@ function shuffle(arr) {
   return arr.sort(() => Math.random() - 0.5);
 }
 
+// --- Quiz Generation and Logic ---
+
 function generateQuiz(level, count) {
   quizData = [];
+  const selectedDegree = +document.getElementById('degree-select')?.value;
   for (let i = 0; i < count; i++) {
-    const degree = Math.floor(Math.random() * 7) + 1;
-    const key = level === 'easy' ? keySelect.value : randomChoice(keys);
+    let degree;
+    let key;
+    if (level === 'degree-training') {
+      degree = selectedDegree;
+      key = randomChoice(keys);
+    } else {
+      degree = Math.floor(Math.random() * 7) + 1;
+      key = level === 'easy' ? keySelect.value : randomChoice(keys);
+    }
     const scale = getScale(key);
 
-    if (level === 'easy' || level === 'intermediate') {
+    if (level === 'easy' || level === 'intermediate' || level === 'degree-training') {
       let options = scale.filter(n => n !== scale[degree - 1]);
       options = shuffle(options).slice(0, 4);
       options.push(scale[degree - 1]);
@@ -146,6 +251,7 @@ function showQuestion() {
   const q = quizData[currentIndex];
   questionDiv.textContent = q.question;
   answerButtons.innerHTML = '';
+  
   q.options.forEach(option => {
     const btn = document.createElement('button');
     btn.textContent = option;
@@ -232,12 +338,14 @@ function nextQuestion() {
   if (currentIndex < quizData.length) {
     showQuestion();
   } else {
-    const best = Math.max(correctAnswers, parseInt(localStorage.getItem('bestScore') || 0));
-    localStorage.setItem('bestScore', best);
-    quizCard.classList.add('hidden');
-    resultsCard.classList.remove('hidden');
-    scoreSummary.textContent = `You scored ${correctAnswers} out of ${quizData.length}. Best: ${best}`;
-    playAgainBtn.textContent = "Try Again";
+    if (quizActive && currentIndex >= quizData.length) {
+      const best = Math.max(correctAnswers, parseInt(localStorage.getItem('bestScore') || 0));
+      localStorage.setItem('bestScore', best);
+      quizCard.classList.add('hidden');
+      resultsCard.classList.remove('hidden');
+      scoreSummary.textContent = `You scored ${correctAnswers} out of ${quizData.length}. Best: ${best}`;
+      playAgainBtn.textContent = "Try Again";
+    }
   }
 }
 
@@ -249,63 +357,9 @@ function resetQuiz() {
   clearInterval(countdownInterval);
   feedback.textContent = '';
   countdown.textContent = '';
+  quizActive = false;
 }
 
-levelSelect.addEventListener('change', () => {
-  keyContainer.style.display = levelSelect.value === 'easy' ? 'block' : 'none';
-  updateChart();
-});
-
-keySelect.addEventListener('change', updateChart);
-document.getElementById('scale-type').addEventListener('change', updateChart);
-
-// --- Modal logic for scale chart ---
-chartToggle.addEventListener('click', () => {
-  updateChart();
-  scaleChartModal.classList.remove('hidden');
-});
-closeScaleChartBtn.addEventListener('click', () => {
-  scaleChartModal.classList.add('hidden');
-  // Only remove overlay if quiz is not open
-  if (quizCard.classList.contains('hidden')) {
-  }
-});
-
-// --- Quiz logic ---
-startBtn.addEventListener('click', () => {
-  resetQuiz();
-  generateQuiz(levelSelect.value, +document.getElementById('question-count').value);
-  settingsCard.classList.add('hidden');
-  quizCard.classList.remove('hidden');
-  showQuestion();
-});
-closeQuizBtn.addEventListener('click', () => {
-  resetQuiz();
-  quizCard.classList.add('hidden');
-  settingsCard.classList.remove('hidden');
-});
-playAgainBtn.addEventListener('click', () => {
-  resultsCard.classList.add('hidden');
-  settingsCard.classList.remove('hidden');
-});
-
-// --- Help Button Logic ---
-helpBtn.addEventListener('click', () => {
-  if (isPaused) return;
-  isPaused = true;
-  clearTimeout(timer);
-  clearInterval(countdownInterval);
-  feedback.textContent = `ℹ️ Answer: ${quizData[currentIndex].answer}`;
-  // Disable answer buttons while paused
-  [...answerButtons.querySelectorAll('button')].forEach(btn => btn.disabled = true);
-  setTimeout(() => {
-    isPaused = false;
-    showQuestion();
-  }, 5000);
-});
-
-// --- Init ---
-populateKeys();
-keySelect.selectedIndex = 0;
-updateChart();
-keyContainer.style.display = levelSelect.value === 'easy' ? 'block' : 'none';
+// --- Initialization ---
+initializeUI();
+bindUIEvents();
