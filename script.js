@@ -13,6 +13,7 @@ let timer;
 let countdownInterval;
 let isPaused = false;
 let quizActive = false;
+let quizStartTime;
 
 const levelSelect = document.getElementById('level-select');
 const keySelect = document.getElementById('key-select');
@@ -83,6 +84,7 @@ function bindUIEvents() {
 
   startBtn.addEventListener('click', () => {
     resetQuiz();
+    quizStartTime = performance.now();
     quizActive = true;
     generateQuiz(levelSelect.value, +document.getElementById('question-count').value);
     if (quizData.length === 0) {
@@ -262,7 +264,10 @@ function showQuestion() {
   q.options.forEach(option => {
     const btn = document.createElement('button');
     btn.textContent = option;
-    btn.onclick = () => checkAnswer(option);
+    btn.onclick = () => {
+      btn.blur();  // Remove focus to prevent persistent hover state
+      checkAnswer(option);
+    };
     answerButtons.appendChild(btn);
   });
 
@@ -332,7 +337,7 @@ function showFeedback(correct) {
     correctAnswers++;
     playCorrectSound();
     feedback.textContent = '✅ Correct!';
-    setTimeout(nextQuestion, 1500);
+    setTimeout(nextQuestion, 300);
   } else {
     playIncorrectSound();
     feedback.textContent = `❌ Incorrect. Answer: ${quizData[currentIndex].answer}`;
@@ -350,7 +355,12 @@ function nextQuestion() {
       localStorage.setItem('bestScore', best);
       quizCard.classList.add('hidden');
       resultsCard.classList.remove('hidden');
-      scoreSummary.textContent = `You scored ${correctAnswers} out of ${quizData.length}. Best: ${best}`;
+      const elapsedTime = ((performance.now() - quizStartTime) / 1000).toFixed(1);
+      scoreSummary.innerHTML = `
+        <div style="font-size: 1.2em; margin-bottom: 16px;">🏆 Best Score: <strong>${best}</strong></div>
+        <div>✅ You scored <strong>${correctAnswers}</strong> out of ${quizData.length}</div>
+        <div>⏱️ Time: <strong>${elapsedTime}</strong> seconds</div>
+      `;
       playAgainBtn.textContent = "Try Again";
     }
   }
