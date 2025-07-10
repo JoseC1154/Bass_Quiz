@@ -28,6 +28,11 @@ main {
   gap: 12px;
   align-items: center;
   text-align: center;
+  max-width: 100%;
+  width: 90vw;
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .setting-group {
