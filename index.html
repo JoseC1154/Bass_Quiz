@@ -13,16 +13,7 @@
     <section id="settings-card" class="card">
       <h1>Scale Driller</h1>
 
-      <!-- Instrument Dropdown (added) -->
-      <div class="setting-group">
-        <label for="instrument-select">Instrument</label>
-        <select id="instrument-select">
-          <option value="piano" selected>Piano</option>
-          <option value="bass" disabled>Bass Guitar</option>
-          <option value="guitar" disabled>Guitar</option>
-        </select>
-      </div>
-
+      <!-- Level & Instrument -->
       <div class="setting-group">
         <label for="level-select">Quiz Level</label>
         <select id="level-select">
@@ -33,13 +24,23 @@
         </select>
       </div>
 
-      <div id="key-select-container" class="setting-group">
-        <label for="key-select" style="display: block; width: 100%; text-align: left;">Key</label>
+      <div class="setting-group">
+        <label for="instrument-select">Instrument</label>
+        <select id="instrument-select">
+          <option value="piano" selected>Piano</option>
+          <option value="bass" disabled>Bass Guitar</option>
+          <option value="guitar" disabled>Guitar</option>
+        </select>
+      </div>
+
+      <!-- Conditional Toggles -->
+      <div id="key-select-container" class="setting-group hidden">
+        <label for="key-select">Key</label>
         <select id="key-select"></select>
       </div>
 
       <div id="degree-select-container" class="setting-group hidden">
-        <label for="degree-select">Select Degree</label>
+        <label for="degree-select">Degree</label>
         <select id="degree-select">
           <option value="1">1st</option>
           <option value="2">2nd</option>
@@ -51,6 +52,7 @@
         </select>
       </div>
 
+      <!-- Compact Toggles -->
       <div class="setting-group">
         <label for="scale-type">Scale Type</label>
         <select id="scale-type">
@@ -61,28 +63,19 @@
 
       <div class="setting-group">
         <label for="time-limit">Seconds per Question</label>
-        <select id="time-limit">
-          <option value="5">5</option>
-          <option value="10" selected>10</option>
-          <option value="15">15</option>
-          <option value="20">20</option>
-        </select>
+        <input type="range" id="time-limit" min="5" max="30" step="5" value="10" />
       </div>
 
       <div class="setting-group">
         <label for="question-count">Number of Questions</label>
-        <select id="question-count">
-          <option value="2">2</option>
-          <option value="5">5</option>
-          <option value="10" selected>10</option>
-          <option value="50">50</option>
-          <option value="100">100</option>
-          <option value="200">200</option>
-        </select>
+        <input type="number" id="question-count" min="1" max="200" value="10" />
       </div>
 
-      <button id="start-btn">Start Quiz</button>
-      <button id="toggle-chart">Show Scale Chart</button>
+      <!-- Action Buttons -->
+      <div class="setting-group">
+        <button id="start-btn" class="start-button">Start Quiz</button>
+        <button id="toggle-chart" class="secondary-button">Show Scale Chart</button>
+      </div>
     </section>
 
     <!-- Scale Chart Modal (improved) -->
