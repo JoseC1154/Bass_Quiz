@@ -363,3 +363,4 @@ function resetQuiz() {
 // --- Initialization ---
 initializeUI();
 bindUIEvents();
+ 
