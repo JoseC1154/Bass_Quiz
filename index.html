@@ -71,20 +71,11 @@
         <input type="number" id="question-count" min="1" max="200" value="10" />
       </div>
 
-      <!-- Action Buttons -->
+      <!-- Start Button Only -->
       <div class="setting-group">
-        <button id="start-btn" class="start-button">Start Quiz</button>
-        <button id="toggle-chart" class="secondary-button">Show Scale Chart</button>
+        <button id="start-btn" class="start-button">Start</button>
       </div>
     </section>
-
-    <!-- Scale Chart Modal (improved) -->
-    <div id="scale-chart-modal" class="modal hidden">
-      <div class="card scale-chart-card">
-        <button id="close-scale-chart" class="close-btn" aria-label="Close Scale Chart">✖</button>
-        <div id="scale-chart"></div>
-      </div>
-    </div>
 
     <!-- Quiz Card -->
     <section id="quiz-card" class="card hidden">
@@ -95,6 +86,9 @@
       <div id="quiz-question"></div>
       <div id="answer-buttons"></div>
       <div id="feedback" class="feedback"></div>
+      <div id="inline-chart-container" class="hidden">
+        <div id="inline-scale-chart"></div>
+      </div>
     </section>
 
     <!-- Results Card -->
@@ -106,5 +100,15 @@
   </main>
 
 <script src="script.js"></script>
+
+<!-- Help Chart Modal -->
+<div id="help-chart-modal" class="modal hidden">
+  <div class="card scale-chart-card">
+    <button id="close-help-chart" class="close-btn" aria-label="Close Help Chart">✖</button>
+    <div id="help-scale-chart"></div>
+    <div id="help-feedback" class="feedback"></div>
+  </div>
+</div>
+
 </body>
 </html>
