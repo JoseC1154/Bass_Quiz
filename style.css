@@ -96,7 +96,7 @@ button:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000; /* Highest */
+  z-index: 2000; /* Highest, above quiz card */
 }
 
 .scale-chart-card {
@@ -275,4 +275,11 @@ button:hover {
   button {
     font-size: 15px;
   }
+}
+
+
+#scale-chart {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
 }
