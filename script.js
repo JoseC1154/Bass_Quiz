@@ -126,14 +126,29 @@ function playCorrectSound() {
 }
 
 function playIncorrectSound() {
-  const oscillator = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  oscillator.type = 'sine';
-  oscillator.frequency.setValueAtTime(100, audioCtx.currentTime); // deeper tone
-  oscillator.connect(gain);
-  gain.connect(audioCtx.destination);
-  oscillator.start();
-  oscillator.stop(audioCtx.currentTime + 1.0); // longer duration
+  const duration1 = 0.2;
+  const duration2 = 0.4;
+  const baseTone = 880;
+  const tone1 = baseTone / Math.pow(2, 13 / 12); // ~493.88 Hz
+  const tone2 = tone1 / Math.pow(2, 1 / 12);     // ~466.16 Hz
+
+  const oscillator1 = audioCtx.createOscillator();
+  const gain1 = audioCtx.createGain();
+  oscillator1.type = 'sine';
+  oscillator1.frequency.setValueAtTime(tone1, audioCtx.currentTime);
+  oscillator1.connect(gain1);
+  gain1.connect(audioCtx.destination);
+  oscillator1.start();
+  oscillator1.stop(audioCtx.currentTime + duration1);
+
+  const oscillator2 = audioCtx.createOscillator();
+  const gain2 = audioCtx.createGain();
+  oscillator2.type = 'sine';
+  oscillator2.frequency.setValueAtTime(tone2, audioCtx.currentTime + duration1);
+  oscillator2.connect(gain2);
+  gain2.connect(audioCtx.destination);
+  oscillator2.start(audioCtx.currentTime + duration1);
+  oscillator2.stop(audioCtx.currentTime + duration1 + duration2);
 }
 
 // --- UI Update Functions ---
