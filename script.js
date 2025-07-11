@@ -293,25 +293,39 @@ function handleNoteClick(note) {
   const correct = quizData[currentIndex].answer;
   const keys = document.querySelectorAll('.white-key, .black-key');
   keys.forEach(k => k.disabled = true);
+  // Also disable bass frets
+  const frets = document.querySelectorAll('.bass-fret');
+  frets.forEach(f => f.disabled = true);
+
   const selectedKey = document.querySelector(`[data-note="${note}"]`);
   const correctKey = document.querySelector(`[data-note="${correct}"]`);
+  // For bass, select fret elements
+  const selectedFret = document.querySelector(`.bass-fret[data-note="${note}"]`);
+  const correctFret = document.querySelector(`.bass-fret[data-note="${correct}"]`);
+
   if (note === correct) {
     playCorrectSound();
     if (selectedKey) selectedKey.classList.add('correct');
+    if (selectedFret) selectedFret.classList.add('correct');
     feedback.textContent = '✅ Correct!';
     correctAnswers++;
     setTimeout(() => {
       if (selectedKey) selectedKey.classList.remove('correct');
+      if (selectedFret) selectedFret.classList.remove('correct');
       nextQuestion();
     }, 300);
   } else {
     playIncorrectSound();
     if (selectedKey) selectedKey.classList.add('incorrect');
+    if (selectedFret) selectedFret.classList.add('incorrect');
     if (correctKey) correctKey.classList.add('correct');
+    if (correctFret) correctFret.classList.add('correct');
     feedback.textContent = `❌ Incorrect. Answer: ${correct}`;
     setTimeout(() => {
       if (selectedKey) selectedKey.classList.remove('incorrect');
+      if (selectedFret) selectedFret.classList.remove('incorrect');
       if (correctKey) correctKey.classList.remove('correct');
+      if (correctFret) correctFret.classList.remove('correct');
       nextQuestion();
     }, 1000);
   }
