@@ -411,6 +411,37 @@ button:active {
   box-shadow: 0 4px 6px rgba(0,0,0,0.2);
 }
 
+/* --- 11. Bass Guitar UI Enhancements --- */
+.bass-string-label {
+  font-weight: bold;
+  margin-right: 8px;
+  width: 20px;
+  display: inline-block;
+  text-align: right;
+}
+
+.bass-fret.pressed {
+  background-color: #b3e5fc;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+}
+
+.bass-fret.correct {
+  background-color: #4CAF50 !important;
+  color: white !important;
+}
+
+.bass-fret.incorrect {
+  background-color: #f44336 !important;
+  color: white !important;
+}
+
+@media (max-width: 600px) {
+  .bass-fret {
+    width: 36px;
+    font-size: 0.7rem;
+  }
+}
+
 /* --- 10. Input UI Styles (Bass Guitar) --- */
 .bass-fretboard {
   display: flex;
@@ -446,4 +477,28 @@ button:active {
 
 .bass-fret.pressed {
   background-color: #b3e5fc;
+}
+
+.bass-string {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  position: relative;
+  padding: 4px 0;
+}
+
+.bass-string::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #888;
+  z-index: 0;
+}
+
+.bass-fret {
+  position: relative;
+  z-index: 1;
 }
