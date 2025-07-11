@@ -476,3 +476,4 @@ document.addEventListener('DOMContentLoaded', () => {
     helpChartModal.classList.remove('hidden');
   });
 });
+ 
