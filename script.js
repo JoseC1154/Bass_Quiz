@@ -123,6 +123,7 @@ function bindUIEvents() {
     }
     settingsCard.classList.add('hidden');
     quizCard.classList.remove('hidden');
+    quizCard.classList.add('full-width');
     updateInputUI();
     showQuestion();
     startMetronome();
@@ -132,9 +133,11 @@ function bindUIEvents() {
     clearInterval(countdownInterval);
     resetQuiz();
     quizCard.classList.add('hidden');
+    quizCard.classList.remove('full-width');
     settingsCard.classList.remove('hidden');
   });
   playAgainBtn.addEventListener('click', () => {
+    quizCard.classList.remove('full-width');
     resultsCard.classList.add('hidden');
     settingsCard.classList.remove('hidden');
   });

@@ -38,6 +38,7 @@ main {
   box-sizing: border-box;
   margin-left: auto;
   margin-right: auto;
+  overflow-x: auto;
 }
 
 .setting-group {
@@ -305,6 +306,10 @@ button:active {
   button {
     font-size: 15px;
   }
+  .bass-fretboard {
+    overflow-x: auto;
+    max-width: 100%;
+  }
 }
 
 /* --- 9. Input UI Styles (Piano, Icons) --- */
@@ -444,6 +449,10 @@ button:active {
 
 /* --- 10. Input UI Styles (Bass Guitar) --- */
 .bass-fretboard {
+  position: relative;
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 10px;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -540,4 +549,38 @@ button:active {
   height: 100%;
   background-color: #bbb;
   z-index: 1;
+}
+
+#orientation-hint {
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.95);
+  color: #333;
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  z-index: 3000;
+}
+
+@media screen and (orientation: landscape) {
+  #orientation-hint {
+    display: none;
+  }
+}
+
+@media screen and (orientation: portrait) and (max-width: 768px) {
+  #orientation-hint {
+    display: block;
+  }
+}
+/* --- 13. Full-Width Quiz Card --- */
+.card.full-width {
+  max-width: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 1rem;
+  box-sizing: border-box;
 }
