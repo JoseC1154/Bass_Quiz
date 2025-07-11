@@ -315,3 +315,12 @@ button:hover {
   font-style: italic;
   color: #444;
 }
+# Prevent lingering hover/focus/active effects on mobile devices
+button:focus {
+  outline: none;
+}
+
+button:active {
+  background-color: inherit !important;
+  box-shadow: none !important;
+}
