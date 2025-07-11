@@ -453,6 +453,9 @@ button:active {
 
 .bass-string {
   display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  max-width: 100%;
   justify-content: center;
   gap: 4px;
   position: relative;
@@ -497,15 +500,44 @@ button:active {
   position: relative;
   z-index: 1;
   padding: 0 4px;
+  min-width: 36px;
 }
 
-/* --- 12. Bass Guitar Fret Markers --- */
-.bass-fret.marker::after {
-  content: '•';
-  color: #555;
-  font-size: 16px;
+.bass-fretboard {
+  position: relative;
+}
+
+.nut-line {
   position: absolute;
-  bottom: -12px;
-  left: 50%;
-  transform: translateX(-50%);
+  top: 0;
+  left: 12%;
+  width: 6px;
+  height: 100%;
+  background-color: black;
+  z-index: 2;
+}
+
+.fret-marker {
+  width: 12px;
+  height: 12px;
+  background-color: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 1;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
+} 
+
+
+/* --- 12. Bass Guitar Fret Markers --- */
+
+.fret-wire {
+  position: absolute;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  background-color: #bbb;
+  z-index: 1;
 }

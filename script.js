@@ -221,12 +221,12 @@ function updateInputUI() {
     container.innerHTML = '';
 
     const tuning = ['G', 'D', 'A', 'E'];
-    const frets = 12;
+    const frets = 7;
 
     const fretboard = document.createElement('div');
     fretboard.className = 'bass-fretboard';
 
-    tuning.forEach(openNote => {
+    tuning.forEach((openNote, stringIdx) => {
       const stringDiv = document.createElement('div');
       stringDiv.className = 'bass-string';
       const startIndex = notes.indexOf(openNote);
@@ -245,7 +245,47 @@ function updateInputUI() {
       fretboard.appendChild(stringDiv);
     });
 
+    // Add nut line as the first child inside fretboard after all strings are added
+    const nutLine = document.createElement('div');
+    nutLine.className = 'nut-line';
+    fretboard.insertBefore(nutLine, fretboard.firstChild);
+
+    // Add fret wire lines after the nut for frets 1 through 7
+    for (let i = 1; i <= frets; i++) {
+      const wire = document.createElement('div');
+      wire.className = 'fret-wire';
+      wire.style.left = `calc(${(i / (frets + 1)) * 100}%)`;
+      fretboard.appendChild(wire);
+    }
+
+    // Add central fret markers for 3rd, 5th, and 7th frets, centered
+    const markerFrets = [3, 5, 7];
+    markerFrets.forEach(fretNum => {
+      const marker = document.createElement('div');
+      marker.className = 'fret-marker';
+      marker.style.left = `calc(${(fretNum + 0.5) / (frets + 1) * 100}%)`;
+      marker.style.top = '50%';
+      fretboard.appendChild(marker);
+    });
+
     container.appendChild(fretboard);
+
+    // Add fret label row below the fretboard
+    const labelRow = document.createElement('div');
+    labelRow.className = 'fret-label-row';
+    labelRow.style.display = 'flex';
+    labelRow.style.justifyContent = 'space-between';
+    labelRow.style.marginTop = '4px';
+
+    for (let i = 0; i <= frets; i++) {
+      const label = document.createElement('div');
+      label.className = 'fret-label';
+      label.textContent = i;
+      label.style.flex = '1';
+      label.style.textAlign = 'center';
+      labelRow.appendChild(label);
+    }
+    container.appendChild(labelRow);
   }
 }
 
