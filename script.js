@@ -1,3 +1,4 @@
+
 // script.js
 
 const levels = ['easy', 'intermediate', 'hard'];
@@ -14,6 +15,7 @@ let countdownInterval;
 let isPaused = false;
 let quizActive = false;
 let quizStartTime;
+let metronomeInterval;
 
 const levelSelect = document.getElementById('level-select');
 const keySelect = document.getElementById('key-select');
@@ -94,6 +96,7 @@ function bindUIEvents() {
     settingsCard.classList.add('hidden');
     quizCard.classList.remove('hidden');
     showQuestion();
+    startMetronome();
   });
 
   closeQuizBtn.addEventListener('click', () => {
@@ -112,7 +115,7 @@ function bindUIEvents() {
 
 // --- Audio Functions ---
 
-function playTone(freq, duration = 0.2) {
+function playTone(freq, duration = 0.15) {
   const oscillator = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
   oscillator.type = 'sine';
@@ -121,6 +124,10 @@ function playTone(freq, duration = 0.2) {
   gain.connect(audioCtx.destination);
   oscillator.start();
   oscillator.stop(audioCtx.currentTime + duration);
+  oscillator.onended = () => {
+    oscillator.disconnect();
+    gain.disconnect();
+  };
 }
 
 function playCorrectSound() {
@@ -372,9 +379,50 @@ function resetQuiz() {
   correctAnswers = 0;
   clearTimeout(timer);
   clearInterval(countdownInterval);
+  clearInterval(metronomeInterval);
   feedback.textContent = '';
   countdown.textContent = '';
   quizActive = false;
+}
+
+// --- Metronome ---
+function startMetronome() {
+  let total = quizData.length;
+  let baseBpm = 60;
+  let maxBpm = 150;
+
+  if (metronomeInterval) clearInterval(metronomeInterval);
+
+  const getProgress = () => currentIndex / total;
+
+  function tick() {
+    if (!quizActive || currentIndex >= total) {
+      clearInterval(metronomeInterval);
+      return;
+    }
+
+    const oscillator = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    oscillator.type = 'square';
+    oscillator.frequency.setValueAtTime(1000, audioCtx.currentTime);
+    oscillator.connect(gain);
+    gain.connect(audioCtx.destination);
+    gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + 0.05);
+    oscillator.onended = () => {
+      oscillator.disconnect();
+      gain.disconnect();
+    };
+
+    const bpm = baseBpm + (maxBpm - baseBpm) * getProgress();
+    const interval = (60 / bpm) * 1000;
+
+    clearInterval(metronomeInterval);
+    metronomeInterval = setInterval(tick, interval);
+  }
+
+  tick();
 }
 
 // --- Initialization ---
@@ -385,6 +433,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initializeUI();
   bindUIEvents();
+
+  // Ensure audio context is resumed on first user interaction
+  document.body.addEventListener('click', () => {
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+  }, { once: true });
 
   // Attach event listener here since the element is now defined
   closeHelpChartBtn.addEventListener('click', () => {
