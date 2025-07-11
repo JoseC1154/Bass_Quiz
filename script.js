@@ -215,6 +215,37 @@ function updateInputUI() {
       }
     });
     container.appendChild(piano);
+  } else if (selectedInputType === 'bass') {
+    document.getElementById('bass-ui')?.classList.remove('hidden');
+    const container = document.getElementById('bass-ui');
+    container.innerHTML = '';
+
+    const tuning = ['G', 'D', 'A', 'E'];
+    const frets = 12;
+
+    const fretboard = document.createElement('div');
+    fretboard.className = 'bass-fretboard';
+
+    tuning.forEach(openNote => {
+      const stringDiv = document.createElement('div');
+      stringDiv.className = 'bass-string';
+      const startIndex = notes.indexOf(openNote);
+
+      for (let fret = 0; fret <= frets; fret++) {
+        const noteIndex = (startIndex + fret) % notes.length;
+        const note = notes[noteIndex];
+        const fretDiv = document.createElement('div');
+        fretDiv.className = 'bass-fret';
+        fretDiv.dataset.note = note;
+        fretDiv.textContent = note;
+        fretDiv.onclick = () => handleNoteClick(note);
+        stringDiv.appendChild(fretDiv);
+      }
+
+      fretboard.appendChild(stringDiv);
+    });
+
+    container.appendChild(fretboard);
   }
 }
 

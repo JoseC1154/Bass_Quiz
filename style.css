@@ -410,3 +410,40 @@ button:active {
   background: linear-gradient(to bottom right, #fff3b0, #ffd700);
   box-shadow: 0 4px 6px rgba(0,0,0,0.2);
 }
+
+/* --- 10. Input UI Styles (Bass Guitar) --- */
+.bass-fretboard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 1rem;
+  align-items: center;
+}
+
+.bass-string {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+.bass-fret {
+  width: 40px;
+  height: 24px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  text-align: center;
+  line-height: 24px;
+  font-size: 0.8rem;
+  background-color: #fff;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.bass-fret:hover {
+  background-color: #e6f7ff;
+  transform: scale(1.05);
+}
+
+.bass-fret.pressed {
+  background-color: #b3e5fc;
+}
