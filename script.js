@@ -276,6 +276,7 @@ function showQuestion() {
     btn.textContent = option;
     btn.onclick = () => {
       btn.blur();  // Remove focus to prevent persistent hover state
+      btn.classList.remove('hover');  // Defensive: if any hover class was applied
       checkAnswer(option);
     };
     answerButtons.appendChild(btn);
@@ -476,4 +477,3 @@ document.addEventListener('DOMContentLoaded', () => {
     helpChartModal.classList.remove('hidden');
   });
 });
- 
