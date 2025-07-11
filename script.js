@@ -115,13 +115,14 @@ function bindUIEvents() {
 
 // --- Audio Functions ---
 
-function playTone(freq, duration = 0.15) {
+function playTone(freq, duration = 0.15, volume = 0.1) {
   const oscillator = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
   oscillator.type = 'sine';
   oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
   oscillator.connect(gain);
   gain.connect(audioCtx.destination);
+  gain.gain.setValueAtTime(volume, audioCtx.currentTime);
   oscillator.start();
   oscillator.stop(audioCtx.currentTime + duration);
   oscillator.onended = () => {
@@ -131,7 +132,7 @@ function playTone(freq, duration = 0.15) {
 }
 
 function playCorrectSound() {
-  playTone(880);
+  playTone(880, 0.15, 0.05);
 }
 
 function playIncorrectSound() {
@@ -145,6 +146,7 @@ function playIncorrectSound() {
   oscillator1.frequency.setValueAtTime(tone1, audioCtx.currentTime);
   oscillator1.connect(gain1);
   gain1.connect(audioCtx.destination);
+  gain1.gain.setValueAtTime(0.05, audioCtx.currentTime);
   oscillator1.start();
   oscillator1.stop(audioCtx.currentTime + duration);
 
@@ -154,6 +156,7 @@ function playIncorrectSound() {
   oscillator2.frequency.setValueAtTime(tone2, audioCtx.currentTime + duration);
   oscillator2.connect(gain2);
   gain2.connect(audioCtx.destination);
+  gain2.gain.setValueAtTime(0.05, audioCtx.currentTime);
   oscillator2.start(audioCtx.currentTime + duration);
   oscillator2.stop(audioCtx.currentTime + duration * 2);
 }
