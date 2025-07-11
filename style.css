@@ -6,6 +6,10 @@ body {
   min-height: 100vh;
   margin: 0;
   font-family: 'Segoe UI', Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 
 
@@ -146,14 +150,12 @@ button:hover {
 }
 
 #close-quiz,
-#help-btn {
+.help-btn {
   width: 10%;
   min-width: 36px;
-  background: transparent;
   border: none;
   font-size: 30px;
   cursor: pointer;
-  transition: color 0.2s, transform 0.2s;
   margin: 0;
   padding: 0;
 }
@@ -168,14 +170,21 @@ button:hover {
   transform: scale(1.2);
 }
 
-#help-btn {
-  color: yellow;
+.help-btn {
+  color: black;
+  background-color: transparent;
   text-align: right;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 30px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, transform 0.2s;
 }
 
-#help-btn:hover {
+.help-btn:hover {
   color: gold;
-  background: transparent;
+  background-color: transparent;
   transform: scale(1.2);
 }
 
