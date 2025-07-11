@@ -13,7 +13,7 @@
     <section id="settings-card" class="card">
       <h1>Scale Driller</h1>
 
-      <!-- Level & Instrument -->
+      <!-- Level Selection -->
       <div class="setting-group">
         <label for="level-select">Quiz Level</label>
         <select id="level-select">
@@ -24,16 +24,18 @@
         </select>
       </div>
 
-      <div class="setting-group">
-        <label for="instrument-select">Instrument</label>
-        <select id="instrument-select">
-          <option value="piano" selected>Piano</option>
-          <option value="bass" disabled>Bass Guitar</option>
-          <option value="guitar" disabled>Guitar</option>
-        </select>
+      <!-- Instrument Input Icons -->
+      <div class="setting-group" id="input-type-group">
+        <label>Input Type</label>
+        <div class="input-icons">
+          <img src="images/icon_keys.png" alt="Keys Icon" class="input-icon selected" data-type="keys" title="Keys" />
+          <img src="images/icon_piano.png" alt="Piano Icon" class="input-icon" data-type="piano" title="Piano" />
+          <img src="images/icon_bass.png" alt="Bass Icon" class="input-icon" data-type="bass" title="Bass" />
+          <img src="images/icon_guitar.png" alt="Guitar Icon" class="input-icon" data-type="guitar" title="Guitar" />
+        </div>
       </div>
 
-      <!-- Conditional Toggles -->
+      <!-- Conditional Input Settings -->
       <div id="key-select-container" class="setting-group hidden">
         <label for="key-select">Key</label>
         <select id="key-select"></select>
@@ -52,7 +54,7 @@
         </select>
       </div>
 
-      <!-- Compact Toggles -->
+      <!-- Scale Type -->
       <div class="setting-group">
         <label for="scale-type">Scale Type</label>
         <select id="scale-type">
@@ -61,17 +63,19 @@
         </select>
       </div>
 
+      <!-- Time Limit -->
       <div class="setting-group">
         <label for="time-limit">Seconds per Question</label>
         <input type="range" id="time-limit" min="5" max="30" step="5" value="10" />
       </div>
 
+      <!-- Number of Questions -->
       <div class="setting-group">
         <label for="question-count">Number of Questions</label>
         <input type="number" id="question-count" min="1" max="200" value="10" />
       </div>
 
-      <!-- Start Button Only -->
+      <!-- Start Button -->
       <div class="setting-group">
         <button id="start-btn" class="start-button">Start</button>
       </div>
@@ -84,7 +88,14 @@
         <button id="help-btn" class="help-btn">?</button>
       </div>
       <div id="quiz-question"></div>
-      <div id="answer-buttons"></div>
+      <div id="keys-ui" class="instrument-ui hidden">
+        <div id="custom-input-ui"></div>
+        <div id="answer-buttons"></div>
+      </div>
+
+      <div id="piano-ui" class="instrument-ui hidden">
+        <!-- Piano UI will be generated dynamically -->
+      </div>
       <div id="feedback" class="feedback"></div>
       <div id="inline-chart-container" class="hidden">
         <div id="inline-scale-chart"></div>
@@ -99,17 +110,15 @@
     </section>
   </main>
 
-<script src="script.js"></script>
-
-<!-- Help Chart Modal -->
-<div id="help-chart-modal" class="modal hidden">
-  <div class="card scale-chart-card">
-    <button id="close-help-chart" class="close-btn" aria-label="Close Help Chart">✖</button>
-    <div id="help-scale-chart"></div>
-    <div id="help-feedback" class="feedback"></div>
+  <!-- Help Chart Modal -->
+  <div id="help-chart-modal" class="modal hidden">
+    <div class="card scale-chart-card">
+      <button id="close-help-chart" class="close-btn" aria-label="Close Help Chart">✖</button>
+      <div id="help-scale-chart"></div>
+      <div id="help-feedback" class="feedback"></div>
+    </div>
   </div>
-</div>
 
+  <script src="script.js"></script>
 </body>
 </html>
- 
