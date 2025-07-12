@@ -29,11 +29,23 @@ const scoreSummary = document.getElementById('score-summary');
 const playAgainBtn = document.getElementById('play-again');
 const helpBtn = document.getElementById('help-btn');
 
-const countdown = document.createElement('div');
-countdown.id = 'countdown';
-countdown.style.fontSize = '20px';
-countdown.style.marginTop = '10px';
-quizCard.appendChild(countdown);
+// Timer-related elements and constants
+// Only the totalTimer (bottom center) is used for the active quiz timer.
+
+// Add total timer at bottom center
+const totalTimer = document.createElement('div');
+totalTimer.id = 'total-timer';
+totalTimer.style.position = 'absolute';
+totalTimer.style.bottom = '8px';
+totalTimer.style.left = '50%';
+totalTimer.style.transform = 'translateX(-50%)';
+totalTimer.style.zIndex = '10';
+totalTimer.style.background = 'rgba(255, 255, 255, 0.85)';
+totalTimer.style.padding = '6px 12px';
+totalTimer.style.borderRadius = '6px';
+totalTimer.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+totalTimer.style.fontWeight = 'bold';
+quizCard.appendChild(totalTimer);
 
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -115,8 +127,10 @@ function bindUIEvents() {
   startBtn.addEventListener('click', () => {
     resetQuiz();
     quizStartTime = performance.now();
+    startTotalTimer();
     quizActive = true;
-    generateQuiz(levelSelect.value, +document.getElementById('question-count').value);
+    // Generate enough questions to last full 3 minutes (no question count limit)
+    generateQuiz(levelSelect.value, 200); // Generate enough questions to last full 3 minutes
     if (quizData.length === 0) {
       alert("⚠️ No questions generated. Please check your settings.");
       return;
@@ -148,6 +162,15 @@ function bindUIEvents() {
 // ================================
 function populateKeys() {
   keySelect.innerHTML = '';
+  
+  // Add "Random" as the first and selected option
+  const randomOption = document.createElement('option');
+  randomOption.value = 'random';
+  randomOption.textContent = 'Random';
+  randomOption.selected = true;
+  keySelect.appendChild(randomOption);
+
+  // Add remaining key options
   keys.forEach(k => {
     const opt = document.createElement('option');
     opt.value = k;
@@ -348,6 +371,10 @@ document.querySelectorAll('.input-icon').forEach(icon => {
 function generateQuiz(level, count) {
   quizData = [];
   const selectedDegree = +document.getElementById('degree-select')?.value;
+  let fixedKey;
+  if (level === 'easy') {
+    fixedKey = keySelect.value === 'random' ? randomChoice(keys) : keySelect.value;
+  }
   for (let i = 0; i < count; i++) {
     let degree, key;
     if (level === 'degree-training') {
@@ -355,7 +382,7 @@ function generateQuiz(level, count) {
       key = randomChoice(keys);
     } else {
       degree = Math.floor(Math.random() * 7) + 1;
-      key = level === 'easy' ? keySelect.value : randomChoice(keys);
+      key = (level === 'easy') ? fixedKey : randomChoice(keys);
     }
     const scale = getScale(key);
     const isDegreeLevel = level === 'easy' || level === 'intermediate' || level === 'degree-training';
@@ -389,7 +416,7 @@ function showQuestion() {
   clearTimeout(timer);
   clearInterval(countdownInterval);
   feedback.textContent = '';
-  countdown.style.color = 'black';
+  // Only the total timer is displayed; per-question countdown is not shown.
   const q = quizData[currentIndex];
   questionDiv.textContent = q.question;
   answerButtons.innerHTML = '';
@@ -403,26 +430,8 @@ function showQuestion() {
     };
     answerButtons.appendChild(btn);
   });
-  const seconds = +document.getElementById('time-limit').value;
-  let timeLeft = seconds;
-  countdown.textContent = `⏳ ${timeLeft} seconds`;
-  countdown.style.transition = 'color 0.5s ease';
-  countdownInterval = setInterval(() => {
-    if (isPaused) return;
-    timeLeft--;
-    countdown.textContent = `⏳ ${timeLeft} seconds`;
-    if (timeLeft <= 3) {
-      countdown.style.color = 'red';
-      countdown.animate([
-        { transform: 'scale(1)' },
-        { transform: 'scale(1.3)' },
-        { transform: 'scale(1)' }
-      ], { duration: 500, iterations: 1 });
-    } else {
-      countdown.style.color = 'black';
-    }
-    if (timeLeft <= 0) clearInterval(countdownInterval);
-  }, 1000);
+  // No countdown display or interval
+  const seconds = 7;
   timer = setTimeout(() => {
     if (!isPaused) {
       playIncorrectSound();
@@ -466,21 +475,29 @@ function showFeedback(correct) {
 
 function nextQuestion() {
   currentIndex++;
-  if (currentIndex < quizData.length) {
+  const elapsedTime = (performance.now() - quizStartTime) / 1000;
+  if (quizActive && elapsedTime >= 180) {
+    endQuiz();
+  } else if (currentIndex < quizData.length) {
     showQuestion();
-  } else if (quizActive && currentIndex >= quizData.length) {
-    const best = Math.max(correctAnswers, parseInt(localStorage.getItem('bestScore') || 0));
-    localStorage.setItem('bestScore', best);
-    quizCard.classList.add('hidden');
-    resultsCard.classList.remove('hidden');
-    const elapsedTime = ((performance.now() - quizStartTime) / 1000).toFixed(1);
-    scoreSummary.innerHTML = `
-      <div style="font-size: 1.2em; margin-bottom: 16px;">🏆 Best Score: <strong>${best}</strong></div>
-      <div>✅ You scored <strong>${correctAnswers}</strong> out of ${quizData.length}</div>
-      <div>⏱️ Time: <strong>${elapsedTime}</strong> seconds</div>
-    `;
-    playAgainBtn.textContent = "Try Again";
+  } else {
+    endQuiz();
   }
+}
+
+function endQuiz() {
+  const best = Math.max(correctAnswers, parseInt(localStorage.getItem('bestScore') || 0));
+  localStorage.setItem('bestScore', best);
+  quizCard.classList.add('hidden');
+  resultsCard.classList.remove('hidden');
+  const elapsedTime = ((performance.now() - quizStartTime) / 1000).toFixed(1);
+  scoreSummary.innerHTML = `
+    <div style="font-size: 1.2em; margin-bottom: 16px;">🏆 Best Score: <strong>${best}</strong></div>
+    <div>✅ Correct: <strong>${correctAnswers}</strong></div>
+    <div>❌ Incorrect: <strong>${quizData.length - correctAnswers}</strong></div>
+    <div>⏱️ Time: <strong>${elapsedTime}</strong> seconds</div>
+  `;
+  playAgainBtn.textContent = "Try Again";
 }
 
 function resetQuiz() {
@@ -490,9 +507,12 @@ function resetQuiz() {
   clearTimeout(timer);
   clearInterval(countdownInterval);
   clearInterval(metronomeInterval);
+  clearInterval(totalTimer.intervalId);
+  totalTimer.textContent = '';
   feedback.textContent = '';
-  countdown.textContent = '';
+  // Removed: countdown.textContent = '';
   quizActive = false;
+  // quizStartTime is set when quiz starts, so no need to reset here unless tracking elapsed time between quizzes
 }
 
 // ================================
@@ -584,3 +604,33 @@ function shuffle(arr) {
   return arr.sort(() => Math.random() - 0.5);
 }
 
+
+// ================================
+// 5.5. Total Timer
+// ================================
+function startTotalTimer() {
+  const totalDuration = 180;
+  function updateTotalTimer() {
+    const elapsed = Math.floor((performance.now() - quizStartTime) / 1000);
+    const remaining = totalDuration - elapsed;
+    const min = Math.floor(remaining / 60);
+    const sec = remaining % 60;
+    totalTimer.textContent = `⏱️ ${min}:${sec < 10 ? '0' + sec : sec} remaining`;
+    if (remaining <= 15) {
+      totalTimer.style.color = 'red';
+      totalTimer.animate([
+        { transform: 'scale(1)' },
+        { transform: 'scale(1.2)' },
+        { transform: 'scale(1)' }
+      ], { duration: 500, iterations: 1 });
+    } else {
+      totalTimer.style.color = 'black';
+    }
+    if (remaining <= 0 || !quizActive) {
+      clearInterval(totalTimer.intervalId);
+      totalTimer.textContent = '';
+    }
+  }
+  updateTotalTimer();
+  totalTimer.intervalId = setInterval(updateTotalTimer, 1000);
+}

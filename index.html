@@ -11,22 +11,10 @@
   <main>
     <!-- Settings Card -->
     <section id="settings-card" class="card">
-      <h1>Scale Driller</h1>
-
-      <!-- Level Selection -->
-      <div class="setting-group">
-        <label for="level-select">Quiz Level</label>
-        <select id="level-select">
-          <option value="easy">Easy</option>
-          <option value="intermediate">Intermediate</option>
-          <option value="hard">Hard</option>
-          <option value="degree-training">Degree Training</option>
-        </select>
-      </div>
+      <h1 class="app-title">Scale Driller</h1>
 
       <!-- Instrument Input Icons -->
       <div class="setting-group" id="input-type-group">
-        <label>Input Type</label>
         <div class="input-icons">
           <img src="images/icon_keys.png" alt="Keys Icon" class="input-icon selected" data-type="keys" title="Keys" />
           <img src="images/icon_piano.png" alt="Piano Icon" class="input-icon" data-type="piano" title="Piano" />
@@ -35,10 +23,23 @@
         </div>
       </div>
 
+      <!-- Level Selection -->
+      <div class="setting-group">
+        <label for="level-select">Training Mode</label>
+        <select id="level-select">
+          <option value="easy">Easy</option>
+          <option value="intermediate">Intermediate</option>
+          <option value="hard">Hard</option>
+          <option value="degree-training">Degree Training</option>
+        </select>
+      </div>
+
       <!-- Conditional Input Settings -->
       <div id="key-select-container" class="setting-group hidden">
         <label for="key-select">Key</label>
-        <select id="key-select"></select>
+        <select id="key-select">
+          <option value="random" selected>Random</option>
+        </select>
       </div>
 
       <div id="degree-select-container" class="setting-group hidden">
@@ -63,18 +64,6 @@
         </select>
       </div>
 
-      <!-- Time Limit -->
-      <div class="setting-group">
-        <label for="time-limit">Seconds per Question</label>
-        <input type="range" id="time-limit" min="5" max="30" step="5" value="10" />
-      </div>
-
-      <!-- Number of Questions -->
-      <div class="setting-group">
-        <label for="question-count">Number of Questions</label>
-        <input type="number" id="question-count" min="1" max="200" value="10" />
-      </div>
-
       <!-- Start Button -->
       <div class="setting-group">
         <button id="start-btn" class="start-button">Start</button>
@@ -92,17 +81,13 @@
         <div id="custom-input-ui"></div>
         <div id="answer-buttons"></div>
       </div>
-
-      <div id="piano-ui" class="instrument-ui hidden">
-        <!-- Piano UI will be generated dynamically -->
-      </div>
-      <div id="bass-ui" class="instrument-ui hidden">
-        <!-- Bass Guitar UI will be generated dynamically -->
-      </div>
+      <div id="piano-ui" class="instrument-ui hidden"></div>
+      <div id="bass-ui" class="instrument-ui hidden"></div>
       <div id="feedback" class="feedback"></div>
       <div id="inline-chart-container" class="hidden">
         <div id="inline-scale-chart"></div>
       </div>
+      <!-- Timer will be injected dynamically -->
     </section>
 
     <!-- Results Card -->
@@ -122,9 +107,11 @@
     </div>
   </div>
 
-</body>
+  <!-- Orientation Hint -->
   <div id="orientation-hint" class="hidden">
     📱 Rotate your device for a better experience!
   </div>
+
   <script src="script.js"></script>
+</body>
 </html>

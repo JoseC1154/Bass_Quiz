@@ -44,22 +44,26 @@ main {
 .setting-group {
   width: 100%;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 6px;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 /* --- 3. Forms and Controls (Labels, Inputs, Buttons) --- */
 .setting-group label {
+  flex: 1;
+  margin: 0;
   font-weight: bold;
-  width: 100%;
-  margin-top: 10px;
-  text-align: left;
+  text-align: right;
+  white-space: nowrap;
+  padding-right: 8px;
 }
 
 .setting-group select,
 .setting-group input[type="number"] {
-  width: 90%;
+  flex: 2;
+  width: auto;
   padding: 8px;
   font-size: 16px;
   border: 1px solid #ccc;
@@ -240,14 +244,7 @@ button:hover {
   font-weight: bold;
 }
 
-/* --- 7. Countdown and Close Buttons --- */
-#countdown {
-  font-weight: bold;
-  text-align: center;
-  margin-top: 10px;
-  font-size: 20px;
-}
-
+/* --- 7. Close Buttons --- */
 .close-btn {
   background: transparent;
   color: #333;
@@ -267,14 +264,6 @@ button:hover {
   color: red;
   background: transparent;
   transform: scale(1.2);
-}
-
-/* For modal close button positioning */
-#close-scale-chart.close-btn {
-  position: absolute;
-  top: 8px;
-  left: 24px;
-  z-index: 2;
 }
 
 /* Prevent lingering hover/focus/active effects on mobile devices */
@@ -310,6 +299,20 @@ button:active {
     overflow-x: auto;
     max-width: 100%;
   }
+  /* Optionally stack setting-group vertically on mobile: */
+  /*
+  .setting-group {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+  .setting-group label,
+  .setting-group select,
+  .setting-group input[type="number"] {
+    flex: unset;
+    width: 100%;
+  }
+  */
 }
 
 /* --- 9. Input UI Styles (Piano, Icons) --- */
@@ -393,8 +396,8 @@ button:active {
   justify-content: center;
   align-items: center;
   gap: 12px;
-  margin-top: 8px;
-  margin-bottom: 12px;
+  margin: 0 auto;
+  flex: 2;
 }
 
 .input-icon {
@@ -416,38 +419,7 @@ button:active {
   box-shadow: 0 4px 6px rgba(0,0,0,0.2);
 }
 
-/* --- 11. Bass Guitar UI Enhancements --- */
-.bass-string-label {
-  font-weight: bold;
-  margin-right: 8px;
-  width: 20px;
-  display: inline-block;
-  text-align: right;
-}
-
-.bass-fret.pressed {
-  background-color: #b3e5fc;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
-}
-
-.bass-fret.correct {
-  background-color: #4CAF50 !important;
-  color: black !important;
-}
-
-.bass-fret.incorrect {
-  background-color: #f44336 !important;
-  color: black !important;
-}
-
-@media (max-width: 600px) {
-  .bass-fret {
-    width: 36px;
-    font-size: 0.7rem;
-  }
-}
-
-/* --- 10. Input UI Styles (Bass Guitar) --- */
+/* --- 10. Bass Guitar UI Styles --- */
 .bass-fretboard {
   position: relative;
   width: 100%;
@@ -512,8 +484,26 @@ button:active {
   min-width: 36px;
 }
 
-.bass-fretboard {
-  position: relative;
+.bass-fret.pressed {
+  background-color: #b3e5fc;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+}
+
+.bass-fret.correct {
+  background-color: #4CAF50 !important;
+  color: black !important;
+}
+
+.bass-fret.incorrect {
+  background-color: #f44336 !important;
+  color: black !important;
+}
+
+@media (max-width: 600px) {
+  .bass-fret {
+    width: 36px;
+    font-size: 0.7rem;
+  }
 }
 
 .nut-line {
@@ -540,7 +530,7 @@ button:active {
 } 
 
 
-/* --- 12. Bass Guitar Fret Markers --- */
+/* --- 11. Fret Markers and Wires --- */
 
 .fret-wire {
   position: absolute;
@@ -576,7 +566,7 @@ button:active {
     display: block;
   }
 }
-/* --- 13. Full-Width Quiz Card --- */
+/* --- 12. Layout Helpers --- */
 .card.full-width {
   max-width: 100%;
   width: 100%;
