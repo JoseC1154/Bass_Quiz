@@ -29,15 +29,6 @@
     <section id="settings-card" class="card" role="region" aria-label="Settings">
       <h1 class="app-title">Scale Driller</h1>
 
-      <!-- Instrument Input Icons -->
-      <div class="setting-group" id="input-type-group">
-        <div class="input-icons">
-          <img src="images/icon_keys.png" alt="Keys Icon" class="input-icon selected" data-type="keys" title="Keys" />
-          <img src="images/icon_piano.png" alt="Piano Icon" class="input-icon" data-type="piano" title="Piano" />
-          <img src="images/icon_bass.png" alt="Bass Icon" class="input-icon" data-type="bass" title="Bass" />
-          <img src="images/icon_guitar.png" alt="Guitar Icon" class="input-icon" data-type="guitar" title="Guitar" />
-        </div>
-      </div>
 
       <!-- Level Selection -->
       <div class="setting-group">
@@ -80,9 +71,14 @@
         </select>
       </div>
 
-      <!-- Start Button -->
-      <div class="setting-group">
-        <button id="start-btn" class="start-button">Start</button>
+      <!-- Instrument Input Icons -->
+      <div class="setting-group" id="input-type-group">
+        <div class="input-icons">
+          <img src="images/icon_keys.png" alt="Keys Icon" class="input-icon selected" data-type="keys" title="Keys" />
+          <img src="images/icon_piano.png" alt="Piano Icon" class="input-icon" data-type="piano" title="Piano" />
+          <img src="images/icon_bass.png" alt="Bass Icon" class="input-icon" data-type="bass" title="Bass" />
+          <img src="images/icon_guitar.png" alt="Guitar Icon" class="input-icon" data-type="guitar" title="Guitar" />
+        </div>
       </div>
     </section>
 
@@ -91,6 +87,7 @@
       <div id="quiz-header" class="setting-group">
         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
           <button id="close-quiz" class="close-btn" aria-label="Close Quiz">✖</button>
+          <div id="total-timer" style="padding: 6px 12px; border-radius: 6px; font-weight: bold; text-align: center;">2:00 remaining</div>
           <button id="help-btn" class="help-btn">?</button>
         </div>
       </div>

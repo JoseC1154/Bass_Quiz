@@ -126,24 +126,6 @@ function bindUIEvents() {
   });
   keySelect.addEventListener('change', updateChart);
   document.getElementById('scale-type').addEventListener('change', updateChart);
-  startBtn.addEventListener('click', () => {
-    resetQuiz();
-    quizStartTime = performance.now();
-    startTotalTimer();
-    quizActive = true;
-    // Generate enough questions to last full 3 minutes (no question count limit)
-    generateQuiz(levelSelect.value, 200); // Generate enough questions to last full 3 minutes
-    if (quizData.length === 0) {
-      alert("⚠️ No questions generated. Please check your settings.");
-      return;
-    }
-    settingsCard.classList.add('hidden');
-    quizCard.classList.remove('hidden');
-    quizCard.classList.add('full-width');
-    updateInputUI();
-    showQuestion();
-    startMetronome();
-  });
   closeQuizBtn.addEventListener('click', () => {
     clearTimeout(timer);
     clearInterval(countdownInterval);
@@ -413,8 +395,27 @@ document.querySelectorAll('.input-icon').forEach(icon => {
     document.querySelectorAll('.input-icon').forEach(i => i.classList.remove('selected'));
     icon.classList.add('selected');
     updateInputUI();
+    startQuiz();
   });
 });
+
+function startQuiz() {
+  resetQuiz();
+  quizStartTime = performance.now();
+  startTotalTimer();
+  quizActive = true;
+  generateQuiz(levelSelect.value, 200);
+  if (quizData.length === 0) {
+    alert("⚠️ No questions generated. Please check your settings.");
+    return;
+  }
+  settingsCard.classList.add('hidden');
+  quizCard.classList.remove('hidden');
+  quizCard.classList.add('full-width');
+  updateInputUI();
+  showQuestion();
+  startMetronome();
+}
 
 // ================================
 // 4. Quiz Logic
