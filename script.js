@@ -88,6 +88,13 @@ document.addEventListener('DOMContentLoaded', () => {
     helpFeedback.textContent = `ℹ️ Answer: ${quizData[currentIndex].answer}`;
     helpChartModal.classList.remove('hidden');
   });
+
+  // Ensure piano keys UI updates responsively on window resize
+  window.addEventListener('resize', () => {
+    if (!quizCard.classList.contains('hidden')) {
+      updateInputUI();
+    }
+  });
 });
 
 function initializeUI() {
@@ -218,8 +225,22 @@ function updateInputUI() {
     document.getElementById('piano-ui')?.classList.remove('hidden');
     const container = document.getElementById('piano-ui');
     container.innerHTML = '';
-    const whiteNotes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
-    const blackNotes = ['Db', 'Eb', '', 'F#', 'Ab', 'Bb', ''];
+    // Dynamically calculate number of white keys that fit based on quiz card width
+    const containerWidth = document.getElementById('quiz-card').clientWidth * 0.9;
+    const whiteKeyWidth = 40;
+    const maxWhiteKeys = Math.floor(containerWidth / whiteKeyWidth);
+    const whiteNotePattern = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+    const blackNotePattern = ['Db', 'Eb', '', 'F#', 'Ab', 'Bb', ''];
+
+    let whiteNotes = [];
+    let blackNotes = [];
+
+    for (let i = 0; i < maxWhiteKeys; i++) {
+      const patternIndex = i % whiteNotePattern.length;
+      whiteNotes.push(whiteNotePattern[patternIndex]);
+      blackNotes.push(blackNotePattern[patternIndex]);
+    }
+
     const piano = document.createElement('div');
     piano.className = 'piano';
     whiteNotes.forEach((note, i) => {
