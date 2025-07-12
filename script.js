@@ -171,10 +171,15 @@ function bindUIEvents() {
   closeQuizBtn.addEventListener('click', () => {
     clearTimeout(timer);
     clearInterval(countdownInterval);
-    resetQuiz();
     quizCard.classList.add('hidden');
     quizCard.classList.remove('full-width');
-    settingsCard.classList.remove('hidden');
+
+    // End quiz and show results card with correct vs incorrect
+    endQuiz();
+
+    // Make sure settings are hidden and results are shown
+    settingsCard.classList.add('hidden');
+    resultsCard.classList.remove('hidden');
   });
   playAgainBtn.addEventListener('click', () => {
     quizCard.classList.remove('full-width');
@@ -662,7 +667,7 @@ function shuffle(arr) {
 // 5.5. Total Timer
 // ================================
 function startTotalTimer() {
-  const totalDuration = 180;
+  const totalDuration = 120;
   function updateTotalTimer() {
     const elapsed = Math.floor((performance.now() - quizStartTime) / 1000);
     const remaining = totalDuration - elapsed;
