@@ -88,9 +88,11 @@
 
     <!-- Quiz Card -->
     <section id="quiz-card" class="card hidden" role="region" aria-label="Quiz">
-      <div id="quiz-header">
-        <button id="close-quiz" class="close-btn" aria-label="Close Quiz">✖</button>
-        <button id="help-btn" class="help-btn">?</button>
+      <div id="quiz-header" class="setting-group">
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <button id="close-quiz" class="close-btn" aria-label="Close Quiz">✖</button>
+          <button id="help-btn" class="help-btn">?</button>
+        </div>
       </div>
       <div id="quiz-question"></div>
       <div id="keys-ui" class="instrument-ui hidden">
@@ -103,7 +105,6 @@
       <div id="inline-chart-container" class="hidden">
         <div id="inline-scale-chart"></div>
       </div>
-      <!-- Timer will be injected dynamically -->
     </section>
 
     <!-- Results Card -->

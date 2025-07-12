@@ -28,34 +28,10 @@ const feedback = document.getElementById('feedback');
 const scoreSummary = document.getElementById('score-summary');
 const playAgainBtn = document.getElementById('play-again');
 const helpBtn = document.getElementById('help-btn');
+const totalTimer = document.getElementById('total-timer');
 
 // Timer-related elements and constants
-// Only the totalTimer (bottom center) is used for the active quiz timer.
-
-// Add total timer at bottom center
-const totalTimer = document.createElement('div');
-totalTimer.id = 'total-timer';
-totalTimer.style.position = 'absolute';
-totalTimer.style.bottom = '8px';
-totalTimer.style.left = '50%';
-totalTimer.style.transform = 'translateX(-50%)';
-totalTimer.style.zIndex = '10';
-totalTimer.style.padding = '6px 12px';
-totalTimer.style.borderRadius = '6px';
-totalTimer.style.fontWeight = 'bold';
-const pianoUI = document.getElementById('piano-ui');
-const bassUI = document.getElementById('bass-ui');
-const keysUI = document.getElementById('keys-ui');
-
-if (pianoUI && pianoUI.parentElement === quizCard) {
-  quizCard.insertBefore(totalTimer, pianoUI.nextSibling);
-} else if (bassUI && bassUI.parentElement === quizCard) {
-  quizCard.insertBefore(totalTimer, bassUI.nextSibling);
-} else if (keysUI && keysUI.parentElement === quizCard) {
-  quizCard.insertBefore(totalTimer, keysUI.nextSibling);
-} else {
-  quizCard.appendChild(totalTimer);
-}
+// Only the totalTimer (now in header) is used for the active quiz timer.
 
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -172,7 +148,9 @@ function bindUIEvents() {
     clearTimeout(timer);
     clearInterval(countdownInterval);
     clearInterval(metronomeInterval);
-    clearInterval(totalTimer.intervalId);
+    if (totalTimer && totalTimer.intervalId) {
+      clearInterval(totalTimer.intervalId);
+    }
     quizCard.classList.add('hidden');
     quizCard.classList.remove('full-width');
     quizActive = false;
@@ -580,8 +558,12 @@ function resetQuiz() {
   clearTimeout(timer);
   clearInterval(countdownInterval);
   clearInterval(metronomeInterval);
-  clearInterval(totalTimer.intervalId);
-  totalTimer.textContent = '';
+  if (totalTimer && totalTimer.intervalId) {
+    clearInterval(totalTimer.intervalId);
+  }
+  if (totalTimer) {
+    totalTimer.textContent = '';
+  }
   feedback.textContent = '';
   // Removed: countdown.textContent = '';
   quizActive = false;
@@ -684,11 +666,14 @@ function shuffle(arr) {
 function startTotalTimer() {
   const totalDuration = 120;
   function updateTotalTimer() {
+    if (!totalTimer) return;
+
     const elapsed = Math.floor((performance.now() - quizStartTime) / 1000);
     const remaining = totalDuration - elapsed;
     const min = Math.floor(remaining / 60);
     const sec = remaining % 60;
     totalTimer.textContent = `${min}:${sec < 10 ? '0' + sec : sec} remaining`;
+
     if (remaining <= 15) {
       totalTimer.style.color = 'red';
       totalTimer.animate([
@@ -699,11 +684,14 @@ function startTotalTimer() {
     } else {
       totalTimer.style.color = 'black';
     }
+
     if (remaining <= 0 || !quizActive) {
       clearInterval(totalTimer.intervalId);
       totalTimer.textContent = '';
     }
   }
   updateTotalTimer();
-  totalTimer.intervalId = setInterval(updateTotalTimer, 1000);
+  if (totalTimer) {
+    totalTimer.intervalId = setInterval(updateTotalTimer, 1000);
+  }
 }
