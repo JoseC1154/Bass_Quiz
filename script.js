@@ -89,6 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
       el.style.overflowY = 'auto';
     }
   });
+  fetchGitHubVersion();
 });
 
 function initializeUI() {
@@ -682,5 +683,23 @@ function startTotalTimer() {
   updateTotalTimer();
   if (totalTimer) {
     totalTimer.intervalId = setInterval(updateTotalTimer, 1000);
+  }
+}
+
+// ================================
+// 8. GitHub Version Fetch
+// ================================
+async function fetchGitHubVersion() {
+  try {
+    const response = await fetch("https://api.github.com/repos/josecardona/Bass_Quiz/releases/latest");
+    const data = await response.json();
+    if (data && data.tag_name) {
+      const versionDisplay = document.getElementById('version-info');
+      if (versionDisplay) {
+        versionDisplay.textContent = `Scale Driller ${data.tag_name}`;
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching GitHub version:", error);
   }
 }
