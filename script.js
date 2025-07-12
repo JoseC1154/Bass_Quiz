@@ -241,6 +241,12 @@ function updateInputUI() {
       blackNotes.push(blackNotePattern[patternIndex]);
     }
 
+    // Filter quiz options to only include those currently displayed (both white and black notes)
+    if (quizData[currentIndex]) {
+      const visibleNotes = [...whiteNotes, ...blackNotes.filter(note => note !== '')];
+      quizData[currentIndex].options = quizData[currentIndex].options.filter(opt => visibleNotes.includes(opt));
+    }
+
     const piano = document.createElement('div');
     piano.className = 'piano';
     whiteNotes.forEach((note, i) => {
@@ -344,35 +350,33 @@ function handleNoteClick(note) {
   const frets = document.querySelectorAll('.bass-fret');
   frets.forEach(f => f.disabled = true);
 
-  const selectedKey = document.querySelector(`[data-note="${note}"]`);
-  const correctKey = document.querySelector(`[data-note="${correct}"]`);
-  // For bass, select fret elements
-  const selectedFret = document.querySelector(`.bass-fret[data-note="${note}"]`);
-  const correctFret = document.querySelector(`.bass-fret[data-note="${correct}"]`);
+  // Select all visible keys/frets with the selected and correct notes
+  const selectedKeys = document.querySelectorAll(`[data-note="${note}"]`);
+  const correctKeys = document.querySelectorAll(`[data-note="${correct}"]`);
 
   if (note === correct) {
     playCorrectSound();
-    if (selectedKey) selectedKey.classList.add('correct');
-    if (selectedFret) selectedFret.classList.add('correct');
+    selectedKeys.forEach(key => key.classList.add('correct'));
+    document.querySelectorAll(`.bass-fret[data-note="${note}"]`).forEach(f => f.classList.add('correct'));
     feedback.textContent = '✅ Correct!';
     correctAnswers++;
     setTimeout(() => {
-      if (selectedKey) selectedKey.classList.remove('correct');
-      if (selectedFret) selectedFret.classList.remove('correct');
+      selectedKeys.forEach(key => key.classList.remove('correct'));
+      document.querySelectorAll(`.bass-fret[data-note="${note}"]`).forEach(f => f.classList.remove('correct'));
       nextQuestion();
     }, 300);
   } else {
     playIncorrectSound();
-    if (selectedKey) selectedKey.classList.add('incorrect');
-    if (selectedFret) selectedFret.classList.add('incorrect');
-    if (correctKey) correctKey.classList.add('correct');
-    if (correctFret) correctFret.classList.add('correct');
+    selectedKeys.forEach(key => key.classList.add('incorrect'));
+    document.querySelectorAll(`.bass-fret[data-note="${note}"]`).forEach(f => f.classList.add('incorrect'));
+    correctKeys.forEach(key => key.classList.add('correct'));
+    document.querySelectorAll(`.bass-fret[data-note="${correct}"]`).forEach(f => f.classList.add('correct'));
     feedback.textContent = `❌ Incorrect. Answer: ${correct}`;
     setTimeout(() => {
-      if (selectedKey) selectedKey.classList.remove('incorrect');
-      if (selectedFret) selectedFret.classList.remove('incorrect');
-      if (correctKey) correctKey.classList.remove('correct');
-      if (correctFret) correctFret.classList.remove('correct');
+      selectedKeys.forEach(key => key.classList.remove('incorrect'));
+      document.querySelectorAll(`.bass-fret[data-note="${note}"]`).forEach(f => f.classList.remove('incorrect'));
+      correctKeys.forEach(key => key.classList.remove('correct'));
+      document.querySelectorAll(`.bass-fret[data-note="${correct}"]`).forEach(f => f.classList.remove('correct'));
       nextQuestion();
     }, 1000);
   }
