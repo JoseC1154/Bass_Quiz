@@ -95,6 +95,15 @@ document.addEventListener('DOMContentLoaded', () => {
       updateInputUI();
     }
   });
+
+  // Constrain the height of main UI cards
+  ['settings-card', 'quiz-card', 'results-card'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.style.maxHeight = '95vh';
+      el.style.overflowY = 'auto';
+    }
+  });
 });
 
 function initializeUI() {

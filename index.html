@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Scale Driller</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <main>
+  <main style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh;">
     <!-- Settings Card -->
-    <section id="settings-card" class="card">
+    <section id="settings-card" class="card" role="region" aria-label="Settings">
       <h1 class="app-title">Scale Driller</h1>
 
       <!-- Instrument Input Icons -->
@@ -71,7 +71,7 @@
     </section>
 
     <!-- Quiz Card -->
-    <section id="quiz-card" class="card hidden">
+    <section id="quiz-card" class="card hidden" role="region" aria-label="Quiz">
       <div id="quiz-header">
         <button id="close-quiz" class="close-btn" aria-label="Close Quiz">✖</button>
         <button id="help-btn" class="help-btn">?</button>
@@ -91,7 +91,7 @@
     </section>
 
     <!-- Results Card -->
-    <section id="results-card" class="card hidden">
+    <section id="results-card" class="card hidden" role="region" aria-label="Results">
       <h2>Quiz Complete!</h2>
       <p id="score-summary"></p>
       <button id="play-again">Try Again</button>
