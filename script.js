@@ -24,7 +24,6 @@ const resultsCard = document.getElementById('results-card');
 const closeQuizBtn = document.getElementById('close-quiz');
 const questionDiv = document.getElementById('quiz-question');
 const answerButtons = document.getElementById('answer-buttons');
-const feedback = document.getElementById('feedback');
 const scoreSummary = document.getElementById('score-summary');
 const playAgainBtn = document.getElementById('play-again');
 const helpBtn = document.getElementById('help-btn');
@@ -366,7 +365,6 @@ function handleNoteClick(note) {
     playCorrectSound();
     selectedKeys.forEach(key => key.classList.add('correct'));
     document.querySelectorAll(`.bass-fret[data-note="${note}"]`).forEach(f => f.classList.add('correct'));
-    feedback.textContent = '✅ Correct!';
     correctAnswers++;
     setTimeout(() => {
       selectedKeys.forEach(key => key.classList.remove('correct'));
@@ -379,7 +377,6 @@ function handleNoteClick(note) {
     document.querySelectorAll(`.bass-fret[data-note="${note}"]`).forEach(f => f.classList.add('incorrect'));
     correctKeys.forEach(key => key.classList.add('correct'));
     document.querySelectorAll(`.bass-fret[data-note="${correct}"]`).forEach(f => f.classList.add('correct'));
-    feedback.textContent = `❌ Incorrect. Answer: ${correct}`;
     setTimeout(() => {
       selectedKeys.forEach(key => key.classList.remove('incorrect'));
       document.querySelectorAll(`.bass-fret[data-note="${note}"]`).forEach(f => f.classList.remove('incorrect'));
@@ -467,7 +464,6 @@ function showQuestion() {
   if (!quizData[currentIndex]) return;
   clearTimeout(timer);
   clearInterval(countdownInterval);
-  feedback.textContent = '';
   // Only the total timer is displayed; per-question countdown is not shown.
   const q = quizData[currentIndex];
   questionDiv.textContent = q.question;
@@ -509,21 +505,9 @@ function checkAnswer(selected) {
     if (btn.textContent === correct) btn.classList.add('correct');
     if (btn.textContent === selected && !isCorrect) btn.classList.add('incorrect');
   });
-  setTimeout(() => showFeedback(isCorrect), 1000);
+  setTimeout(nextQuestion, 1000);
 }
 
-function showFeedback(correct) {
-  if (correct) {
-    correctAnswers++;
-    playCorrectSound();
-    feedback.textContent = '✅ Correct!';
-    setTimeout(nextQuestion, 300);
-  } else {
-    playIncorrectSound();
-    feedback.textContent = `❌ Incorrect. Answer: ${quizData[currentIndex].answer}`;
-    setTimeout(nextQuestion, 3000);
-  }
-}
 
 function nextQuestion() {
   currentIndex++;
@@ -565,7 +549,7 @@ function resetQuiz() {
   if (totalTimer) {
     totalTimer.textContent = '';
   }
-  feedback.textContent = '';
+  // Removed: feedback.textContent = '';
   // Removed: countdown.textContent = '';
   quizActive = false;
   // quizStartTime is set when quiz starts, so no need to reset here unless tracking elapsed time between quizzes
@@ -592,6 +576,10 @@ function startMetronome() {
     gain.connect(audioCtx.destination);
     gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
     oscillator.start();
+    // Add vibration after oscillator starts
+    if (navigator.vibrate) {
+      navigator.vibrate([50]);
+    }
     oscillator.stop(audioCtx.currentTime + 0.05);
     oscillator.onended = () => {
       oscillator.disconnect();
