@@ -595,3 +595,32 @@ button:active {
   margin: 1rem auto 0 auto;
   max-width: 240px;
 }
+/* --- Question Timer Styles --- */
+#question-timer {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 4px 8px;
+  background-color: rgba(255, 255, 255, 0.85);
+  border-radius: 6px;
+  z-index: 3;
+  animation: none;
+  transition: background-color 0.3s ease;
+}
+
+@keyframes blink-warning {
+  0%   { background-color: orange; }
+  33%  { background-color: green; }
+  66%  { background-color: yellow; }
+  100% { background-color: red; }
+}
+/* --- Total Timer Styles --- */
+#total-timer {
+  margin-top: 16px;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  color: #333;
+}

@@ -40,12 +40,22 @@ totalTimer.style.bottom = '8px';
 totalTimer.style.left = '50%';
 totalTimer.style.transform = 'translateX(-50%)';
 totalTimer.style.zIndex = '10';
-totalTimer.style.background = 'rgba(255, 255, 255, 0.85)';
 totalTimer.style.padding = '6px 12px';
 totalTimer.style.borderRadius = '6px';
-totalTimer.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
 totalTimer.style.fontWeight = 'bold';
-quizCard.appendChild(totalTimer);
+const pianoUI = document.getElementById('piano-ui');
+const bassUI = document.getElementById('bass-ui');
+const keysUI = document.getElementById('keys-ui');
+
+if (pianoUI && pianoUI.parentElement === quizCard) {
+  quizCard.insertBefore(totalTimer, pianoUI.nextSibling);
+} else if (bassUI && bassUI.parentElement === quizCard) {
+  quizCard.insertBefore(totalTimer, bassUI.nextSibling);
+} else if (keysUI && keysUI.parentElement === quizCard) {
+  quizCard.insertBefore(totalTimer, keysUI.nextSibling);
+} else {
+  quizCard.appendChild(totalTimer);
+}
 
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -244,10 +254,19 @@ function updateInputUI() {
     let whiteNotes = [];
     let blackNotes = [];
 
-    for (let i = 0; i < maxWhiteKeys; i++) {
-      const patternIndex = i % whiteNotePattern.length;
-      whiteNotes.push(whiteNotePattern[patternIndex]);
-      blackNotes.push(blackNotePattern[patternIndex]);
+    // Ensure piano starts and ends with a white key (new logic)
+    whiteNotes = [];
+    blackNotes = [];
+
+    while (whiteNotes.length < maxWhiteKeys) {
+      const index = whiteNotes.length % whiteNotePattern.length;
+      whiteNotes.push(whiteNotePattern[index]);
+      blackNotes.push(blackNotePattern[index]);
+    }
+
+    // Ensure last key is a white key (remove trailing black if needed)
+    if (blackNotes[blackNotes.length - 1] !== '') {
+      blackNotes[blackNotes.length - 1] = '';
     }
 
     // Filter quiz options to only include those currently displayed (both white and black notes)
@@ -649,7 +668,7 @@ function startTotalTimer() {
     const remaining = totalDuration - elapsed;
     const min = Math.floor(remaining / 60);
     const sec = remaining % 60;
-    totalTimer.textContent = `⏱️ ${min}:${sec < 10 ? '0' + sec : sec} remaining`;
+    totalTimer.textContent = `${min}:${sec < 10 ? '0' + sec : sec} remaining`;
     if (remaining <= 15) {
       totalTimer.style.color = 'red';
       totalTimer.animate([
