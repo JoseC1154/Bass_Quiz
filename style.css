@@ -395,9 +395,12 @@ button:active {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
   gap: 12px;
   margin: 0 auto;
-  flex: 2;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .input-icon {
@@ -573,4 +576,10 @@ button:active {
   margin: 0;
   padding: 1rem;
   box-sizing: border-box;
+}
+/* Center the start button within the settings card */
+#start-btn {
+  display: block;
+  margin: 1rem auto 0 auto;
+  max-width: 240px;
 }
