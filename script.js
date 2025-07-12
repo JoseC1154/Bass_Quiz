@@ -171,15 +171,30 @@ function bindUIEvents() {
   closeQuizBtn.addEventListener('click', () => {
     clearTimeout(timer);
     clearInterval(countdownInterval);
+    clearInterval(metronomeInterval);
+    clearInterval(totalTimer.intervalId);
     quizCard.classList.add('hidden');
     quizCard.classList.remove('full-width');
+    quizActive = false;
 
-    // End quiz and show results card with correct vs incorrect
-    endQuiz();
+    // Adjust quizData to include only questions attempted
+    const attemptedCount = currentIndex + 1;
+    const displayedQuizData = quizData.slice(0, attemptedCount);
+
+    // Manually end quiz with accurate count
+    const best = Math.max(correctAnswers, parseInt(localStorage.getItem('bestScore') || 0));
+    localStorage.setItem('bestScore', best);
+    resultsCard.classList.remove('hidden');
+    const elapsedTime = ((performance.now() - quizStartTime) / 1000).toFixed(1);
+    scoreSummary.innerHTML = `
+      <div style="font-size: 1.2em; margin-bottom: 16px;">🏆 Best Score: <strong>${best}</strong></div>
+      <div>✅ Correct: <strong>${correctAnswers}</strong></div>
+      <div>❌ Incorrect: <strong>${attemptedCount - correctAnswers}</strong></div>
+      <div>⏱️ Time: <strong>${elapsedTime}</strong> seconds</div>
+    `;
 
     // Make sure settings are hidden and results are shown
     settingsCard.classList.add('hidden');
-    resultsCard.classList.remove('hidden');
   });
   playAgainBtn.addEventListener('click', () => {
     quizCard.classList.remove('full-width');
