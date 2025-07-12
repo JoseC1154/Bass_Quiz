@@ -1,10 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+</head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Scale Driller</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    :root {
+      --vh: 100%;
+    }
+  </style>
+  <script>
+    function setVhUnit() {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    }
+    window.addEventListener('resize', setVhUnit);
+    window.addEventListener('orientationchange', setVhUnit);
+    window.addEventListener('load', setVhUnit);
+  </script>
+</head>
 </head>
 <body>
 

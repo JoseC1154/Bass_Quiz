@@ -2,7 +2,7 @@
 
 /* --- 1. Base Styles --- */
 body, html {
-  min-height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
   width: 100%;
   overflow-x: hidden;
 }
@@ -50,13 +50,15 @@ main {
   box-sizing: border-box;
   margin-left: auto;
   margin-right: auto;
-  overflow-x: auto;
+  overflow: visible;
+  flex-wrap: wrap;
 }
 
 .setting-group {
   width: 100%;
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
@@ -64,7 +66,8 @@ main {
 
 /* --- 3. Forms and Controls (Labels, Inputs, Buttons) --- */
 .setting-group label {
-  flex: 1;
+  flex: 0 1 40%;
+  max-width: 40%;
   margin: 0;
   font-weight: bold;
   text-align: right;
@@ -74,7 +77,8 @@ main {
 
 .setting-group select,
 .setting-group input[type="number"] {
-  flex: 2;
+  flex: 1 1 55%;
+  max-width: 55%;
   width: auto;
   padding: 8px;
   font-size: 16px;
@@ -623,4 +627,12 @@ button:active {
   font-weight: bold;
   text-align: center;
   color: #333;
+}
+/* --- Settings Wrapper Styles --- */
+.settings-wrapper {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  padding: 16px;
+  width: 100%;
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.1);
 }
