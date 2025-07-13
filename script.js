@@ -13,7 +13,7 @@ let correctAnswers = 0;
 let timer, countdownInterval, isPaused = false, quizActive = false, quizStartTime, metronomeInterval;
 
 // Tick-based timer variables
-let totalTicks = 30;
+let totalTicks = 100;
 let currentBpm = 40;
 
 const levelSelect = document.getElementById('level-select');
@@ -642,7 +642,7 @@ function shuffle(arr) {
 // ================================
 function startTotalTimer() {
   // Reset tick and BPM at quiz start
-  totalTicks = 30;
+  totalTicks = 100;
   currentBpm = 40;
 
   updateDisplay();
@@ -678,7 +678,7 @@ function addTicksForCorrect() {
   totalTicks += 2;
   updateDisplay();
   // Increase BPM by 5 every 5 correct answers
-  if (correctAnswers > 0 && correctAnswers % 2 === 0) {
+  if (correctAnswers > 0 && correctAnswers % 4 === 0) {
     currentBpm += 5;
   }
 }
@@ -698,7 +698,7 @@ function updateDisplay() {
   totalTimer.style.color = totalTicks <= 5 ? 'red' : 'black';
 
   // Adjust background color of quizCard based on how close totalTicks is to 0 or max, with smooth transition
-  const maxTicks = 200;
+  const maxTicks = 100;
   const progress = Math.max(0, Math.min(1, totalTicks / maxTicks));
 
   // Transition from red (255, 0, 0) to blue (0, 0, 255)
