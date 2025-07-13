@@ -675,17 +675,17 @@ function startTotalTimer() {
 }
 
 function addTicksForCorrect() {
-  totalTicks += 5;
+  totalTicks += 2;
   updateDisplay();
   // Increase BPM by 5 every 5 correct answers
-  if (correctAnswers > 0 && correctAnswers % 5 === 0) {
+  if (correctAnswers > 0 && correctAnswers % 2 === 0) {
     currentBpm += 5;
   }
 }
 
 function subtractTicksForWrong() {
   console.log('subtractTicksForWrong called. totalTicks before:', totalTicks);
-  totalTicks = Math.max(0, totalTicks - 10);
+  totalTicks = Math.max(0, totalTicks - 5);
   updateDisplay();
 }
 
@@ -698,7 +698,7 @@ function updateDisplay() {
   totalTimer.style.color = totalTicks <= 5 ? 'red' : 'black';
 
   // Adjust background color of quizCard based on how close totalTicks is to 0 or max, with smooth transition
-  const maxTicks = 100;
+  const maxTicks = 200;
   const progress = Math.max(0, Math.min(1, totalTicks / maxTicks));
 
   // Transition from red (255, 0, 0) to blue (0, 0, 255)
