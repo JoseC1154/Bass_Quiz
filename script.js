@@ -658,8 +658,8 @@ function startTotalTimer() {
 
     if ((30 - totalTicks) % 30 === 0 && totalTicks !== 30) {
       currentBpm += 10;
-      if (currentBpm >= 120) {
-        alert("🎉 You win! Final BPM: 120");
+      if (currentBpm >= 240) {
+        alert("🎉 You win! Final BPM: 240");
         endQuiz();
         return;
       }
