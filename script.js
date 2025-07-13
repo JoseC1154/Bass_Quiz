@@ -21,6 +21,7 @@ let levelStartBpm = 40;
 let correctStreak = 0;
 
 const levelSelect = document.getElementById('level-select');
+const difficultySelect = document.getElementById('difficulty-select');
 const keySelect = document.getElementById('key-select');
 const keyContainer = document.getElementById('key-select-container');
 const degreeContainer = document.getElementById('degree-select-container');
@@ -52,6 +53,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initializeUI();
   bindUIEvents();
+
+  // Difficulty slider label update
+  const difficultySlider = document.getElementById('difficulty-select');
+  const difficultyLabel = document.getElementById('difficulty-label');
+  if (difficultySlider && difficultyLabel) {
+    difficultySlider.addEventListener('input', () => {
+      difficultyLabel.textContent = difficultySlider.value;
+    });
+    // Initialize label at load
+    difficultyLabel.textContent = difficultySlider.value;
+  }
 
   document.body.addEventListener('click', () => {
     if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -730,12 +742,15 @@ function addTicksForCorrect() {
     }
   }
 
-  // Award bonus ticks based on current BPM (reduced by one per tier)
-  let bonus = 3;
-  if (currentBpm >= 100 && currentBpm < 160) bonus = 4;
-  else if (currentBpm >= 160 && currentBpm < 210) bonus = 5;
-  else if (currentBpm >= 210) bonus = 6;
-  totalTicks += bonus;
+  // Adjust bonus ticks based on difficulty (now 1-8 slider)
+  const difficulty = parseInt(difficultySelect?.value || 4);
+  const difficultyModifier = Math.floor((4 - difficulty) / 2);  // scale bonus: easier = more ticks
+
+  let bonus = 3 + difficultyModifier;
+  if (currentBpm >= 100 && currentBpm < 160) bonus = 4 + difficultyModifier;
+  else if (currentBpm >= 160 && currentBpm < 210) bonus = 5 + difficultyModifier;
+  else if (currentBpm >= 210) bonus = 6 + difficultyModifier;
+  totalTicks += Math.max(1, bonus);  // Ensure at least 1 tick is added
   updateDisplay();
 }
 
