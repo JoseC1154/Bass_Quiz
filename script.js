@@ -656,7 +656,7 @@ function startTotalTimer() {
     totalTicks--;
     updateDisplay();
 
-    if ((30 - totalTicks) % 30 === 0 && totalTicks !== 30) {
+    if ((100 - totalTicks) % 30 === 0 && totalTicks !== 100) {
       currentBpm += 10;
       if (currentBpm >= 240) {
         alert("🎉 You win! Final BPM: 240");
