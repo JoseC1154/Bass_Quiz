@@ -696,4 +696,19 @@ function updateDisplay() {
   if (!totalTimer) return;
   totalTimer.textContent = `🎵 Ticks: ${totalTicks} remaining | BPM: ${currentBpm}`;
   totalTimer.style.color = totalTicks <= 5 ? 'red' : 'black';
+
+  // Adjust background color of quizCard based on how close totalTicks is to 0 or max, with smooth transition
+  const maxTicks = 100;
+  const progress = Math.max(0, Math.min(1, totalTicks / maxTicks));
+
+  // Transition from red (255, 0, 0) to blue (0, 0, 255)
+  const red = Math.round(255 * (1 - progress));
+  const green = 0;
+  const blue = Math.round(255 * progress);
+
+  const bgColor = `rgb(${red}, ${green}, ${blue})`;
+
+  // Apply smooth transition
+  quizCard.style.transition = 'background-color 0.3s ease';
+  quizCard.style.backgroundColor = bgColor;
 }
