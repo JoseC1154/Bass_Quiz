@@ -48,5 +48,5 @@ I created this to train myself about keys and their placement on different instr
 
 3. What chord has a C (CHor)
 
-4. 
+4. tritone
 
