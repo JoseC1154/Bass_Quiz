@@ -425,9 +425,9 @@ document.querySelectorAll('.input-icon').forEach(icon => {
 
 function startQuiz() {
   resetQuiz();
-  quizActive = true; // ensure this line is present at the start
   quizStartTime = performance.now();
   startTotalTimer();
+  quizActive = true;
   generateQuiz(levelSelect.value, 200);
   if (quizData.length === 0) {
     alert("⚠️ No questions generated. Please check your settings.");
@@ -545,23 +545,13 @@ function endQuiz() {
   localStorage.setItem('bestScore', best);
   quizCard.classList.add('hidden');
   clearInterval(metronomeInterval);
-  // Ensure the tick-based timer stops running after the quiz ends.
-  if (totalTimer && totalTimer.intervalId) {
-    clearInterval(totalTimer.intervalId);
-  }
   resultsCard.classList.remove('hidden');
-  // Format elapsed time as minutes:seconds
-  const totalSeconds = Math.floor((performance.now() - quizStartTime) / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  const elapsedTime = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  // Use attemptedCount to properly calculate incorrect answers
-  const attemptedCount = currentIndex + 1;
+  const elapsedTime = ((performance.now() - quizStartTime) / 1000).toFixed(1);
   scoreSummary.innerHTML = `
     <div style="font-size: 1.2em; margin-bottom: 16px;">🏆 Best Score: <strong>${best}</strong></div>
     <div>✅ Correct: <strong>${correctAnswers}</strong></div>
-    <div>❌ Incorrect: <strong>${attemptedCount - correctAnswers}</strong></div>
-    <div>⏱️ Time: <strong>${elapsedTime}</strong></div>
+    <div>❌ Incorrect: <strong>${quizData.length - correctAnswers}</strong></div>
+    <div>⏱️ Time: <strong>${elapsedTime}</strong> seconds</div>
   `;
   playAgainBtn.textContent = "Try Again";
   // Auto-close the results card after 6 seconds
@@ -689,20 +679,28 @@ function shuffle(arr) {
 // ================================
 function startTotalTimer() {
   // Reset tick and BPM at quiz start
-  totalTicks = 100;
+  totalTicks = 30;
   currentBpm = 40;
 
   updateDisplay();
 
   function tickLoop() {
     if (!quizActive || totalTicks <= 0) {
-      quizActive = false;
       endQuiz();
       return;
     }
 
     totalTicks--;
     updateDisplay();
+
+    if ((30 - totalTicks) % 30 === 0 && totalTicks !== 30) {
+      currentBpm += 10;
+      if (currentBpm >= 120) {
+        alert("🎉 You win! Final BPM: 120");
+        endQuiz();
+        return;
+      }
+    }
 
     const interval = (60 / currentBpm) * 1000;
     clearInterval(totalTimer.intervalId);
@@ -714,17 +712,16 @@ function startTotalTimer() {
 }
 
 function addTicksForCorrect() {
-  if (correctAnswers > 0 && correctAnswers % 3 === 0) {
-    currentBpm += 10;
-    if (currentBpm > 240) {
-      alert(`🔥 New Level! BPM: ${currentBpm}`);
-    }
-  }
-  totalTicks += 4;
+  totalTicks += 5;
   updateDisplay();
+  // Increase BPM by 5 every 5 correct answers
+  if (correctAnswers > 0 && correctAnswers % 5 === 0) {
+    currentBpm += 5;
+  }
 }
 
 function subtractTicksForWrong() {
+  console.log('subtractTicksForWrong called. totalTicks before:', totalTicks);
   totalTicks = Math.max(0, totalTicks - 10);
   updateDisplay();
 }
@@ -734,7 +731,7 @@ function subtractTicksForWrong() {
 // ================================
 function updateDisplay() {
   if (!totalTimer) return;
-  totalTimer.textContent = `🎵 Ticks: ${totalTicks} remaining | BPM: ${currentBpm}`;
+  totalTimer.textContent = '';
   totalTimer.style.color = totalTicks <= 5 ? 'red' : 'black';
 
   // Adjust background color of quizCard based on how close totalTicks is to 0 or max, with smooth transition
