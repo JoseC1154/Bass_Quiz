@@ -15,6 +15,10 @@ let timer, countdownInterval, isPaused = false, quizActive = false, quizStartTim
 // Tick-based timer variables
 let totalTicks = 30;
 let currentBpm = 40;
+let levelStartBpm = 40;
+
+// Track streak of correct answers
+let correctStreak = 0;
 
 const levelSelect = document.getElementById('level-select');
 const keySelect = document.getElementById('key-select');
@@ -160,10 +164,42 @@ function bindUIEvents() {
     settingsCard.classList.add('hidden');
   });
   playAgainBtn.addEventListener('click', () => {
-    resultsCard.classList.add('hidden');
-    settingsCard.classList.remove('hidden');
-    quizCard.classList.add('hidden');
+    // Ensure resultsCard is hidden (safeguard even if user lost)
+    resultsCard.classList.add('hidden');  // Ensure it's hidden
+    quizCard.classList.add('hidden');     // Hide quiz card in case it's still showing
     quizCard.classList.remove('full-width');
+    settingsCard.classList.remove('hidden');
+
+    // Reset all state values
+    currentIndex = 0;
+    correctAnswers = 0;
+    quizData = [];
+    totalTicks = 30;
+    currentBpm = 40;
+    clearTimeout(timer);
+    clearInterval(countdownInterval);
+    clearInterval(metronomeInterval);
+    if (totalTimer && totalTimer.intervalId) {
+      clearInterval(totalTimer.intervalId);
+    }
+    if (totalTimer) {
+      totalTimer.textContent = '';
+    }
+
+    // Reset background color and transition
+    quizCard.style.backgroundColor = '';
+    quizCard.style.transition = '';
+
+    // Hide help chart and quiz UI remnants
+    const helpScaleChart = document.getElementById('help-scale-chart');
+    const helpChartModal = document.getElementById('help-chart-modal');
+    if (helpScaleChart) helpScaleChart.classList.add('hidden');
+    if (helpChartModal) helpChartModal.classList.add('hidden');
+
+    // Reset input selection and UI
+    document.querySelectorAll('.input-icon').forEach(icon => icon.classList.remove('selected'));
+    document.getElementById('custom-input-ui').innerHTML = '';
+    document.querySelectorAll('.instrument-ui').forEach(el => el.classList.add('hidden'));
   });
 }
 
@@ -394,8 +430,8 @@ document.querySelectorAll('.input-icon').forEach(icon => {
 function startQuiz() {
   resetQuiz();
   quizStartTime = performance.now();
-  startTotalTimer();
   quizActive = true;
+  startTotalTimer();
   generateQuiz(levelSelect.value, 200);
   if (quizData.length === 0) {
     alert("⚠️ No questions generated. Please check your settings.");
@@ -515,17 +551,24 @@ function endQuiz() {
   clearInterval(metronomeInterval);
   resultsCard.classList.remove('hidden');
   const elapsedTime = ((performance.now() - quizStartTime) / 1000).toFixed(1);
+  const attemptedCount = currentIndex + 1;
   scoreSummary.innerHTML = `
     <div style="font-size: 1.2em; margin-bottom: 16px;">🏆 Best Score: <strong>${best}</strong></div>
     <div>✅ Correct: <strong>${correctAnswers}</strong></div>
-    <div>❌ Incorrect: <strong>${quizData.length - correctAnswers}</strong></div>
+    <div>❌ Incorrect: <strong>${attemptedCount - correctAnswers}</strong></div>
     <div>⏱️ Time: <strong>${elapsedTime}</strong> seconds</div>
   `;
   playAgainBtn.textContent = "Try Again";
+  // Auto-close the results card after 10 seconds
+  setTimeout(() => {
+    resultsCard.classList.add('hidden');
+    settingsCard.classList.remove('hidden');
+  }, 10000);
 }
 
 function resetQuiz() {
   quizData = [];
+  levelStartBpm = 40;
   currentIndex = 0;
   correctAnswers = 0;
   clearTimeout(timer);
@@ -556,23 +599,7 @@ function startMetronome() {
       clearInterval(metronomeInterval);
       return;
     }
-    const oscillator = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    oscillator.type = 'square';
-    oscillator.frequency.setValueAtTime(1000, audioCtx.currentTime);
-    oscillator.connect(gain);
-    gain.connect(audioCtx.destination);
-    gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
-    oscillator.start();
-    // Add vibration after oscillator starts
-    if (navigator.vibrate) {
-      navigator.vibrate([50]);
-    }
-    oscillator.stop(audioCtx.currentTime + 0.05);
-    oscillator.onended = () => {
-      oscillator.disconnect();
-      gain.disconnect();
-    };
+    // Removed oscillator and vibration logic to avoid overlapping tick sounds.
     const bpm = baseBpm + (maxBpm - baseBpm) * getProgress();
     const interval = (60 / bpm) * 1000;
     clearInterval(metronomeInterval);
@@ -626,6 +653,23 @@ function playIncorrectSound() {
   oscillator2.stop(audioCtx.currentTime + duration * 2);
 }
 
+// Play a short metronome tick sound
+function playTickSound() {
+  const oscillator = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  oscillator.type = 'square';
+  oscillator.frequency.setValueAtTime(1000, audioCtx.currentTime);
+  oscillator.connect(gain);
+  gain.connect(audioCtx.destination);
+  gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+  oscillator.start();
+  oscillator.stop(audioCtx.currentTime + 0.05);
+  oscillator.onended = () => {
+    oscillator.disconnect();
+    gain.disconnect();
+  };
+}
+
 // ================================
 // 7. Utility
 // ================================
@@ -642,49 +686,61 @@ function shuffle(arr) {
 // ================================
 function startTotalTimer() {
   // Reset tick and BPM at quiz start
-  totalTicks = 30;
+  totalTicks = 100;
   currentBpm = 40;
 
   updateDisplay();
 
   function tickLoop() {
     if (!quizActive || totalTicks <= 0) {
+      clearInterval(totalTimer.intervalId);
+      quizActive = false;
       endQuiz();
       return;
     }
 
     totalTicks--;
+    playTickSound();  // Play tick sound after decrement
     updateDisplay();
 
-    if ((30 - totalTicks) % 30 === 0 && totalTicks !== 30) {
-      currentBpm += 10;
-      if (currentBpm >= 120) {
-        alert("🎉 You win! Final BPM: 120");
-        endQuiz();
-        return;
-      }
-    }
+    // Removed BPM increase logic from here; BPM now only increases via addTicksForCorrect()
 
     const interval = (60 / currentBpm) * 1000;
     clearInterval(totalTimer.intervalId);
     totalTimer.intervalId = setInterval(tickLoop, interval);
   }
 
-  const interval = (60 / currentBpm) * 1000;
-  totalTimer.intervalId = setInterval(tickLoop, interval);
-}
-
-function addTicksForCorrect() {
-  totalTicks += 5;
-  updateDisplay();
-  // Increase BPM by 5 every 5 correct answers
-  if (correctAnswers > 0 && correctAnswers % 5 === 0) {
-    currentBpm += 5;
+  // Only start the interval if the quiz is active and there are ticks left
+  if (quizActive && totalTicks > 0) {
+    const interval = (60 / currentBpm) * 1000;
+    totalTimer.intervalId = setInterval(tickLoop, interval);
   }
 }
 
+function addTicksForCorrect() {
+  correctStreak++;
+
+  if (correctStreak > 0 && correctStreak % 3 === 0) {
+    if (currentBpm >= 240) {
+      levelStartBpm += 10;
+      currentBpm = levelStartBpm;
+      alert(`🔥 Level Up! Now at BPM: ${currentBpm}`);
+    } else {
+      currentBpm += 10;
+    }
+  }
+
+  // Award bonus ticks based on current BPM (reduced by one per tier)
+  let bonus = 3;
+  if (currentBpm >= 100 && currentBpm < 160) bonus = 4;
+  else if (currentBpm >= 160 && currentBpm < 210) bonus = 5;
+  else if (currentBpm >= 210) bonus = 6;
+  totalTicks += bonus;
+  updateDisplay();
+}
+
 function subtractTicksForWrong() {
-  console.log('subtractTicksForWrong called. totalTicks before:', totalTicks);
+  correctStreak = 0;
   totalTicks = Math.max(0, totalTicks - 10);
   updateDisplay();
 }
