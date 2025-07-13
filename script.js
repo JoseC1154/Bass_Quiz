@@ -13,7 +13,7 @@ let correctAnswers = 0;
 let timer, countdownInterval, isPaused = false, quizActive = false, quizStartTime, metronomeInterval;
 
 // Tick-based timer variables
-let totalTicks = 100;
+let totalTicks = 30;
 let currentBpm = 40;
 
 const levelSelect = document.getElementById('level-select');
@@ -160,10 +160,42 @@ function bindUIEvents() {
     settingsCard.classList.add('hidden');
   });
   playAgainBtn.addEventListener('click', () => {
-    resultsCard.classList.add('hidden');
-    settingsCard.classList.remove('hidden');
-    quizCard.classList.add('hidden');
+    // Ensure resultsCard is hidden (safeguard even if user lost)
+    resultsCard.classList.add('hidden');  // Ensure it's hidden
+    quizCard.classList.add('hidden');     // Hide quiz card in case it's still showing
     quizCard.classList.remove('full-width');
+    settingsCard.classList.remove('hidden');
+
+    // Reset all state values
+    currentIndex = 0;
+    correctAnswers = 0;
+    quizData = [];
+    totalTicks = 30;
+    currentBpm = 40;
+    clearTimeout(timer);
+    clearInterval(countdownInterval);
+    clearInterval(metronomeInterval);
+    if (totalTimer && totalTimer.intervalId) {
+      clearInterval(totalTimer.intervalId);
+    }
+    if (totalTimer) {
+      totalTimer.textContent = '';
+    }
+
+    // Reset background color and transition
+    quizCard.style.backgroundColor = '';
+    quizCard.style.transition = '';
+
+    // Hide help chart and quiz UI remnants
+    const helpScaleChart = document.getElementById('help-scale-chart');
+    const helpChartModal = document.getElementById('help-chart-modal');
+    if (helpScaleChart) helpScaleChart.classList.add('hidden');
+    if (helpChartModal) helpChartModal.classList.add('hidden');
+
+    // Reset input selection and UI
+    document.querySelectorAll('.input-icon').forEach(icon => icon.classList.remove('selected'));
+    document.getElementById('custom-input-ui').innerHTML = '';
+    document.querySelectorAll('.instrument-ui').forEach(el => el.classList.add('hidden'));
   });
 }
 
@@ -393,9 +425,9 @@ document.querySelectorAll('.input-icon').forEach(icon => {
 
 function startQuiz() {
   resetQuiz();
+  quizActive = true; // ensure this line is present at the start
   quizStartTime = performance.now();
   startTotalTimer();
-  quizActive = true;
   generateQuiz(levelSelect.value, 200);
   if (quizData.length === 0) {
     alert("⚠️ No questions generated. Please check your settings.");
@@ -513,15 +545,30 @@ function endQuiz() {
   localStorage.setItem('bestScore', best);
   quizCard.classList.add('hidden');
   clearInterval(metronomeInterval);
+  // Ensure the tick-based timer stops running after the quiz ends.
+  if (totalTimer && totalTimer.intervalId) {
+    clearInterval(totalTimer.intervalId);
+  }
   resultsCard.classList.remove('hidden');
-  const elapsedTime = ((performance.now() - quizStartTime) / 1000).toFixed(1);
+  // Format elapsed time as minutes:seconds
+  const totalSeconds = Math.floor((performance.now() - quizStartTime) / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  const elapsedTime = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  // Use attemptedCount to properly calculate incorrect answers
+  const attemptedCount = currentIndex + 1;
   scoreSummary.innerHTML = `
     <div style="font-size: 1.2em; margin-bottom: 16px;">🏆 Best Score: <strong>${best}</strong></div>
     <div>✅ Correct: <strong>${correctAnswers}</strong></div>
-    <div>❌ Incorrect: <strong>${quizData.length - correctAnswers}</strong></div>
-    <div>⏱️ Time: <strong>${elapsedTime}</strong> seconds</div>
+    <div>❌ Incorrect: <strong>${attemptedCount - correctAnswers}</strong></div>
+    <div>⏱️ Time: <strong>${elapsedTime}</strong></div>
   `;
   playAgainBtn.textContent = "Try Again";
+  // Auto-close the results card after 6 seconds
+  setTimeout(() => {
+    resultsCard.classList.add('hidden');
+    settingsCard.classList.remove('hidden');
+  }, 6000);
 }
 
 function resetQuiz() {
@@ -649,21 +696,13 @@ function startTotalTimer() {
 
   function tickLoop() {
     if (!quizActive || totalTicks <= 0) {
+      quizActive = false;
       endQuiz();
       return;
     }
 
     totalTicks--;
     updateDisplay();
-
-    if ((100 - totalTicks) % 30 === 0 && totalTicks !== 100) {
-      currentBpm += 10;
-      if (currentBpm >= 240) {
-        alert("🎉 You win! Final BPM: 240");
-        endQuiz();
-        return;
-      }
-    }
 
     const interval = (60 / currentBpm) * 1000;
     clearInterval(totalTimer.intervalId);
@@ -675,17 +714,18 @@ function startTotalTimer() {
 }
 
 function addTicksForCorrect() {
-  totalTicks += 2;
-  updateDisplay();
-  // Increase BPM by 5 every 5 correct answers
-  if (correctAnswers > 0 && correctAnswers % 4 === 0) {
-    currentBpm += 5;
+  if (correctAnswers > 0 && correctAnswers % 3 === 0) {
+    currentBpm += 10;
+    if (currentBpm > 240) {
+      alert(`🔥 New Level! BPM: ${currentBpm}`);
+    }
   }
+  totalTicks += 4;
+  updateDisplay();
 }
 
 function subtractTicksForWrong() {
-  console.log('subtractTicksForWrong called. totalTicks before:', totalTicks);
-  totalTicks = Math.max(0, totalTicks - 5);
+  totalTicks = Math.max(0, totalTicks - 10);
   updateDisplay();
 }
 
