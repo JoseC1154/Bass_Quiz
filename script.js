@@ -12,6 +12,10 @@ let currentIndex = 0;
 let correctAnswers = 0;
 let timer, countdownInterval, isPaused = false, quizActive = false, quizStartTime, metronomeInterval;
 
+// Tick-based timer variables
+let totalTicks = 30;
+let currentBpm = 40;
+
 const levelSelect = document.getElementById('level-select');
 const keySelect = document.getElementById('key-select');
 const keyContainer = document.getElementById('key-select-container');
@@ -156,9 +160,10 @@ function bindUIEvents() {
     settingsCard.classList.add('hidden');
   });
   playAgainBtn.addEventListener('click', () => {
-    quizCard.classList.remove('full-width');
     resultsCard.classList.add('hidden');
     settingsCard.classList.remove('hidden');
+    quizCard.classList.add('hidden');
+    quizCard.classList.remove('full-width');
   });
 }
 
@@ -351,37 +356,27 @@ function updateInputUI() {
 
 function handleNoteClick(note) {
   const correct = quizData[currentIndex].answer;
-  const keys = document.querySelectorAll('.white-key, .black-key');
-  keys.forEach(k => k.disabled = true);
-  // Also disable bass frets
-  const frets = document.querySelectorAll('.bass-fret');
-  frets.forEach(f => f.disabled = true);
-
-  // Select all visible keys/frets with the selected and correct notes
+  const isCorrect = note === correct;
   const selectedKeys = document.querySelectorAll(`[data-note="${note}"]`);
   const correctKeys = document.querySelectorAll(`[data-note="${correct}"]`);
 
-  if (note === correct) {
+  if (isCorrect) {
     playCorrectSound();
     selectedKeys.forEach(key => key.classList.add('correct'));
-    document.querySelectorAll(`.bass-fret[data-note="${note}"]`).forEach(f => f.classList.add('correct'));
     correctAnswers++;
+    addTicksForCorrect();
     setTimeout(() => {
       selectedKeys.forEach(key => key.classList.remove('correct'));
-      document.querySelectorAll(`.bass-fret[data-note="${note}"]`).forEach(f => f.classList.remove('correct'));
       nextQuestion();
     }, 300);
   } else {
     playIncorrectSound();
     selectedKeys.forEach(key => key.classList.add('incorrect'));
-    document.querySelectorAll(`.bass-fret[data-note="${note}"]`).forEach(f => f.classList.add('incorrect'));
     correctKeys.forEach(key => key.classList.add('correct'));
-    document.querySelectorAll(`.bass-fret[data-note="${correct}"]`).forEach(f => f.classList.add('correct'));
+    subtractTicksForWrong();
     setTimeout(() => {
       selectedKeys.forEach(key => key.classList.remove('incorrect'));
-      document.querySelectorAll(`.bass-fret[data-note="${note}"]`).forEach(f => f.classList.remove('incorrect'));
       correctKeys.forEach(key => key.classList.remove('correct'));
-      document.querySelectorAll(`.bass-fret[data-note="${correct}"]`).forEach(f => f.classList.remove('correct'));
       nextQuestion();
     }, 1000);
   }
@@ -478,20 +473,7 @@ function showQuestion() {
     };
     answerButtons.appendChild(btn);
   });
-  // No countdown display or interval
-  const seconds = 7;
-  timer = setTimeout(() => {
-    if (!isPaused) {
-      playIncorrectSound();
-      const correct = quizData[currentIndex].answer;
-      const buttons = [...answerButtons.querySelectorAll('button')];
-      buttons.forEach(btn => {
-        btn.disabled = true;
-        if (btn.textContent === correct) btn.classList.add('correct');
-      });
-      setTimeout(nextQuestion, 2000);
-    }
-  }, seconds * 1000);
+  // Removed per-question auto-fail timeout.
 }
 
 function checkAnswer(selected) {
@@ -505,6 +487,11 @@ function checkAnswer(selected) {
     if (btn.textContent === correct) btn.classList.add('correct');
     if (btn.textContent === selected && !isCorrect) btn.classList.add('incorrect');
   });
+  if (isCorrect) {
+    addTicksForCorrect();
+  } else {
+    subtractTicksForWrong();
+  }
   setTimeout(nextQuestion, 1000);
 }
 
@@ -525,6 +512,7 @@ function endQuiz() {
   const best = Math.max(correctAnswers, parseInt(localStorage.getItem('bestScore') || 0));
   localStorage.setItem('bestScore', best);
   quizCard.classList.add('hidden');
+  clearInterval(metronomeInterval);
   resultsCard.classList.remove('hidden');
   const elapsedTime = ((performance.now() - quizStartTime) / 1000).toFixed(1);
   scoreSummary.innerHTML = `
@@ -650,37 +638,62 @@ function shuffle(arr) {
 
 
 // ================================
-// 5.5. Total Timer
+// 5.5. Total Timer (Tick-based Metronome)
 // ================================
 function startTotalTimer() {
-  const totalDuration = 120;
-  function updateTotalTimer() {
-    if (!totalTimer) return;
+  // Reset tick and BPM at quiz start
+  totalTicks = 30;
+  currentBpm = 40;
 
-    const elapsed = Math.floor((performance.now() - quizStartTime) / 1000);
-    const remaining = totalDuration - elapsed;
-    const min = Math.floor(remaining / 60);
-    const sec = remaining % 60;
-    totalTimer.textContent = `${min}:${sec < 10 ? '0' + sec : sec} remaining`;
+  updateDisplay();
 
-    if (remaining <= 15) {
-      totalTimer.style.color = 'red';
-      totalTimer.animate([
-        { transform: 'scale(1)' },
-        { transform: 'scale(1.2)' },
-        { transform: 'scale(1)' }
-      ], { duration: 500, iterations: 1 });
-    } else {
-      totalTimer.style.color = 'black';
+  function tickLoop() {
+    if (!quizActive || totalTicks <= 0) {
+      endQuiz();
+      return;
     }
 
-    if (remaining <= 0 || !quizActive) {
-      clearInterval(totalTimer.intervalId);
-      totalTimer.textContent = '';
+    totalTicks--;
+    updateDisplay();
+
+    if ((30 - totalTicks) % 30 === 0 && totalTicks !== 30) {
+      currentBpm += 10;
+      if (currentBpm >= 120) {
+        alert("🎉 You win! Final BPM: 120");
+        endQuiz();
+        return;
+      }
     }
+
+    const interval = (60 / currentBpm) * 1000;
+    clearInterval(totalTimer.intervalId);
+    totalTimer.intervalId = setInterval(tickLoop, interval);
   }
-  updateTotalTimer();
-  if (totalTimer) {
-    totalTimer.intervalId = setInterval(updateTotalTimer, 1000);
+
+  const interval = (60 / currentBpm) * 1000;
+  totalTimer.intervalId = setInterval(tickLoop, interval);
+}
+
+function addTicksForCorrect() {
+  totalTicks += 5;
+  updateDisplay();
+  // Increase BPM by 5 every 5 correct answers
+  if (correctAnswers > 0 && correctAnswers % 5 === 0) {
+    currentBpm += 5;
   }
+}
+
+function subtractTicksForWrong() {
+  console.log('subtractTicksForWrong called. totalTicks before:', totalTicks);
+  totalTicks = Math.max(0, totalTicks - 10);
+  updateDisplay();
+}
+
+// ================================
+// Global updateDisplay for totalTimer
+// ================================
+function updateDisplay() {
+  if (!totalTimer) return;
+  totalTimer.textContent = `🎵 Ticks: ${totalTicks} remaining | BPM: ${currentBpm}`;
+  totalTimer.style.color = totalTicks <= 5 ? 'red' : 'black';
 }
