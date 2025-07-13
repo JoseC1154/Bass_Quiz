@@ -35,6 +35,8 @@ I created this to train myself about keys and their placement on different instr
 
 14. User score record.
 
+15. Get rid of Card background.
+
 
 //-----------------------
 //Future Training Modes
