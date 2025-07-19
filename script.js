@@ -744,7 +744,7 @@ function addTicksForCorrect() {
 
   // Adjust bonus ticks based on difficulty (now 1-8 slider)
   const difficulty = parseInt(difficultySelect?.value || 4);
-  const difficultyModifier = Math.floor((4 - difficulty) / 2);  // scale bonus: easier = more ticks
+  const difficultyModifier = Math.floor((6 - difficulty) / 2);  // scale bonus: easier = more ticks
 
   let bonus = 3 + difficultyModifier;
   if (currentBpm >= 100 && currentBpm < 160) bonus = 4 + difficultyModifier;
