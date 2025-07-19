@@ -46,21 +46,25 @@ main {
   background-color: rgba(255, 255, 255, 0.85);
   border-radius: 16px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  padding: 200px 4%;
+  padding: 40px 4%;
   margin-bottom: 20px;
   gap: 12px;
   text-align: left;
   max-width: 100%;
   width: 90vw;
   box-sizing: border-box;
-  margin-left: auto;
-  margin-right: auto;
+  margin-left: 0;
+  margin-right: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
   justify-content: flex-start;
   align-items: stretch;
+  padding-top: 100px;
+}
+#settings-card {
+  min-height: 60vh;
 }
 
 .topShade {
@@ -69,15 +73,31 @@ main {
   margin:0;
   width: 100%;            /* fill parent's width */
   text-align:center;
-  top:0;
-  left:0;
-  right:0;
+  /* Ensure .topShade starts at the very top and spans full width */
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  z-index: 1;
 }
 .topShadeInner {
   padding: 16px 4%; /* replicate .card padding */
   box-sizing: border-box;
+  width: 100%;
 }
 
+.cardBody {
+  flex: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 4%;
+  box-sizing: border-box;
+  margin:auto;
+}
 
 .setting-group {
   width: 100%;
