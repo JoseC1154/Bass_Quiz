@@ -14,8 +14,8 @@ let timer, countdownInterval, isPaused = false, quizActive = false, quizStartTim
 
 // Tick-based timer variables
 let totalTicks = 30;
-let currentBpm = 40;
-let levelStartBpm = 40;
+let currentBpm = 130; //Adjusted from40 JC
+let levelStartBpm = 130; //Adjusted from 40 JC
 
 // Track streak of correct answers
 let correctStreak = 0;
@@ -699,7 +699,7 @@ function shuffle(arr) {
 function startTotalTimer() {
   // Reset tick and BPM at quiz start
   totalTicks = 100;
-  currentBpm = 40;
+  currentBpm = 180; //adjusted from 100 to 180
 
   updateDisplay();
 
