@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-</head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Scale Driller</title>
@@ -9,6 +8,12 @@
   <style>
     :root {
       --vh: 100%;
+    }
+    .card {
+      position: relative;
+      min-height: 95vh;
+      display: flex;
+      flex-direction: column;
     }
   </style>
   <script>
@@ -20,7 +25,6 @@
     window.addEventListener('orientationchange', setVhUnit);
     window.addEventListener('load', setVhUnit);
   </script>
-</head>
 </head>
 <body>
 
@@ -34,25 +38,28 @@
         </div>
       
       <!-- Level Selection -->
-      <div class="setting-group">
-        <label for="level-select">Training Mode</label>
-        <select id="level-select">
-          <option value="easy">Easy</option>
-          <option value="intermediate">Intermediate</option>
-          <option value="hard">Hard</option>
-          <option value="degree-training">Degree Training</option>
-        </select>
+    <div class="card-body">
+      <div class="card-section">
+        <div class="setting-group">
+          <label for="level-select">Training Mode</label>
+          <select id="level-select">
+            <option value="easy">Easy</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="hard">Hard</option>
+            <option value="degree-training">Degree Training</option>
+          </select>
+        </div>
       </div>
 
       <!-- Conditional Input Settings -->
-      <div id="key-select-container" class="setting-group hidden">
+      <div class="card-section" id="key-select-container" class="setting-group hidden">
         <label for="key-select">Key</label>
         <select id="key-select">
           <option value="random" selected>Random</option>
         </select>
       </div>
 
-      <div id="degree-select-container" class="setting-group hidden">
+      <div class="card-section" id="degree-select-container" class="setting-group hidden">
         <label for="degree-select">Degree</label>
         <select id="degree-select">
           <option value="1">1st</option>
@@ -66,22 +73,26 @@
       </div>
 
       <!-- Scale Type -->
-      <div class="setting-group">
-        <label for="scale-type">Scale Type</label>
-        <select id="scale-type">
-          <option value="major" selected>Major</option>
-          <option value="minor">Minor</option>
-        </select>
+      <div class="card-section">
+        <div class="setting-group">
+          <label for="scale-type">Scale Type</label>
+          <select id="scale-type">
+            <option value="major" selected>Major</option>
+            <option value="minor">Minor</option>
+          </select>
+        </div>
       </div>
 
       <!-- Difficulty Setting -->
-      <div class="setting-group">
-        <label for="difficulty-select">Difficulty: <span id="difficulty-label">4</span></label>
-        <input type="range" id="difficulty-select" min="1" max="8" value="4" step="1" />
+      <div class="card-section">
+        <div class="setting-group">
+          <label for="difficulty-select">Difficulty: <span id="difficulty-label">4</span></label>
+          <input type="range" id="difficulty-select" min="1" max="8" value="4" step="1" />
+        </div>
       </div>
 
       <!-- Instrument Input Icons -->
-      <div class="setting-group" id="input-type-group">
+      <div class="card-section" id="input-type-group">
         <div class="input-icons">
           <img src="images/icon_keys.png" alt="Keys Icon" class="input-icon selected" data-type="keys" title="Keys" />
           <img src="images/icon_piano.png" alt="Piano Icon" class="input-icon" data-type="piano" title="Piano" />
@@ -89,8 +100,9 @@
           <img src="images/icon_guitar.png" alt="Guitar Icon" class="input-icon" data-type="guitar" title="Guitar" />
         </div>
       </div>
+    </div>
     </section>
-
+    
     <!-- Quiz Card -->
     <section id="quiz-card" class="card hidden" role="region" aria-label="Quiz">
       <div class="topShade">
@@ -105,15 +117,22 @@
       <div id="quiz-question"></div>
       </div>
         </div>
-      <div id="keys-ui" class="instrument-ui hidden">
-        <div id="custom-input-ui"></div>
-        <div id="answer-buttons"></div>
-      </div>
-      <div id="piano-ui" class="instrument-ui hidden"></div>
-      <div id="bass-ui" class="instrument-ui hidden"></div>
-      <div id="feedback" class="feedback"></div>
-      <div id="inline-chart-container" class="hidden">
-        <div id="inline-scale-chart"></div>
+      
+      <div class="card-body">
+        <div class="card-section" id="quiz-ui-container">
+          <div id="keys-ui" class="instrument-ui hidden">
+            <div id="custom-input-ui"></div>
+            <div id="answer-buttons"></div>
+          </div>
+          <div id="piano-ui" class="instrument-ui hidden"></div>
+          <div id="bass-ui" class="instrument-ui hidden"></div>
+        </div>
+        <div class="card-section">
+          <div id="feedback" class="feedback"></div>
+        </div>
+        <div class="card-section hidden" id="inline-chart-container">
+          <div id="inline-scale-chart"></div>
+        </div>
       </div>
     </section>
 
@@ -123,8 +142,10 @@
       <div class="topShadeInner">
       <h2>Quiz Complete!</h2>
       </div></div>
+      <div class="card-body">
         <p id="score-summary"></p>
-      <button id="play-again">Try Again</button>
+        <button id="play-again">Try Again</button>
+      </div>
     </section>
   </main>
 
