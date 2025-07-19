@@ -36,12 +36,17 @@ main {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  position:relative;
+  margin:0;
+  padding-top:0;
+  padding-right:0;
+  padding-left:0;
 }
 .card {
   background-color: rgba(255, 255, 255, 0.85);
   border-radius: 16px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  padding: 16px 4%;
+  padding: 200px 4%;
   margin-bottom: 20px;
   gap: 12px;
   text-align: left;
@@ -57,6 +62,22 @@ main {
   justify-content: flex-start;
   align-items: stretch;
 }
+
+.topShade {
+  background-color:#ffffff;
+  padding:0;
+  margin:0;
+  width: 100%;            /* fill parent's width */
+  text-align:center;
+  top:0;
+  left:0;
+  right:0;
+}
+.topShadeInner {
+  padding: 16px 4%; /* replicate .card padding */
+  box-sizing: border-box;
+}
+
 
 .setting-group {
   width: 100%;
