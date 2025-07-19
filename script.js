@@ -109,6 +109,19 @@ document.addEventListener('DOMContentLoaded', () => {
       el.style.overflowY = 'auto';
     }
   });
+
+  // Dynamically adjust .card padding based on .topShade height
+  function adjustCardPadding() {
+    document.querySelectorAll('.card').forEach(card => {
+      const shade = card.querySelector('.topShade');
+      if (shade) {
+        const height = shade.offsetHeight;
+        card.style.paddingTop = `${height}px`;
+      }
+    });
+  }
+  window.addEventListener('resize', adjustCardPadding);
+  adjustCardPadding();
 });
 
 function initializeUI() {
