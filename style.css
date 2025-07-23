@@ -706,14 +706,24 @@ button:active {
   position: relative;
 }
 
-.app-title {
+.title-container {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
+  text-align: center;
+}
+
+.app-title {
   margin: 0;
   font-size: 1.5rem;
   font-weight: bold;
-  text-align: center;
+}
+
+.time-mode-indicator {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: normal;
+  margin-top: 2px;
 }
 
 .menu-btn {
@@ -827,4 +837,96 @@ button:active {
   background-color: rgba(0, 0, 0, 0.05);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Dropdown button styles */
+.dropdown-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dropdown-arrow {
+  font-size: 12px;
+  transition: transform 0.2s;
+}
+
+.dropdown-button.active .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+/* Submenu styles */
+.submenu {
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+.submenu-item {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid #e0e0e0;
+  padding: 10px 16px;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  color: #555;
+  transition: all 0.2s;
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 4px;
+}
+
+.submenu-item:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+  transform: translateX(4px);
+}
+
+/* --- Fullscreen Timer Display --- */
+.fullscreen-timer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: -1; /* Behind all UI elements but above background */
+  pointer-events: none; /* Don't interfere with interactions */
+}
+
+.timer-number {
+  font-size: clamp(8rem, 25vw, 20rem); /* Responsive large size */
+  font-weight: 900; /* Extra bold */
+  color: #ffffff; /* Same as topShade */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Subtle shadow for visibility */
+  opacity: 0.8;
+  transition: opacity 0.5s ease-in-out;
+  line-height: 0.8;
+  margin: 0;
+  padding: 0;
+}
+
+.timer-label {
+  font-size: clamp(2rem, 8vw, 4rem); /* Responsive medium size */
+  font-weight: 700; /* Bold */
+  color: #ffffff; /* Same as topShade */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  opacity: 0.6;
+  transition: opacity 0.5s ease-in-out;
+  margin-top: -1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5rem;
+}
+
+.timer-number.fade-out,
+.timer-label.fade-out {
+  opacity: 0;
+}
+
+.fullscreen-timer.hidden {
+  display: none;
 }

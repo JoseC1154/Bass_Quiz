@@ -12,6 +12,10 @@ let currentIndex = 0;
 let correctAnswers = 0;
 let timer, countdownInterval, isPaused = false, quizActive = false, quizStartTime, metronomeInterval;
 
+// Time Attack mode variables
+let timeAttackCountdown = 0;
+let timeAttackInterval = null;
+
 // Tick-based timer variables
 let totalTicks = 30;
 let currentBpm = 130; //Adjusted from40 JC
@@ -25,7 +29,6 @@ const difficultySelect = document.getElementById('difficulty-select');
 const keySelect = document.getElementById('key-select');
 const keyContainer = document.getElementById('key-select-container');
 const degreeContainer = document.getElementById('degree-select-container');
-const timeModeContainer = document.getElementById('time-mode-container');
 const attackTimeContainer = document.getElementById('attack-time-container');
 const scaleChart = document.getElementById('scale-chart');
 const startBtn = document.getElementById('start-btn');
@@ -39,6 +42,11 @@ const scoreSummary = document.getElementById('score-summary');
 const playAgainBtn = document.getElementById('play-again');
 const helpBtn = document.getElementById('help-btn');
 const totalTimer = document.getElementById('total-timer');
+
+// Fullscreen timer elements
+const fullscreenTimer = document.getElementById('fullscreen-timer');
+const timerDisplay = document.getElementById('timer-display');
+const timerLabel = document.getElementById('timer-label');
 
 // Timer-related elements and constants
 // Only the totalTimer (now in header) is used for the active quiz timer.
@@ -92,25 +100,71 @@ document.addEventListener('DOMContentLoaded', () => {
     menuToggle.classList.remove('active');
   });
 
-  document.getElementById('menu-settings').addEventListener('click', () => {
-    alert('Settings are available on the main screen. Adjust difficulty, scale type, and training mode.');
-    dropdownMenu.classList.add('hidden');
-    menuToggle.classList.remove('active');
+  document.getElementById('menu-time-mode').addEventListener('click', () => {
+    // Toggle the submenu
+    const submenu = document.getElementById('time-mode-submenu');
+    const timeMode = document.getElementById('menu-time-mode');
+    
+    submenu.classList.toggle('hidden');
+    timeMode.classList.toggle('active');
   });
 
-  document.getElementById('menu-time-mode').addEventListener('click', () => {
-    // Show the time mode container and hide others
-    keyContainer.classList.add('hidden');
-    degreeContainer.classList.add('hidden');
-    timeModeContainer.classList.remove('hidden');
-    attackTimeContainer.classList.add('hidden'); // Hidden until Time Attack is selected
+    // Handle Time Attack selection
+  document.getElementById('time-attack-option').addEventListener('click', () => {
+    // Show attack time container for Time Attack mode
+    attackTimeContainer.classList.remove('hidden');
+    
+    // Update the time mode indicator
+    const timeModeIndicator = document.getElementById('time-mode-indicator');
+    timeModeIndicator.textContent = 'Time Attack';
+    timeModeIndicator.classList.remove('hidden');
     
     // Close the menu
     dropdownMenu.classList.add('hidden');
     menuToggle.classList.remove('active');
     
-    // Optional: Show a message about Time Mode
-    alert('Time Mode activated! Choose between Time Attack (fixed seconds per question) or BPM Challenge (tempo-based timing).');
+    alert('Time Attack activated! Each question must be answered within the selected time limit.');
+  });
+
+  // Handle BPM Challenge selection
+  document.getElementById('bpm-challenge-option').addEventListener('click', () => {
+    // Hide attack time container for BPM Challenge (normal mode)
+    attackTimeContainer.classList.add('hidden');
+    
+    // Update the time mode indicator
+    const timeModeIndicator = document.getElementById('time-mode-indicator');
+    timeModeIndicator.textContent = 'BPM Challenge';
+    timeModeIndicator.classList.remove('hidden');
+    
+    // Close the menu
+    dropdownMenu.classList.add('hidden');
+    menuToggle.classList.remove('active');
+    
+    alert('BPM Challenge activated! Answer speed increases with tempo progression.');
+  });
+
+  // Handle BPM Challenge selection
+  document.getElementById('bpm-challenge-option').addEventListener('click', () => {
+    // Show the time mode container but hide attack time container
+    keyContainer.classList.add('hidden');
+    degreeContainer.classList.add('hidden');
+    timeModeContainer.classList.remove('hidden');
+    attackTimeContainer.classList.add('hidden');
+    
+    // Set the time mode select to bpm-challenge
+    const timeModeSelect = document.getElementById('time-mode-select');
+    timeModeSelect.value = 'bpm-challenge';
+    
+    // Update the time mode indicator
+    const timeModeIndicator = document.getElementById('time-mode-indicator');
+    timeModeIndicator.textContent = 'BPM Challenge';
+    timeModeIndicator.classList.remove('hidden');
+    
+    // Close the menu
+    dropdownMenu.classList.add('hidden');
+    menuToggle.classList.remove('active');
+    
+    alert('BPM Challenge activated! Answer speed increases with tempo progression.');
   });
 
   document.getElementById('menu-stats').addEventListener('click', () => {
@@ -189,17 +243,14 @@ function initializeUI() {
   if (level === 'easy') {
     keyContainer.classList.remove('hidden');
     degreeContainer.classList.add('hidden');
-    timeModeContainer.classList.add('hidden');
     attackTimeContainer.classList.add('hidden');
   } else if (level === 'degree-training') {
     keyContainer.classList.add('hidden');
     degreeContainer.classList.remove('hidden');
-    timeModeContainer.classList.add('hidden');
     attackTimeContainer.classList.add('hidden');
   } else {
     keyContainer.classList.add('hidden');
     degreeContainer.classList.add('hidden');
-    timeModeContainer.classList.add('hidden');
     attackTimeContainer.classList.add('hidden');
   }
 }
@@ -210,45 +261,32 @@ function bindUIEvents() {
     if (level === 'easy') {
       keyContainer.classList.remove('hidden');
       degreeContainer.classList.add('hidden');
-      timeModeContainer.classList.add('hidden');
       attackTimeContainer.classList.add('hidden');
     } else if (level === 'degree-training') {
       keyContainer.classList.add('hidden');
       degreeContainer.classList.remove('hidden');
-      timeModeContainer.classList.add('hidden');
       attackTimeContainer.classList.add('hidden');
     } else {
       keyContainer.classList.add('hidden');
       degreeContainer.classList.add('hidden');
-      timeModeContainer.classList.add('hidden');
       attackTimeContainer.classList.add('hidden');
     }
     updateChart();
   });
 
-  // Handle time mode selection
-  const timeModeSelect = document.getElementById('time-mode-select');
-  if (timeModeSelect) {
-    timeModeSelect.addEventListener('change', () => {
-      const timeMode = timeModeSelect.value;
-      if (timeMode === 'time-attack') {
-        attackTimeContainer.classList.remove('hidden');
-      } else {
-        attackTimeContainer.classList.add('hidden');
-      }
-    });
-  }
   keySelect.addEventListener('change', updateChart);
   document.getElementById('scale-type').addEventListener('change', updateChart);
   closeQuizBtn.addEventListener('click', () => {
     clearTimeout(timer);
     clearInterval(countdownInterval);
     clearInterval(metronomeInterval);
+    clearInterval(timeAttackInterval); // Clear Time Attack interval
     if (totalTimer && totalTimer.intervalId) {
       clearInterval(totalTimer.intervalId);
     }
     quizCard.classList.add('hidden');
     quizCard.classList.remove('full-width');
+    hideFullscreenTimer(); // Hide the fullscreen timer
     quizActive = false;
 
     // Adjust quizData to include only questions attempted
@@ -548,6 +586,7 @@ function startQuiz() {
   quizCard.classList.remove('hidden');
   quizCard.classList.add('full-width');
   updateInputUI();
+  showFullscreenTimer(); // Show the fullscreen timer
   showQuestion();
   startMetronome();
 }
@@ -602,7 +641,16 @@ function showQuestion() {
   if (!quizData[currentIndex]) return;
   clearTimeout(timer);
   clearInterval(countdownInterval);
-  // Only the total timer is displayed; per-question countdown is not shown.
+  clearInterval(timeAttackInterval);
+  
+  // Check if we're in Time Attack mode
+  const timeModeIndicator = document.getElementById('time-mode-indicator');
+  const isTimeAttack = timeModeIndicator && timeModeIndicator.textContent === 'Time Attack';
+  
+  if (isTimeAttack) {
+    startTimeAttackCountdown();
+  }
+  
   const q = quizData[currentIndex];
   questionDiv.textContent = q.question;
   answerButtons.innerHTML = '';
@@ -616,12 +664,12 @@ function showQuestion() {
     };
     answerButtons.appendChild(btn);
   });
-  // Removed per-question auto-fail timeout.
 }
 
 function checkAnswer(selected) {
   clearTimeout(timer);
   clearInterval(countdownInterval);
+  clearInterval(timeAttackInterval); // Clear Time Attack countdown
   const correct = quizData[currentIndex].answer;
   const isCorrect = selected === correct;
   const buttons = [...answerButtons.querySelectorAll('button')];
@@ -656,6 +704,7 @@ function endQuiz() {
   localStorage.setItem('bestScore', best);
   quizCard.classList.add('hidden');
   clearInterval(metronomeInterval);
+  hideFullscreenTimer(); // Hide the fullscreen timer
   resultsCard.classList.remove('hidden');
   const elapsedTime = ((performance.now() - quizStartTime) / 1000).toFixed(1);
   const attemptedCount = currentIndex + 1;
@@ -681,6 +730,7 @@ function resetQuiz() {
   clearTimeout(timer);
   clearInterval(countdownInterval);
   clearInterval(metronomeInterval);
+  clearInterval(timeAttackInterval); // Clear Time Attack interval
   if (totalTimer && totalTimer.intervalId) {
     clearInterval(totalTimer.intervalId);
   }
@@ -863,6 +913,9 @@ function updateDisplay() {
   totalTimer.textContent = `🎵 Ticks: ${totalTicks} remaining | BPM: ${currentBpm}`;
   totalTimer.style.color = totalTicks <= 5 ? 'red' : 'black';
 
+  // Update fullscreen timer
+  updateFullscreenTimer();
+
   // Adjust background color of quizCard based on how close totalTicks is to 0 or max, with smooth transition
   const maxTicks = 100;
   const progress = Math.max(0, Math.min(1, totalTicks / maxTicks));
@@ -877,4 +930,100 @@ function updateDisplay() {
   // Apply smooth transition
   quizCard.style.transition = 'background-color 0.3s ease';
   quizCard.style.backgroundColor = bgColor;
+}
+
+// ================================
+// Fullscreen Timer Functions
+// ================================
+function updateFullscreenTimer() {
+  if (!fullscreenTimer || !timerDisplay || !timerLabel) return;
+  
+  // Check if we're in Time Attack mode or BPM Challenge mode
+  const timeModeIndicator = document.getElementById('time-mode-indicator');
+  const isTimeAttack = timeModeIndicator && timeModeIndicator.textContent === 'Time Attack';
+  
+  if (isTimeAttack) {
+    // Time Attack mode - show current countdown (will be updated by startTimeAttackCountdown)
+    // This function is mainly for BPM mode, Time Attack updates are handled separately
+    return;
+  } else {
+    // BPM Challenge mode (default/normal mode) - show current BPM
+    updateTimerDisplay(currentBpm, 'BPM');
+  }
+}
+
+function updateTimerDisplay(number, label) {
+  if (!timerDisplay || !timerLabel) return;
+  
+  // Add fade out class
+  timerDisplay.classList.add('fade-out');
+  timerLabel.classList.add('fade-out');
+  
+  // Update content after fade out
+  setTimeout(() => {
+    timerDisplay.textContent = number;
+    timerLabel.textContent = label;
+    
+    // Remove fade out class to fade in
+    timerDisplay.classList.remove('fade-out');
+    timerLabel.classList.remove('fade-out');
+  }, 250); // Half of the CSS transition duration
+}
+
+function showFullscreenTimer() {
+  if (fullscreenTimer) {
+    fullscreenTimer.classList.remove('hidden');
+    updateFullscreenTimer();
+  }
+}
+
+function hideFullscreenTimer() {
+  if (fullscreenTimer) {
+    fullscreenTimer.classList.add('hidden');
+  }
+}
+
+// ================================
+// Time Attack Mode Functions
+// ================================
+function startTimeAttackCountdown() {
+  const attackTimeSelect = document.getElementById('attack-time-select');
+  timeAttackCountdown = parseInt(attackTimeSelect?.value || 5);
+  
+  // Update initial display
+  updateTimerDisplay(timeAttackCountdown, 'SEC');
+  
+  // Start countdown
+  timeAttackInterval = setInterval(() => {
+    timeAttackCountdown--;
+    updateTimerDisplay(timeAttackCountdown, 'SEC');
+    
+    if (timeAttackCountdown <= 0) {
+      clearInterval(timeAttackInterval);
+      // Auto-fail the question if time runs out
+      timeAttackTimeOut();
+    }
+  }, 1000);
+}
+
+function timeAttackTimeOut() {
+  // Disable all buttons
+  const buttons = [...answerButtons.querySelectorAll('button')];
+  buttons.forEach(btn => {
+    btn.disabled = true;
+    if (btn.textContent === quizData[currentIndex].answer) {
+      btn.classList.add('correct');
+    }
+  });
+  
+  // Show timeout feedback
+  const feedback = document.getElementById('feedback');
+  if (feedback) {
+    feedback.textContent = '⏰ Time\'s up!';
+    feedback.style.color = 'red';
+  }
+  
+  // Don't add to correct answers, proceed with penalty
+  subtractTicksForWrong();
+  setTimeout(nextQuestion, 1500);
 }
