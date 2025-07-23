@@ -98,14 +98,19 @@ async function requestMIDIPermission() {
         
         // Show success feedback
         showPermissionFeedback('MIDI', true);
+        
+        // Update button states
+        updateInputMethodButtons();
       }
     } else {
       console.log('MIDI not supported in this browser');
       showPermissionFeedback('MIDI', false, 'Not supported in this browser');
+      updateInputMethodButtons();
     }
   } catch (error) {
     console.error('MIDI permission failed:', error);
     showPermissionFeedback('MIDI', false, error.message);
+    updateInputMethodButtons();
   }
 }
 
@@ -143,9 +148,13 @@ async function requestAudioPermission() {
     
     console.log('Audio permission granted');
     
+    // Update button states
+    updateInputMethodButtons();
+    
   } catch (error) {
     console.error('Audio permission failed:', error);
     showPermissionFeedback('Audio', false, error.message);
+    updateInputMethodButtons();
   }
 }
 
@@ -200,7 +209,98 @@ function showPermissionFeedback(permissionType, granted, errorMessage = '') {
 }
 
 // ================================
-// 2. Initialization
+// 3. Input Method Button Management  
+// ================================
+function updateInputMethodButtons() {
+  const touchBtn = document.getElementById('touch-input-btn');
+  const midiBtn = document.getElementById('midi-input-btn');
+  const micBtn = document.getElementById('mic-input-btn');
+  const cableBtn = document.getElementById('cable-input-btn');
+  
+  // Touch is always available
+  if (touchBtn) {
+    touchBtn.disabled = false;
+    touchBtn.title = 'Touch/Click Interface';
+    touchBtn.style.opacity = '1';
+  }
+  
+  // MIDI availability check
+  if (midiBtn) {
+    const midiSupported = navigator.requestMIDIAccess !== undefined;
+    const midiConnected = midiAccess && Array.from(midiAccess.inputs.values()).length > 0;
+    
+    if (!midiSupported) {
+      midiBtn.disabled = true;
+      midiBtn.title = 'MIDI not supported in this browser';
+      midiBtn.style.opacity = '0.5';
+    } else if (!midiConnected && !midiAccess) {
+      midiBtn.disabled = false;
+      midiBtn.title = 'Click to request MIDI access';
+      midiBtn.style.opacity = '0.7';
+    } else if (!midiConnected && midiAccess) {
+      midiBtn.disabled = true;
+      midiBtn.title = 'No MIDI devices connected';
+      midiBtn.style.opacity = '0.5';
+    } else {
+      midiBtn.disabled = false;
+      midiBtn.title = 'MIDI Keyboard/Controller - Ready';
+      midiBtn.style.opacity = '1';
+    }
+  }
+  
+  // Audio availability check
+  const audioSupported = navigator.mediaDevices && navigator.mediaDevices.getUserMedia;
+  
+  if (micBtn) {
+    if (!audioSupported) {
+      micBtn.disabled = true;
+      micBtn.title = 'Microphone access not supported in this browser';
+      micBtn.style.opacity = '0.5';
+    } else if (!audioInputActive) {
+      micBtn.disabled = false;
+      micBtn.title = 'Click to request microphone access';
+      micBtn.style.opacity = '0.7';
+    } else {
+      micBtn.disabled = false;
+      micBtn.title = 'Microphone/Audio Input - Ready';
+      micBtn.style.opacity = '1';
+    }
+  }
+  
+  if (cableBtn) {
+    if (!audioSupported) {
+      cableBtn.disabled = true;
+      cableBtn.title = 'Audio interface access not supported in this browser';
+      cableBtn.style.opacity = '0.5';
+    } else if (!audioInputActive) {
+      cableBtn.disabled = false;
+      cableBtn.title = 'Click to request audio interface access';
+      cableBtn.style.opacity = '0.7';
+    } else {
+      cableBtn.disabled = false;
+      cableBtn.title = 'Instrument Cable (Audio Interface) - Ready';
+      cableBtn.style.opacity = '1';
+    }
+  }
+}
+
+function checkInputMethodCompatibility() {
+  // Check current quiz settings to see which input methods make sense
+  const level = levelSelect?.value;
+  const selectedIcon = document.querySelector('.input-icon.selected');
+  const iconType = selectedIcon?.dataset.type;
+  
+  // All input methods work with all quiz modes, but some combinations are more logical
+  // This function can be extended later for more sophisticated compatibility checking
+  
+  console.log('Quiz level:', level, 'Icon type:', iconType, 'Input method:', currentInputMethod);
+  
+  // For now, just update button availability
+  updateInputMethodButtons();
+}
+
+// ================================
+// 4. Initialization
 // ================================
 document.addEventListener('DOMContentLoaded', () => {
   const helpChartModal = document.getElementById('help-chart-modal');
@@ -324,6 +424,11 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', async (e) => {
       e.stopPropagation();
       
+      // Check if button is disabled
+      if (btn.disabled) {
+        return;
+      }
+      
       // Remove active class from all buttons
       document.querySelectorAll('.input-method-btn').forEach(b => b.classList.remove('active'));
       
@@ -344,6 +449,9 @@ document.addEventListener('DOMContentLoaded', () => {
       // Show feedback
       const inputName = btn.textContent.trim();
       showInputMethodFeedback(inputName);
+      
+      // Update button states after permission request
+      updateInputMethodButtons();
     });
   });
 
@@ -361,6 +469,9 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Initialize default input method
   setInputMethod('touch');
+  
+  // Update input method button states
+  updateInputMethodButtons();
 
   document.body.addEventListener('click', () => {
     if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -499,24 +610,36 @@ function bindUIEvents() {
     settingsCard.classList.add('hidden');
   });
   playAgainBtn.addEventListener('click', () => {
-    // Ensure resultsCard is hidden (safeguard even if user lost)
-    resultsCard.classList.add('hidden');  // Ensure it's hidden
-    quizCard.classList.add('hidden');     // Hide quiz card in case it's still showing
+    // Stop the quiz and clean up all intervals
+    quizActive = false;
+    clearTimeout(timer);
+    clearInterval(countdownInterval);
+    clearInterval(metronomeInterval);
+    clearInterval(timeAttackInterval);
+    if (totalTimer && totalTimer.intervalId) {
+      clearInterval(totalTimer.intervalId);
+    }
+    
+    // Hide all cards first
+    resultsCard.classList.add('hidden');
+    quizCard.classList.add('hidden');
     quizCard.classList.remove('full-width');
-    settingsCard.classList.remove('hidden');
+    
+    // Hide fullscreen timer
+    hideFullscreenTimer();
+    
+    // Stop audio input
+    stopAudioInput();
 
     // Reset all state values
     currentIndex = 0;
     correctAnswers = 0;
+    correctStreak = 0;
     quizData = [];
-    totalTicks = 30;
-    currentBpm = 40;
-    clearTimeout(timer);
-    clearInterval(countdownInterval);
-    clearInterval(metronomeInterval);
-    if (totalTimer && totalTimer.intervalId) {
-      clearInterval(totalTimer.intervalId);
-    }
+    totalTicks = 100;
+    currentBpm = 180;
+    levelStartBpm = 180;
+    
     if (totalTimer) {
       totalTimer.textContent = '';
     }
@@ -535,6 +658,11 @@ function bindUIEvents() {
     document.querySelectorAll('.input-icon').forEach(icon => icon.classList.remove('selected'));
     document.getElementById('custom-input-ui').innerHTML = '';
     document.querySelectorAll('.instrument-ui').forEach(el => el.classList.add('hidden'));
+    
+    // Show settings card last to ensure it's the only visible card
+    setTimeout(() => {
+      settingsCard.classList.remove('hidden');
+    }, 100);
   });
 }
 
@@ -592,37 +720,53 @@ function updateInputUI() {
   document.querySelectorAll('.instrument-ui').forEach(el => el.classList.add('hidden'));
   document.getElementById('custom-input-ui').innerHTML = '';
   
-  // Use the current input method instead of just the selected icon
-  let selectedInputType = currentInputMethod;
+  // Use currentInputMethod to determine UI display
+  let uiType;
   
-  // Fallback to selected icon if currentInputMethod is not set
-  if (!selectedInputType) {
-    const selectedIcon = document.querySelector('.input-icon.selected');
-    selectedInputType = selectedIcon ? selectedIcon.dataset.type : 'keys';
+  switch(currentInputMethod) {
+    case 'touch':
+      // For touch mode, use the selected instrument icon
+      const selectedIcon = document.querySelector('.input-icon.selected');
+      uiType = selectedIcon ? selectedIcon.dataset.type : 'keys';
+      break;
+    case 'midi':
+      // For MIDI mode, show MIDI UI
+      uiType = 'midi';
+      break;
+    case 'audio':
+    case 'instrument':
+      // For audio/instrument modes, show audio UI
+      uiType = 'audio';
+      break;
+    default:
+      uiType = 'keys';
   }
   
-  // Map input methods to UI types
-  let uiType = selectedInputType;
-  if (selectedInputType === 'touch') {
-    uiType = 'keys';
-  } else if (selectedInputType === 'instrument') {
-    uiType = 'audio';
-  }
+  console.log('Input method:', currentInputMethod, 'UI type:', uiType);
   
   if (uiType === 'keys') {
     document.getElementById('keys-ui')?.classList.remove('hidden');
   } else if (uiType === 'midi') {
     document.getElementById('midi-ui')?.classList.remove('hidden');
     // Reset MIDI display
-    document.getElementById('midi-note-display').textContent = 'Play a note on your MIDI device';
+    const midiDisplay = document.getElementById('midi-note-display');
+    if (midiDisplay) {
+      midiDisplay.textContent = 'Play a note on your MIDI device';
+    }
   } else if (uiType === 'audio') {
     document.getElementById('audio-ui')?.classList.remove('hidden');
     // Reset audio display
-    document.getElementById('audio-note-display').textContent = 'Play a note on your instrument';
-    document.getElementById('audio-frequency-display').textContent = 'Frequency: --';
+    const audioDisplay = document.getElementById('audio-note-display');
+    const freqDisplay = document.getElementById('audio-frequency-display');
+    if (audioDisplay) {
+      audioDisplay.textContent = 'Play a note on your instrument';
+    }
+    if (freqDisplay) {
+      freqDisplay.textContent = 'Frequency: --';
+    }
     
-    // Auto-start audio input if using instrument cable method
-    if (selectedInputType === 'instrument' && !audioInputActive) {
+    // Auto-start audio input if using instrument cable method and not already active
+    if (currentInputMethod === 'instrument' && !audioInputActive) {
       setTimeout(() => {
         toggleAudioInput();
       }, 500);
@@ -1135,6 +1279,9 @@ function updateMIDIStatus() {
     statusElement.style.color = 'orange';
     deviceListElement.textContent = 'Connect a MIDI device';
   }
+  
+  // Update input method button states when MIDI status changes
+  updateInputMethodButtons();
 }
 
 function setupMIDIInputs() {
@@ -1156,9 +1303,8 @@ function handleMIDIMessage(message) {
     // Update display
     document.getElementById('midi-note-display').textContent = `Note: ${noteName}`;
     
-    // Check if we're in quiz mode and this input type is selected
-    const selectedIcon = document.querySelector('.input-icon.selected');
-    if (selectedIcon && selectedIcon.dataset.type === 'midi' && !quizCard.classList.contains('hidden')) {
+    // Check if we're in quiz mode and MIDI input method is selected
+    if (currentInputMethod === 'midi' && !quizCard.classList.contains('hidden')) {
       handleNoteInput(noteName);
     }
   }
@@ -1243,6 +1389,9 @@ function stopAudioInput() {
   
   document.getElementById('audio-note-display').textContent = 'Play a note on your instrument';
   document.getElementById('audio-frequency-display').textContent = 'Frequency: --';
+  
+  // Update input method button states when audio stops
+  updateInputMethodButtons();
 }
 
 function startPitchDetection() {
@@ -1279,9 +1428,8 @@ function startPitchDetection() {
       if (noteName) {
         document.getElementById('audio-note-display').textContent = `Note: ${noteName}`;
         
-        // Check if we're in quiz mode and this input type is selected
-        const selectedIcon = document.querySelector('.input-icon.selected');
-        if (selectedIcon && selectedIcon.dataset.type === 'audio' && !quizCard.classList.contains('hidden')) {
+        // Check if we're in quiz mode and audio/instrument input method is selected
+        if ((currentInputMethod === 'audio' || currentInputMethod === 'instrument') && !quizCard.classList.contains('hidden')) {
           handleNoteInput(noteName);
         }
       }
@@ -1318,6 +1466,8 @@ function frequencyToNote(frequency) {
 // ================================
 function handleNoteInput(noteName) {
   if (!quizData[currentIndex]) return;
+  
+  console.log('Note input received:', noteName, 'Current input method:', currentInputMethod);
   
   const correct = quizData[currentIndex].answer;
   const isCorrect = noteName === correct;
@@ -1371,18 +1521,8 @@ let currentInputMethod = 'touch'; // Default to touch
 function setInputMethod(inputType) {
   currentInputMethod = inputType;
   
-  // For touch mode, allow instrument icon selection
-  // For MIDI/audio modes, the instrument icons represent the virtual interface display
-  if (inputType === 'touch') {
-    // Keep current icon selection for touch mode
-  } else {
-    // For non-touch modes, default to keys icon as the virtual interface display
-    document.querySelectorAll('.input-icon').forEach(icon => icon.classList.remove('selected'));
-    const keysIcon = document.querySelector('.input-icon[data-type="keys"]');
-    if (keysIcon) {
-      keysIcon.classList.add('selected');
-    }
-  }
+  // Preserve the current icon selection - don't automatically reset to keys
+  // The user's icon selection should remain as they chose it
   
   // If quiz is active, update the input UI
   if (!quizCard.classList.contains('hidden')) {

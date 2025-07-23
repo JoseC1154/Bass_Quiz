@@ -1039,6 +1039,24 @@ button:active {
   box-shadow: 0 6px 16px rgba(40, 167, 69, 0.5);
 }
 
+.input-method-btn:disabled {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+  color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none;
+  box-shadow: none;
+}
+
+.input-method-btn:disabled:hover {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+  transform: none;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
 @keyframes glow-green {
   from {
     box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
