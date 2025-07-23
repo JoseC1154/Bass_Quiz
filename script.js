@@ -175,6 +175,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initializeUI();
   bindUIEvents();
+  
+  // Set BPM Challenge as default mode
+  const timeModeIndicator = document.getElementById('time-mode-indicator');
+  if (timeModeIndicator) {
+    timeModeIndicator.textContent = 'BPM Challenge';
+    timeModeIndicator.classList.remove('hidden');
+  }
 
   document.body.addEventListener('click', () => {
     if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -576,6 +583,12 @@ function startQuiz() {
   resetQuiz();
   quizStartTime = performance.now();
   quizActive = true;
+  
+  // Ensure audio context is resumed
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  
   startTotalTimer();
   generateQuiz(levelSelect.value, 200);
   if (quizData.length === 0) {
@@ -942,38 +955,30 @@ function updateFullscreenTimer() {
   const timeModeIndicator = document.getElementById('time-mode-indicator');
   const isTimeAttack = timeModeIndicator && timeModeIndicator.textContent === 'Time Attack';
   
-  if (isTimeAttack) {
-    // Time Attack mode - show current countdown (will be updated by startTimeAttackCountdown)
-    // This function is mainly for BPM mode, Time Attack updates are handled separately
-    return;
-  } else {
-    // BPM Challenge mode (default/normal mode) - show current BPM
-    updateTimerDisplay(currentBpm, 'BPM');
+  if (!isTimeAttack) {
+    // BPM Challenge mode (default/normal mode) - show remaining ticks (number only)
+    console.log('Updating ticks display to:', totalTicks); // Debug log
+    updateTimerDisplay(totalTicks, '');
   }
+  // For Time Attack mode, the timer is updated by startTimeAttackCountdown function
 }
 
 function updateTimerDisplay(number, label) {
   if (!timerDisplay || !timerLabel) return;
   
-  // Add fade out class
-  timerDisplay.classList.add('fade-out');
-  timerLabel.classList.add('fade-out');
+  console.log('Setting timer display:', number, label); // Debug log
   
-  // Update content after fade out
-  setTimeout(() => {
-    timerDisplay.textContent = number;
-    timerLabel.textContent = label;
-    
-    // Remove fade out class to fade in
-    timerDisplay.classList.remove('fade-out');
-    timerLabel.classList.remove('fade-out');
-  }, 250); // Half of the CSS transition duration
+  // Update content immediately without fade
+  timerDisplay.textContent = number;
+  timerLabel.textContent = label;
 }
 
 function showFullscreenTimer() {
+  console.log('Showing fullscreen timer'); // Debug log
   if (fullscreenTimer) {
     fullscreenTimer.classList.remove('hidden');
     updateFullscreenTimer();
+    console.log('Fullscreen timer visible:', !fullscreenTimer.classList.contains('hidden')); // Debug log
   }
 }
 
@@ -991,12 +996,12 @@ function startTimeAttackCountdown() {
   timeAttackCountdown = parseInt(attackTimeSelect?.value || 5);
   
   // Update initial display
-  updateTimerDisplay(timeAttackCountdown, 'SEC');
+  updateTimerDisplay(timeAttackCountdown, '');
   
   // Start countdown
   timeAttackInterval = setInterval(() => {
     timeAttackCountdown--;
-    updateTimerDisplay(timeAttackCountdown, 'SEC');
+    updateTimerDisplay(timeAttackCountdown, '');
     
     if (timeAttackCountdown <= 0) {
       clearInterval(timeAttackInterval);

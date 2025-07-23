@@ -46,7 +46,7 @@ main {
   background-color: rgba(255, 255, 255, 0.85);
   border-radius: 16px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  padding: 40px 4%;
+  padding: 120px 4% 40px 4%; /* Reasonable top padding for dynamic topShade */
   margin-bottom: 20px;
   gap: 12px;
   text-align: left;
@@ -61,7 +61,6 @@ main {
   flex-wrap: nowrap;
   justify-content: flex-start;
   align-items: stretch;
-  padding-top: 100px;
 }
 #settings-card {
   min-height: 60vh;
@@ -78,13 +77,17 @@ main {
   top: 0;
   left: 0;
   right: 0;
-  height: 100px;
-  z-index: 1;
+  /* Remove fixed min-height - let content determine the height */
+  border-radius: 16px 16px 0 0; /* Match card border radius on top */
+  z-index: 0; /* Background level, behind interactive elements */
 }
 .topShadeInner {
-  padding: 16px 4%; /* replicate .card padding */
+  padding: 20px 4% 20px 4%; /* Generous padding for dynamic content */
   box-sizing: border-box;
   width: 100%;
+  min-height: 60px; /* Minimum height for basic header elements */
+  position: relative;
+  z-index: 10; /* Higher than topShade to ensure visibility and interactivity */
 }
 
 .cardBody {
@@ -97,6 +100,13 @@ main {
   padding: 16px 4%;
   box-sizing: border-box;
   margin:auto;
+  position: relative;
+  z-index: 5; /* Ensure card body content appears above topShade */
+}
+
+.card-body {
+  position: relative;
+  z-index: 5; /* Ensure card body content appears above topShade */
 }
 
 .setting-group {
@@ -269,6 +279,12 @@ button:hover {
 /* Add spacing so question doesn't overlap header */
 #quiz-question {
   margin-top: 8px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+  padding: 8px 0;
+  background-color: inherit; /* Inherit the topShade white background */
 }
 
 /* --- 6. Answer Buttons and Feedback --- */
@@ -885,26 +901,25 @@ button:active {
 
 /* --- Fullscreen Timer Display --- */
 .fullscreen-timer {
-  position: absolute;
+  position: fixed; /* Fixed to viewport instead of absolute */
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw; /* Full viewport width */
+  height: 100vh; /* Full viewport height */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  z-index: -1; /* Behind all UI elements but above background */
+  z-index: -1; /* Behind everything */
   pointer-events: none; /* Don't interfere with interactions */
 }
 
 .timer-number {
-  font-size: clamp(8rem, 25vw, 20rem); /* Responsive large size */
+  font-size: clamp(25rem, 60vw, 80rem); /* Massive size using viewport width */
   font-weight: 900; /* Extra bold */
   color: #ffffff; /* Same as topShade */
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Subtle shadow for visibility */
-  opacity: 0.8;
-  transition: opacity 0.5s ease-in-out;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8); /* Stronger shadow for better visibility */
+  opacity: 0.2; /* 20% opacity */
   line-height: 0.8;
   margin: 0;
   padding: 0;
@@ -914,17 +929,11 @@ button:active {
   font-size: clamp(2rem, 8vw, 4rem); /* Responsive medium size */
   font-weight: 700; /* Bold */
   color: #ffffff; /* Same as topShade */
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-  opacity: 0.6;
-  transition: opacity 0.5s ease-in-out;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8); /* Stronger shadow */
+  opacity: 0.2; /* 20% opacity */
   margin-top: -1rem;
   text-transform: uppercase;
   letter-spacing: 0.5rem;
-}
-
-.timer-number.fade-out,
-.timer-label.fade-out {
-  opacity: 0;
 }
 
 .fullscreen-timer.hidden {
