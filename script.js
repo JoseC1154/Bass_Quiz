@@ -98,17 +98,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeUI();
   bindUIEvents();
 
-  // Difficulty slider label update
-  const difficultySlider = document.getElementById('difficulty-select');
-  const difficultyLabel = document.getElementById('difficulty-label');
-  if (difficultySlider && difficultyLabel) {
-    difficultySlider.addEventListener('input', () => {
-      difficultyLabel.textContent = difficultySlider.value;
-    });
-    // Initialize label at load
-    difficultyLabel.textContent = difficultySlider.value;
-  }
-
   document.body.addEventListener('click', () => {
     if (audioCtx.state === 'suspended') audioCtx.resume();
   }, { once: true });

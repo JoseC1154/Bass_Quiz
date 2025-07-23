@@ -48,8 +48,8 @@
     <div class="card-body">
       <div class="card-section">
         <div class="setting-group">
-          <label for="level-select">Training Mode</label>
           <select id="level-select">
+            <option value="" disabled selected>Training Mode</option>
             <option value="easy">Easy</option>
             <option value="intermediate">Intermediate</option>
             <option value="hard">Hard</option>
@@ -61,8 +61,8 @@
       <!-- Conditional Input Settings -->
       <div class="card-section hidden" id="key-select-container">
         <div class="setting-group">
-          <label for="key-select">Key</label>
           <select id="key-select">
+            <option value="" disabled>Key</option>
             <option value="random" selected>Random</option>
           </select>
         </div>
@@ -70,8 +70,8 @@
 
       <div class="card-section hidden" id="degree-select-container">
         <div class="setting-group">
-          <label for="degree-select">Degree</label>
           <select id="degree-select">
+            <option value="" disabled selected>Degree</option>
             <option value="1">1st</option>
             <option value="2">2nd</option>
             <option value="3">3rd</option>
@@ -86,8 +86,8 @@
       <!-- Scale Type -->
       <div class="card-section">
         <div class="setting-group">
-          <label for="scale-type">Scale Type</label>
           <select id="scale-type">
+            <option value="" disabled>Scale Type</option>
             <option value="major" selected>Major</option>
             <option value="minor">Minor</option>
           </select>
@@ -97,8 +97,17 @@
       <!-- Difficulty Setting -->
       <div class="card-section">
         <div class="setting-group">
-          <label for="difficulty-select">Difficulty: <span id="difficulty-label">4</span></label>
-          <input type="range" id="difficulty-select" min="1" max="8" value="4" step="1" />
+          <select id="difficulty-select">
+            <option value="" disabled>Difficulty</option>
+            <option value="1">1 - Very Easy</option>
+            <option value="2">2 - Easy</option>
+            <option value="3">3 - Easy-Medium</option>
+            <option value="4" selected>4 - Medium</option>
+            <option value="5">5 - Medium-Hard</option>
+            <option value="6">6 - Hard</option>
+            <option value="7">7 - Very Hard</option>
+            <option value="8">8 - Expert</option>
+          </select>
         </div>
       </div>
 

@@ -105,8 +105,12 @@ main {
   flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 12px;
+}
+
+.card-section {
+  margin-bottom: 5px;
 }
 
 /* --- 3. Forms and Controls (Labels, Inputs, Buttons) --- */
@@ -122,13 +126,19 @@ main {
 
 .setting-group select,
 .setting-group input[type="number"] {
-  flex: 1 1 55%;
-  max-width: 55%;
-  width: auto;
+  flex: 1 1 100%;
+  max-width: 100%;
+  width: 100%;
   padding: 8px;
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 8px;
+}
+
+/* Style for disabled placeholder options */
+.setting-group select option:disabled {
+  color: #999;
+  font-weight: bold;
 }
 
 button {
