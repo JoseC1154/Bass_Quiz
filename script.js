@@ -48,6 +48,30 @@ const fullscreenTimer = document.getElementById('fullscreen-timer');
 const timerDisplay = document.getElementById('timer-display');
 const timerLabel = document.getElementById('timer-label');
 
+// MIDI and Audio input variables
+let midiAccess = null;
+let audioContext = null;
+let analyser = null;
+let microphone = null;
+let audioInputActive = false;
+let midiInputActive = false;
+
+// Note frequency mapping for audio input
+const noteFrequencies = {
+  'C': [65.41, 130.81, 261.63, 523.25, 1046.50],
+  'Db': [69.30, 138.59, 277.18, 554.37, 1108.73],
+  'D': [73.42, 146.83, 293.66, 587.33, 1174.66],
+  'Eb': [77.78, 155.56, 311.13, 622.25, 1244.51],
+  'E': [82.41, 164.81, 329.63, 659.25, 1318.51],
+  'F': [87.31, 174.61, 349.23, 698.46, 1396.91],
+  'F#': [92.50, 185.00, 369.99, 739.99, 1479.98],
+  'G': [98.00, 196.00, 392.00, 783.99, 1567.98],
+  'Ab': [103.83, 207.65, 415.30, 830.61, 1661.22],
+  'A': [110.00, 220.00, 440.00, 880.00, 1760.00],
+  'Bb': [116.54, 233.08, 466.16, 932.33, 1864.66],
+  'B': [123.47, 246.94, 493.88, 987.77, 1975.53]
+};
+
 // Timer-related elements and constants
 // Only the totalTimer (now in header) is used for the active quiz timer.
 
@@ -175,6 +199,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initializeUI();
   bindUIEvents();
+  initializeMIDI();
+  initializeAudioInput();
   
   // Set BPM Challenge as default mode
   const timeModeIndicator = document.getElementById('time-mode-indicator');
@@ -291,6 +317,10 @@ function bindUIEvents() {
     if (totalTimer && totalTimer.intervalId) {
       clearInterval(totalTimer.intervalId);
     }
+    
+    // Stop MIDI and audio input
+    stopAudioInput();
+    
     quizCard.classList.add('hidden');
     quizCard.classList.remove('full-width');
     hideFullscreenTimer(); // Hide the fullscreen timer
@@ -410,8 +440,18 @@ function updateInputUI() {
   document.getElementById('custom-input-ui').innerHTML = '';
   const selectedIcon = document.querySelector('.input-icon.selected');
   const selectedInputType = selectedIcon ? selectedIcon.dataset.type : 'keys';
+  
   if (selectedInputType === 'keys') {
     document.getElementById('keys-ui')?.classList.remove('hidden');
+  } else if (selectedInputType === 'midi') {
+    document.getElementById('midi-ui')?.classList.remove('hidden');
+    // Reset MIDI display
+    document.getElementById('midi-note-display').textContent = 'Play a note on your MIDI device';
+  } else if (selectedInputType === 'audio') {
+    document.getElementById('audio-ui')?.classList.remove('hidden');
+    // Reset audio display
+    document.getElementById('audio-note-display').textContent = 'Play a note on your instrument';
+    document.getElementById('audio-frequency-display').textContent = 'Frequency: --';
   } else if (selectedInputType === 'piano') {
     document.getElementById('piano-ui')?.classList.remove('hidden');
     const container = document.getElementById('piano-ui');
@@ -750,6 +790,10 @@ function resetQuiz() {
   if (totalTimer) {
     totalTimer.textContent = '';
   }
+  
+  // Clean up MIDI and audio
+  stopAudioInput();
+  
   // Removed: feedback.textContent = '';
   // Removed: countdown.textContent = '';
   quizActive = false;
@@ -848,6 +892,279 @@ function randomChoice(arr) {
 }
 function shuffle(arr) {
   return arr.sort(() => Math.random() - 0.5);
+}
+
+// ================================
+// 8. MIDI Input Functions
+// ================================
+async function initializeMIDI() {
+  try {
+    if (navigator.requestMIDIAccess) {
+      midiAccess = await navigator.requestMIDIAccess();
+      console.log('MIDI access granted');
+      
+      // Update connection status
+      updateMIDIStatus();
+      
+      // Listen for MIDI device changes
+      midiAccess.onstatechange = updateMIDIStatus;
+      
+      // Set up MIDI input listeners
+      setupMIDIInputs();
+    } else {
+      console.log('MIDI not supported in this browser');
+      document.getElementById('midi-connection-status').textContent = '🎹 MIDI: Not Supported';
+    }
+  } catch (error) {
+    console.error('MIDI initialization failed:', error);
+    document.getElementById('midi-connection-status').textContent = '🎹 MIDI: Error';
+  }
+}
+
+function updateMIDIStatus() {
+  if (!midiAccess) return;
+  
+  const inputs = Array.from(midiAccess.inputs.values());
+  const statusElement = document.getElementById('midi-connection-status');
+  const deviceListElement = document.getElementById('midi-device-list');
+  
+  if (inputs.length > 0) {
+    statusElement.textContent = '🎹 MIDI: Connected';
+    statusElement.style.color = 'green';
+    
+    const deviceNames = inputs.map(input => input.name).join(', ');
+    deviceListElement.textContent = `Devices: ${deviceNames}`;
+  } else {
+    statusElement.textContent = '🎹 MIDI: No Devices';
+    statusElement.style.color = 'orange';
+    deviceListElement.textContent = 'Connect a MIDI device';
+  }
+}
+
+function setupMIDIInputs() {
+  if (!midiAccess) return;
+  
+  for (const input of midiAccess.inputs.values()) {
+    input.onmidimessage = handleMIDIMessage;
+  }
+}
+
+function handleMIDIMessage(message) {
+  const [command, note, velocity] = message.data;
+  
+  // Note on message (144 + channel) with velocity > 0
+  if ((command & 0xf0) === 0x90 && velocity > 0) {
+    const noteName = midiNoteToName(note);
+    console.log('MIDI Note:', noteName);
+    
+    // Update display
+    document.getElementById('midi-note-display').textContent = `Note: ${noteName}`;
+    
+    // Check if we're in quiz mode and this input type is selected
+    const selectedIcon = document.querySelector('.input-icon.selected');
+    if (selectedIcon && selectedIcon.dataset.type === 'midi' && !quizCard.classList.contains('hidden')) {
+      handleNoteInput(noteName);
+    }
+  }
+}
+
+function midiNoteToName(midiNote) {
+  const noteNames = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
+  const noteName = noteNames[midiNote % 12];
+  return noteName;
+}
+
+// ================================
+// 9. Audio Input Functions
+// ================================
+async function initializeAudioInput() {
+  try {
+    // Set up audio input controls
+    const audioStartBtn = document.getElementById('audio-start-btn');
+    const sensitivitySlider = document.getElementById('audio-sensitivity');
+    const sensitivityValue = document.getElementById('sensitivity-value');
+    
+    if (audioStartBtn) {
+      audioStartBtn.addEventListener('click', toggleAudioInput);
+    }
+    
+    if (sensitivitySlider) {
+      sensitivitySlider.addEventListener('input', (e) => {
+        sensitivityValue.textContent = e.target.value;
+      });
+    }
+    
+    console.log('Audio input initialized');
+  } catch (error) {
+    console.error('Audio input initialization failed:', error);
+  }
+}
+
+async function toggleAudioInput() {
+  const statusElement = document.getElementById('audio-connection-status');
+  const startBtn = document.getElementById('audio-start-btn');
+  
+  if (!audioInputActive) {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = audioContext.createAnalyser();
+      microphone = audioContext.createMediaStreamSource(stream);
+      
+      analyser.fftSize = 2048;
+      microphone.connect(analyser);
+      
+      audioInputActive = true;
+      statusElement.textContent = '🎤 Audio: Connected';
+      statusElement.style.color = 'green';
+      startBtn.textContent = 'Stop Audio Input';
+      
+      startPitchDetection();
+      
+    } catch (error) {
+      console.error('Audio input failed:', error);
+      statusElement.textContent = '🎤 Audio: Permission Denied';
+      statusElement.style.color = 'red';
+    }
+  } else {
+    stopAudioInput();
+  }
+}
+
+function stopAudioInput() {
+  if (audioContext) {
+    audioContext.close();
+    audioContext = null;
+  }
+  
+  audioInputActive = false;
+  const statusElement = document.getElementById('audio-connection-status');
+  const startBtn = document.getElementById('audio-start-btn');
+  
+  statusElement.textContent = '🎤 Audio: Disconnected';
+  statusElement.style.color = 'black';
+  startBtn.textContent = 'Start Audio Input';
+  
+  document.getElementById('audio-note-display').textContent = 'Play a note on your instrument';
+  document.getElementById('audio-frequency-display').textContent = 'Frequency: --';
+}
+
+function startPitchDetection() {
+  if (!audioInputActive || !analyser) return;
+  
+  const bufferLength = analyser.frequencyBinCount;
+  const dataArray = new Uint8Array(bufferLength);
+  
+  function detectPitch() {
+    if (!audioInputActive) return;
+    
+    analyser.getByteFrequencyData(dataArray);
+    
+    const sensitivity = parseFloat(document.getElementById('audio-sensitivity').value);
+    const threshold = 255 * sensitivity;
+    
+    // Find the frequency with the highest amplitude
+    let maxAmplitude = 0;
+    let maxIndex = 0;
+    
+    for (let i = 0; i < bufferLength; i++) {
+      if (dataArray[i] > maxAmplitude && dataArray[i] > threshold) {
+        maxAmplitude = dataArray[i];
+        maxIndex = i;
+      }
+    }
+    
+    if (maxAmplitude > threshold) {
+      const frequency = (maxIndex * audioContext.sampleRate) / (analyser.fftSize * 2);
+      const noteName = frequencyToNote(frequency);
+      
+      document.getElementById('audio-frequency-display').textContent = `Frequency: ${frequency.toFixed(1)} Hz`;
+      
+      if (noteName) {
+        document.getElementById('audio-note-display').textContent = `Note: ${noteName}`;
+        
+        // Check if we're in quiz mode and this input type is selected
+        const selectedIcon = document.querySelector('.input-icon.selected');
+        if (selectedIcon && selectedIcon.dataset.type === 'audio' && !quizCard.classList.contains('hidden')) {
+          handleNoteInput(noteName);
+        }
+      }
+    }
+    
+    requestAnimationFrame(detectPitch);
+  }
+  
+  detectPitch();
+}
+
+function frequencyToNote(frequency) {
+  let closestNote = null;
+  let minDifference = Infinity;
+  
+  for (const [noteName, frequencies] of Object.entries(noteFrequencies)) {
+    for (const noteFreq of frequencies) {
+      const difference = Math.abs(frequency - noteFreq);
+      const percentDifference = difference / noteFreq;
+      
+      // Allow 5% tolerance for note detection
+      if (percentDifference < 0.05 && difference < minDifference) {
+        minDifference = difference;
+        closestNote = noteName;
+      }
+    }
+  }
+  
+  return closestNote;
+}
+
+// ================================
+// 10. Universal Note Input Handler
+// ================================
+function handleNoteInput(noteName) {
+  if (!quizData[currentIndex]) return;
+  
+  const correct = quizData[currentIndex].answer;
+  const isCorrect = noteName === correct;
+  
+  // Visual feedback
+  const noteDisplays = document.querySelectorAll('#midi-note-display, #audio-note-display');
+  noteDisplays.forEach(display => {
+    display.style.backgroundColor = isCorrect ? '#d4edda' : '#f8d7da';
+    display.style.borderColor = isCorrect ? '#28a745' : '#dc3545';
+    display.style.color = isCorrect ? '#155724' : '#721c24';
+  });
+  
+  // Audio feedback
+  if (isCorrect) {
+    playCorrectSound();
+    correctAnswers++;
+    addTicksForCorrect();
+  } else {
+    playIncorrectSound();
+    subtractTicksForWrong();
+  }
+  
+  // Show correct answer briefly if wrong
+  if (!isCorrect) {
+    noteDisplays.forEach(display => {
+      const originalText = display.textContent;
+      display.textContent = `Correct: ${correct}`;
+      setTimeout(() => {
+        display.textContent = originalText;
+      }, 1500);
+    });
+  }
+  
+  setTimeout(() => {
+    // Reset visual feedback
+    noteDisplays.forEach(display => {
+      display.style.backgroundColor = '#e8f4fd';
+      display.style.borderColor = '#4a90e2';
+      display.style.color = 'black';
+    });
+    
+    nextQuestion();
+  }, isCorrect ? 300 : 2000);
 }
 
 
