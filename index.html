@@ -83,6 +83,29 @@
         </div>
       </div>
 
+      <div class="card-section hidden" id="time-mode-container">
+        <div class="setting-group">
+          <select id="time-mode-select">
+            <option value="" disabled selected>Time Mode</option>
+            <option value="time-attack">Time Attack</option>
+            <option value="bpm-challenge">BPM Challenge</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card-section hidden" id="attack-time-container">
+        <div class="setting-group">
+          <select id="attack-time-select">
+            <option value="" disabled>Attack Time</option>
+            <option value="3">3 seconds</option>
+            <option value="5" selected>5 seconds</option>
+            <option value="8">8 seconds</option>
+            <option value="10">10 seconds</option>
+            <option value="15">15 seconds</option>
+          </select>
+        </div>
+      </div>
+
       <!-- Scale Type -->
       <div class="card-section">
         <div class="setting-group">
@@ -172,9 +195,11 @@
   <!-- Dropdown Menu -->
   <div id="dropdown-menu" class="dropdown-menu hidden">
     <div class="menu-content">
+      <div class="menu-close-area" id="menu-close">✖</div>
       <button class="menu-item" id="menu-about">About</button>
       <button class="menu-item" id="menu-help">Help</button>
       <button class="menu-item" id="menu-settings">Settings</button>
+      <button class="menu-item" id="menu-time-mode">Time Mode</button>
       <button class="menu-item" id="menu-stats">Statistics</button>
     </div>
   </div>

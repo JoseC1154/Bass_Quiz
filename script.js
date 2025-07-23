@@ -25,6 +25,8 @@ const difficultySelect = document.getElementById('difficulty-select');
 const keySelect = document.getElementById('key-select');
 const keyContainer = document.getElementById('key-select-container');
 const degreeContainer = document.getElementById('degree-select-container');
+const timeModeContainer = document.getElementById('time-mode-container');
+const attackTimeContainer = document.getElementById('attack-time-container');
 const scaleChart = document.getElementById('scale-chart');
 const startBtn = document.getElementById('start-btn');
 const quizCard = document.getElementById('quiz-card');
@@ -54,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Menu functionality
   const menuToggle = document.getElementById('menu-toggle');
   const dropdownMenu = document.getElementById('dropdown-menu');
+  const menuClose = document.getElementById('menu-close');
 
   // Toggle menu on hamburger button click
   menuToggle.addEventListener('click', (e) => {
@@ -62,9 +65,15 @@ document.addEventListener('DOMContentLoaded', () => {
     menuToggle.classList.toggle('active');
   });
 
-  // Close menu when clicking outside
-  document.addEventListener('click', (e) => {
-    if (!menuToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+  // Close menu when clicking the close button
+  menuClose.addEventListener('click', () => {
+    dropdownMenu.classList.add('hidden');
+    menuToggle.classList.remove('active');
+  });
+
+  // Close menu when clicking outside the menu content
+  dropdownMenu.addEventListener('click', (e) => {
+    if (e.target === dropdownMenu) {
       dropdownMenu.classList.add('hidden');
       menuToggle.classList.remove('active');
     }
@@ -87,6 +96,21 @@ document.addEventListener('DOMContentLoaded', () => {
     alert('Settings are available on the main screen. Adjust difficulty, scale type, and training mode.');
     dropdownMenu.classList.add('hidden');
     menuToggle.classList.remove('active');
+  });
+
+  document.getElementById('menu-time-mode').addEventListener('click', () => {
+    // Show the time mode container and hide others
+    keyContainer.classList.add('hidden');
+    degreeContainer.classList.add('hidden');
+    timeModeContainer.classList.remove('hidden');
+    attackTimeContainer.classList.add('hidden'); // Hidden until Time Attack is selected
+    
+    // Close the menu
+    dropdownMenu.classList.add('hidden');
+    menuToggle.classList.remove('active');
+    
+    // Optional: Show a message about Time Mode
+    alert('Time Mode activated! Choose between Time Attack (fixed seconds per question) or BPM Challenge (tempo-based timing).');
   });
 
   document.getElementById('menu-stats').addEventListener('click', () => {
@@ -165,12 +189,18 @@ function initializeUI() {
   if (level === 'easy') {
     keyContainer.classList.remove('hidden');
     degreeContainer.classList.add('hidden');
+    timeModeContainer.classList.add('hidden');
+    attackTimeContainer.classList.add('hidden');
   } else if (level === 'degree-training') {
     keyContainer.classList.add('hidden');
     degreeContainer.classList.remove('hidden');
+    timeModeContainer.classList.add('hidden');
+    attackTimeContainer.classList.add('hidden');
   } else {
     keyContainer.classList.add('hidden');
     degreeContainer.classList.add('hidden');
+    timeModeContainer.classList.add('hidden');
+    attackTimeContainer.classList.add('hidden');
   }
 }
 
@@ -180,15 +210,34 @@ function bindUIEvents() {
     if (level === 'easy') {
       keyContainer.classList.remove('hidden');
       degreeContainer.classList.add('hidden');
+      timeModeContainer.classList.add('hidden');
+      attackTimeContainer.classList.add('hidden');
     } else if (level === 'degree-training') {
       keyContainer.classList.add('hidden');
       degreeContainer.classList.remove('hidden');
+      timeModeContainer.classList.add('hidden');
+      attackTimeContainer.classList.add('hidden');
     } else {
       keyContainer.classList.add('hidden');
       degreeContainer.classList.add('hidden');
+      timeModeContainer.classList.add('hidden');
+      attackTimeContainer.classList.add('hidden');
     }
     updateChart();
   });
+
+  // Handle time mode selection
+  const timeModeSelect = document.getElementById('time-mode-select');
+  if (timeModeSelect) {
+    timeModeSelect.addEventListener('change', () => {
+      const timeMode = timeModeSelect.value;
+      if (timeMode === 'time-attack') {
+        attackTimeContainer.classList.remove('hidden');
+      } else {
+        attackTimeContainer.classList.add('hidden');
+      }
+    });
+  }
   keySelect.addEventListener('change', updateChart);
   document.getElementById('scale-type').addEventListener('change', updateChart);
   closeQuizBtn.addEventListener('click', () => {
