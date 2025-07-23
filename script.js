@@ -51,6 +51,50 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeHelpChartBtn = document.getElementById('close-help-chart');
   const helpFeedback = document.getElementById('help-feedback');
 
+  // Menu functionality
+  const menuToggle = document.getElementById('menu-toggle');
+  const dropdownMenu = document.getElementById('dropdown-menu');
+
+  // Toggle menu on hamburger button click
+  menuToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dropdownMenu.classList.toggle('hidden');
+    menuToggle.classList.toggle('active');
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!menuToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+      dropdownMenu.classList.add('hidden');
+      menuToggle.classList.remove('active');
+    }
+  });
+
+  // Menu item handlers
+  document.getElementById('menu-about').addEventListener('click', () => {
+    alert('Scale Driller v1.0\nA music theory training app for learning scales and their degrees.');
+    dropdownMenu.classList.add('hidden');
+    menuToggle.classList.remove('active');
+  });
+
+  document.getElementById('menu-help').addEventListener('click', () => {
+    alert('How to use:\n1. Select your training mode and settings\n2. Choose your instrument input type\n3. Start the quiz and answer questions\n4. Use the ? button during quiz for hints');
+    dropdownMenu.classList.add('hidden');
+    menuToggle.classList.remove('active');
+  });
+
+  document.getElementById('menu-settings').addEventListener('click', () => {
+    alert('Settings are available on the main screen. Adjust difficulty, scale type, and training mode.');
+    dropdownMenu.classList.add('hidden');
+    menuToggle.classList.remove('active');
+  });
+
+  document.getElementById('menu-stats').addEventListener('click', () => {
+    alert('Statistics feature coming soon!');
+    dropdownMenu.classList.add('hidden');
+    menuToggle.classList.remove('active');
+  });
+
   initializeUI();
   bindUIEvents();
 

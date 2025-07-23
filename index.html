@@ -33,9 +33,16 @@
     <section id="settings-card" class="card" role="region" aria-label="Settings">
       <div class="topShade">
         <div class="topShadeInner">
-        <h1 class="app-title">Scale Driller</h1>
-      </div>
+          <div class="header-controls">
+            <button id="menu-toggle" class="menu-btn" aria-label="Open Menu">
+              <span class="hamburger-line"></span>
+              <span class="hamburger-line"></span>
+              <span class="hamburger-line"></span>
+            </button>
+            <h1 class="app-title">Scale Driller</h1>
+          </div>
         </div>
+      </div>
       
       <!-- Level Selection -->
     <div class="card-body">
@@ -52,24 +59,28 @@
       </div>
 
       <!-- Conditional Input Settings -->
-      <div class="card-section" id="key-select-container" class="setting-group hidden">
-        <label for="key-select">Key</label>
-        <select id="key-select">
-          <option value="random" selected>Random</option>
-        </select>
+      <div class="card-section hidden" id="key-select-container">
+        <div class="setting-group">
+          <label for="key-select">Key</label>
+          <select id="key-select">
+            <option value="random" selected>Random</option>
+          </select>
+        </div>
       </div>
 
-      <div class="card-section" id="degree-select-container" class="setting-group hidden">
-        <label for="degree-select">Degree</label>
-        <select id="degree-select">
-          <option value="1">1st</option>
-          <option value="2">2nd</option>
-          <option value="3">3rd</option>
-          <option value="4">4th</option>
-          <option value="5">5th</option>
-          <option value="6">6th</option>
-          <option value="7">7th</option>
-        </select>
+      <div class="card-section hidden" id="degree-select-container">
+        <div class="setting-group">
+          <label for="degree-select">Degree</label>
+          <select id="degree-select">
+            <option value="1">1st</option>
+            <option value="2">2nd</option>
+            <option value="3">3rd</option>
+            <option value="4">4th</option>
+            <option value="5">5th</option>
+            <option value="6">6th</option>
+            <option value="7">7th</option>
+          </select>
+        </div>
       </div>
 
       <!-- Scale Type -->
@@ -148,6 +159,16 @@
       </div>
     </section>
   </main>
+
+  <!-- Dropdown Menu -->
+  <div id="dropdown-menu" class="dropdown-menu hidden">
+    <div class="menu-content">
+      <button class="menu-item" id="menu-about">About</button>
+      <button class="menu-item" id="menu-help">Help</button>
+      <button class="menu-item" id="menu-settings">Settings</button>
+      <button class="menu-item" id="menu-stats">Statistics</button>
+    </div>
+  </div>
 
   <!-- Help Chart Modal -->
   <div id="help-chart-modal" class="modal hidden">
