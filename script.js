@@ -78,6 +78,128 @@ const noteFrequencies = {
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 // ================================
+// 2. Permission Request Functions
+// ================================
+async function requestMIDIPermission() {
+  try {
+    if (navigator.requestMIDIAccess) {
+      if (!midiAccess) {
+        midiAccess = await navigator.requestMIDIAccess();
+        console.log('MIDI permission granted');
+        
+        // Update connection status
+        updateMIDIStatus();
+        
+        // Listen for MIDI device changes
+        midiAccess.onstatechange = updateMIDIStatus;
+        
+        // Set up MIDI input listeners
+        setupMIDIInputs();
+        
+        // Show success feedback
+        showPermissionFeedback('MIDI', true);
+      }
+    } else {
+      console.log('MIDI not supported in this browser');
+      showPermissionFeedback('MIDI', false, 'Not supported in this browser');
+    }
+  } catch (error) {
+    console.error('MIDI permission failed:', error);
+    showPermissionFeedback('MIDI', false, error.message);
+  }
+}
+
+async function requestAudioPermission() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    
+    // Initialize audio context if not already done
+    if (!audioContext) {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = audioContext.createAnalyser();
+      microphone = audioContext.createMediaStreamSource(stream);
+      
+      analyser.fftSize = 2048;
+      microphone.connect(analyser);
+    }
+    
+    audioInputActive = true;
+    
+    // Update status
+    const statusElement = document.getElementById('audio-connection-status');
+    const startBtn = document.getElementById('audio-start-btn');
+    
+    if (statusElement) {
+      statusElement.textContent = '🎤 Audio: Connected';
+      statusElement.style.color = 'green';
+    }
+    
+    if (startBtn) {
+      startBtn.textContent = 'Stop Audio Input';
+    }
+    
+    startPitchDetection();
+    showPermissionFeedback('Audio', true);
+    
+    console.log('Audio permission granted');
+    
+  } catch (error) {
+    console.error('Audio permission failed:', error);
+    showPermissionFeedback('Audio', false, error.message);
+  }
+}
+
+function showPermissionFeedback(permissionType, granted, errorMessage = '') {
+  const notification = document.createElement('div');
+  notification.className = 'permission-notification';
+  
+  if (granted) {
+    notification.textContent = `${permissionType} permission granted! ✅`;
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #28a745, #20c997);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+      z-index: 10000;
+      animation: slideInRight 0.3s ease-out;
+    `;
+  } else {
+    notification.textContent = `${permissionType} permission failed: ${errorMessage} ❌`;
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #dc3545, #e74c3c);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+      z-index: 10000;
+      animation: slideInRight 0.3s ease-out;
+    `;
+  }
+  
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.style.animation = 'slideOutRight 0.3s ease-in forwards';
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.parentNode.removeChild(notification);
+      }
+    }, 300);
+  }, 3000);
+}
+
+// ================================
 // 2. Initialization
 // ================================
 document.addEventListener('DOMContentLoaded', () => {
@@ -197,6 +319,34 @@ document.addEventListener('DOMContentLoaded', () => {
     menuToggle.classList.remove('active');
   });
 
+  // Input Method Selection Handlers
+  document.querySelectorAll('.input-method-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      
+      // Remove active class from all buttons
+      document.querySelectorAll('.input-method-btn').forEach(b => b.classList.remove('active'));
+      
+      // Add active class to clicked button
+      btn.classList.add('active');
+      
+      const inputType = btn.dataset.input;
+      
+      // Request permissions immediately for non-touch modes
+      if (inputType === 'midi') {
+        await requestMIDIPermission();
+      } else if (inputType === 'audio' || inputType === 'instrument') {
+        await requestAudioPermission();
+      }
+      
+      setInputMethod(inputType);
+      
+      // Show feedback
+      const inputName = btn.textContent.trim();
+      showInputMethodFeedback(inputName);
+    });
+  });
+
   initializeUI();
   bindUIEvents();
   initializeMIDI();
@@ -208,6 +358,9 @@ document.addEventListener('DOMContentLoaded', () => {
     timeModeIndicator.textContent = 'BPM Challenge';
     timeModeIndicator.classList.remove('hidden');
   }
+  
+  // Initialize default input method
+  setInputMethod('touch');
 
   document.body.addEventListener('click', () => {
     if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -438,21 +591,43 @@ function updateChart(targetElement = scaleChart) {
 function updateInputUI() {
   document.querySelectorAll('.instrument-ui').forEach(el => el.classList.add('hidden'));
   document.getElementById('custom-input-ui').innerHTML = '';
-  const selectedIcon = document.querySelector('.input-icon.selected');
-  const selectedInputType = selectedIcon ? selectedIcon.dataset.type : 'keys';
   
-  if (selectedInputType === 'keys') {
+  // Use the current input method instead of just the selected icon
+  let selectedInputType = currentInputMethod;
+  
+  // Fallback to selected icon if currentInputMethod is not set
+  if (!selectedInputType) {
+    const selectedIcon = document.querySelector('.input-icon.selected');
+    selectedInputType = selectedIcon ? selectedIcon.dataset.type : 'keys';
+  }
+  
+  // Map input methods to UI types
+  let uiType = selectedInputType;
+  if (selectedInputType === 'touch') {
+    uiType = 'keys';
+  } else if (selectedInputType === 'instrument') {
+    uiType = 'audio';
+  }
+  
+  if (uiType === 'keys') {
     document.getElementById('keys-ui')?.classList.remove('hidden');
-  } else if (selectedInputType === 'midi') {
+  } else if (uiType === 'midi') {
     document.getElementById('midi-ui')?.classList.remove('hidden');
     // Reset MIDI display
     document.getElementById('midi-note-display').textContent = 'Play a note on your MIDI device';
-  } else if (selectedInputType === 'audio') {
+  } else if (uiType === 'audio') {
     document.getElementById('audio-ui')?.classList.remove('hidden');
     // Reset audio display
     document.getElementById('audio-note-display').textContent = 'Play a note on your instrument';
     document.getElementById('audio-frequency-display').textContent = 'Frequency: --';
-  } else if (selectedInputType === 'piano') {
+    
+    // Auto-start audio input if using instrument cable method
+    if (selectedInputType === 'instrument' && !audioInputActive) {
+      setTimeout(() => {
+        toggleAudioInput();
+      }, 500);
+    }
+  } else if (uiType === 'piano') {
     document.getElementById('piano-ui')?.classList.remove('hidden');
     const container = document.getElementById('piano-ui');
     container.innerHTML = '';
@@ -612,6 +787,36 @@ function handleNoteClick(note) {
 
 document.querySelectorAll('.input-icon').forEach(icon => {
   icon.addEventListener('click', () => {
+    // Update input method based on icon selection
+    const inputType = icon.dataset.type;
+    let methodType;
+    
+    switch(inputType) {
+      case 'keys':
+      case 'piano':
+      case 'bass':
+      case 'guitar':
+        methodType = 'touch';
+        break;
+      case 'midi':
+        methodType = 'midi';
+        break;
+      case 'audio':
+        methodType = 'audio';
+        break;
+    }
+    
+    if (methodType) {
+      currentInputMethod = methodType;
+      
+      // Update menu button states
+      document.querySelectorAll('.input-method-btn').forEach(btn => btn.classList.remove('active'));
+      const menuBtn = document.querySelector(`.input-method-btn[data-input="${methodType}"]`);
+      if (menuBtn) {
+        menuBtn.classList.add('active');
+      }
+    }
+    
     document.querySelectorAll('.input-icon').forEach(i => i.classList.remove('selected'));
     icon.classList.add('selected');
     updateInputUI();
@@ -900,17 +1105,8 @@ function shuffle(arr) {
 async function initializeMIDI() {
   try {
     if (navigator.requestMIDIAccess) {
-      midiAccess = await navigator.requestMIDIAccess();
-      console.log('MIDI access granted');
-      
-      // Update connection status
-      updateMIDIStatus();
-      
-      // Listen for MIDI device changes
-      midiAccess.onstatechange = updateMIDIStatus;
-      
-      // Set up MIDI input listeners
-      setupMIDIInputs();
+      console.log('MIDI API available - permissions will be requested when MIDI input is selected');
+      // Don't request access automatically - wait for user to select MIDI input method
     } else {
       console.log('MIDI not supported in this browser');
       document.getElementById('midi-connection-status').textContent = '🎹 MIDI: Not Supported';
@@ -1165,6 +1361,81 @@ function handleNoteInput(noteName) {
     
     nextQuestion();
   }, isCorrect ? 300 : 2000);
+}
+
+// ================================
+// 11. Input Method Management
+// ================================
+let currentInputMethod = 'touch'; // Default to touch
+
+function setInputMethod(inputType) {
+  currentInputMethod = inputType;
+  
+  // For touch mode, allow instrument icon selection
+  // For MIDI/audio modes, the instrument icons represent the virtual interface display
+  if (inputType === 'touch') {
+    // Keep current icon selection for touch mode
+  } else {
+    // For non-touch modes, default to keys icon as the virtual interface display
+    document.querySelectorAll('.input-icon').forEach(icon => icon.classList.remove('selected'));
+    const keysIcon = document.querySelector('.input-icon[data-type="keys"]');
+    if (keysIcon) {
+      keysIcon.classList.add('selected');
+    }
+  }
+  
+  // If quiz is active, update the input UI
+  if (!quizCard.classList.contains('hidden')) {
+    updateInputUI();
+  }
+  
+  console.log('Input method set to:', inputType);
+}
+
+function showInputMethodFeedback(inputName) {
+  // Create a temporary notification
+  const notification = document.createElement('div');
+  notification.className = 'input-method-notification';
+  notification.textContent = `${inputName} input activated`;
+  notification.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    padding: 16px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 8px 24px rgba(40, 167, 69, 0.4);
+    z-index: 10000;
+    animation: fadeInOut 2s ease-in-out;
+  `;
+  
+  // Add animation CSS
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+      20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+    }
+  `;
+  document.head.appendChild(style);
+  
+  document.body.appendChild(notification);
+  
+  // Remove notification after animation
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.parentNode.removeChild(notification);
+    }
+    if (style.parentNode) {
+      style.parentNode.removeChild(style);
+    }
+  }, 2000);
 }
 
 

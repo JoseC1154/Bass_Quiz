@@ -134,8 +134,6 @@
           <img src="images/icon_piano.png" alt="Piano Icon" class="input-icon" data-type="piano" title="Piano" />
           <img src="images/icon_bass.png" alt="Bass Icon" class="input-icon" data-type="bass" title="Bass" />
           <img src="images/icon_guitar.png" alt="Guitar Icon" class="input-icon" data-type="guitar" title="Guitar" />
-          <div class="input-icon" data-type="midi" title="MIDI Input">🎹</div>
-          <div class="input-icon" data-type="audio" title="Audio Input">🎤</div>
         </div>
       </div>
     </div>
@@ -225,6 +223,26 @@
       <div class="menu-close-area" id="menu-close">✖</div>
       <button class="menu-item" id="menu-about">About</button>
       <button class="menu-item" id="menu-help">Help</button>
+      
+      <!-- Input Method Selection -->
+      <div class="menu-section">
+        <div class="menu-section-title">Input Method</div>
+        <div class="input-method-buttons">
+          <button class="input-method-btn active" id="touch-input-btn" data-input="touch" title="Touch/Click Interface">
+            📱 Touch
+          </button>
+          <button class="input-method-btn" id="midi-input-btn" data-input="midi" title="MIDI Keyboard/Controller">
+            🎹 MIDI
+          </button>
+          <button class="input-method-btn" id="mic-input-btn" data-input="audio" title="Microphone/Audio Input">
+            🎤 Mic
+          </button>
+          <button class="input-method-btn" id="cable-input-btn" data-input="instrument" title="Instrument Cable (Audio Interface)">
+            🎸 Cable
+          </button>
+        </div>
+      </div>
+      
       <button class="menu-item dropdown-button" id="menu-time-mode">
         Time Mode <span class="dropdown-arrow">▼</span>
       </button>

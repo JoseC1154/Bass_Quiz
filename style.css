@@ -979,6 +979,75 @@ button:active {
   transition: transform 0.2s;
 }
 
+/* Input Method Section */
+.menu-section {
+  margin: 20px 0;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  border: 1px solid #ddd;
+}
+
+.menu-section-title {
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  color: #333;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.input-method-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.input-method-btn {
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid #ddd;
+  padding: 12px 8px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  font-weight: 500;
+}
+
+.input-method-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.input-method-btn.active {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  border-color: #28a745;
+  color: white;
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+  animation: glow-green 2s ease-in-out infinite alternate;
+}
+
+.input-method-btn.active:hover {
+  background: linear-gradient(135deg, #218838, #1e7e34);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(40, 167, 69, 0.5);
+}
+
+@keyframes glow-green {
+  from {
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+  }
+  to {
+    box-shadow: 0 4px 16px rgba(40, 167, 69, 0.6), 0 0 20px rgba(40, 167, 69, 0.3);
+  }
+}
+
 .dropdown-button.active .dropdown-arrow {
   transform: rotate(180deg);
 }
@@ -1050,4 +1119,33 @@ button:active {
 
 .fullscreen-timer.hidden {
   display: none;
+}
+
+/* --- Permission Notification Animations --- */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.permission-notification {
+  max-width: 300px;
+  word-wrap: break-word;
+  border-left: 4px solid rgba(255, 255, 255, 0.3);
 }
