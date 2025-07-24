@@ -856,6 +856,22 @@ body:has(.card.full-width) main {
   width: 100%;
   align-self: center;
 }
+
+/* --- Results Card Centering --- */
+#results-card {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10000; /* Higher than fullscreen quiz */
+  width: 90vw;
+  max-width: 500px;
+  margin: 0;
+}
+
+#results-card.hidden {
+  display: none;
+}
 /* --- Question Timer Styles --- */
 #question-timer {
   position: absolute;
@@ -924,6 +940,14 @@ body:has(.card.full-width) main {
   color: #666;
   font-weight: normal;
   margin-top: 2px;
+}
+
+.input-method-indicator {
+  font-size: 0.8rem;
+  color: #888;
+  font-weight: normal;
+  margin-top: 2px;
+  font-style: italic;
 }
 
 .menu-btn {
@@ -1070,13 +1094,15 @@ body:has(.card.full-width) main {
   letter-spacing: 1px;
 }
 
-.input-method-buttons {
+.input-method-buttons,
+.time-mode-buttons {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
 
-.input-method-btn {
+.input-method-btn,
+.time-mode-btn {
   background: rgba(255, 255, 255, 0.9);
   border: 2px solid #ddd;
   padding: 12px 8px;
@@ -1091,13 +1117,15 @@ body:has(.card.full-width) main {
   font-weight: 500;
 }
 
-.input-method-btn:hover {
+.input-method-btn:hover,
+.time-mode-btn:hover {
   background-color: rgba(0, 0, 0, 0.05);
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.input-method-btn.active {
+.input-method-btn.active,
+.time-mode-btn.active {
   background: linear-gradient(135deg, #28a745, #20c997);
   border-color: #28a745;
   color: white;
@@ -1105,13 +1133,15 @@ body:has(.card.full-width) main {
   animation: glow-green 2s ease-in-out infinite alternate;
 }
 
-.input-method-btn.active:hover {
+.input-method-btn.active:hover,
+.time-mode-btn.active:hover {
   background: linear-gradient(135deg, #218838, #1e7e34);
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(40, 167, 69, 0.5);
 }
 
-.input-method-btn:disabled {
+.input-method-btn:disabled,
+.time-mode-btn:disabled {
   background-color: #f8f9fa;
   border-color: #dee2e6;
   color: #6c757d;
@@ -1121,7 +1151,8 @@ body:has(.card.full-width) main {
   box-shadow: none;
 }
 
-.input-method-btn:disabled:hover {
+.input-method-btn:disabled:hover,
+.time-mode-btn:disabled:hover {
   background-color: #f8f9fa;
   border-color: #dee2e6;
   transform: none;

@@ -42,6 +42,7 @@
             <div class="title-container">
               <h1 class="app-title">Scale Driller</h1>
               <div class="time-mode-indicator hidden" id="time-mode-indicator"></div>
+              <div id="input-method-display" class="input-method-indicator">Touch</div>
             </div>
           </div>
         </div>
@@ -243,13 +244,18 @@
         </div>
       </div>
       
-      <button class="menu-item dropdown-button" id="menu-time-mode">
-        Time Mode <span class="dropdown-arrow">▼</span>
-      </button>
-      <div class="submenu hidden" id="time-mode-submenu">
-        <button class="submenu-item" id="time-attack-option">Time Attack</button>
-        <button class="submenu-item" id="bpm-challenge-option">BPM Challenge</button>
+      <div class="menu-section">
+        <div class="menu-section-title">Time Mode</div>
+        <div class="time-mode-buttons">
+          <button class="time-mode-btn" id="time-attack-option" data-mode="time-attack" title="Time Attack Mode">
+            ⏱️ Time Attack
+          </button>
+          <button class="time-mode-btn active" id="bpm-challenge-option" data-mode="bpm-challenge" title="BPM Challenge Mode">
+            🎵 BPM Challenge
+          </button>
+        </div>
       </div>
+      
       <button class="menu-item" id="menu-stats">Statistics</button>
     </div>
   </div>
