@@ -17,12 +17,30 @@ body {
   flex-direction: column;
 }
 
+/* Override body constraints when quiz is fullscreen */
+body:has(.card.full-width) {
+  display: block !important;
+  justify-content: unset !important;
+  align-items: unset !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
 main {
   width: 90vw;
   max-width: 1000px;
   padding: 20px;
   box-sizing: border-box;
   margin: 0 auto;
+}
+
+/* Override main constraints when quiz is fullscreen */
+main:has(.card.full-width),
+body:has(.card.full-width) main {
+  width: 100vw !important;
+  max-width: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 /* --- 2. Card Layout and UI Containers --- */
@@ -80,6 +98,29 @@ main {
   /* Remove fixed min-height - let content determine the height */
   border-radius: 16px 16px 0 0; /* Match card border radius on top */
   z-index: 0; /* Background level, behind interactive elements */
+}
+
+/* Remove border radius when quiz card is fullscreen */
+.card.full-width .topShade {
+  border-radius: 0;
+  background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Ensure card body takes full space in fullscreen */
+.card.full-width .cardBody {
+  padding: 20px;
+  height: calc(100vh - 140px); /* Account for header space */
+  max-height: none;
+  width: 100% !important;
+  max-width: none !important;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  margin: 20px;
+}
+
+/* Add padding to topShade inner in fullscreen */
+.card.full-width .topShadeInner {
+  padding: 20px;
 }
 .topShadeInner {
   padding: 20px 4% 20px 4%; /* Generous padding for dynamic content */
@@ -770,11 +811,42 @@ button:active {
 }
 /* --- 12. Layout Helpers --- */
 .card.full-width {
-  max-width: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 1rem;
+  max-width: none !important;
+  max-height: none !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
   box-sizing: border-box;
+  border-radius: 0 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 9999 !important;
+  overflow: auto;
+  background-color: transparent;
+}
+
+/* Force remove all margins and padding when fullscreen */
+body:has(.card.full-width),
+html:has(.card.full-width) {
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+body:has(.card.full-width) main {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100vw !important;
+  max-width: none !important;
+}
+
+/* Ensure fullscreen card overrides all parent constraints */
+.card.full-width * {
+  max-width: none !important;
 }
 /* Center the start button within the settings card */
 #start-btn {
