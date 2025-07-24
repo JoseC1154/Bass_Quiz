@@ -24,6 +24,14 @@ let levelStartBpm = 130; //Adjusted from 40 JC
 // Track streak of correct answers
 let correctStreak = 0;
 
+// Pause/Resume state management for help modal
+let pausedTimerStates = {
+  timeAttackCountdown: 0,
+  wasTimeAttackActive: false,
+  wasTotalTimerActive: false,
+  wasMetronomeActive: false
+};
+
 const levelSelect = document.getElementById('level-select');
 const difficultySelect = document.getElementById('difficulty-select');
 const keySelect = document.getElementById('key-select');
@@ -451,15 +459,27 @@ document.addEventListener('DOMContentLoaded', () => {
     helpChartModal.classList.add('hidden');
     const helpScaleChart = document.getElementById('help-scale-chart');
     if (helpScaleChart) helpScaleChart.classList.add('hidden');
+    
+    // Remove modal classes to restore layout
+    document.body.classList.remove('modal-open');
+    const quizCard = document.getElementById('quiz-card');
+    if (quizCard) quizCard.classList.remove('modal-behind');
+    
     isPaused = false;
+    resumeAllTimersAfterHelp();
     showQuestion();
   });
 
   helpBtn.addEventListener('click', () => {
     if (isPaused) return;
     isPaused = true;
-    clearTimeout(timer);
-    clearInterval(countdownInterval);
+    
+    // Add modal classes to prevent layout shifts
+    document.body.classList.add('modal-open');
+    const quizCard = document.getElementById('quiz-card');
+    if (quizCard) quizCard.classList.add('modal-behind');
+    
+    pauseAllTimersForHelp();
     const helpScaleChart = document.getElementById('help-scale-chart');
     const current = quizData[currentIndex];
     const inferredKey = (levelSelect.value === 'hard')
@@ -1054,8 +1074,11 @@ function checkAnswer(selected) {
     if (btn.textContent === selected && !isCorrect) btn.classList.add('incorrect');
   });
   if (isCorrect) {
+    playCorrectSound();
+    correctAnswers++;
     addTicksForCorrect();
   } else {
+    playIncorrectSound();
     subtractTicksForWrong();
   }
   setTimeout(nextQuestion, 1000);
@@ -1088,6 +1111,7 @@ function endQuiz() {
   const best = Math.max(correctAnswers, parseInt(localStorage.getItem('bestScore') || 0));
   localStorage.setItem('bestScore', best);
   quizCard.classList.add('hidden');
+  quizCard.classList.remove('full-width'); // Remove fullscreen layout
   hideFullscreenTimer(); // Hide the fullscreen timer
   resultsCard.classList.remove('hidden');
   const elapsedTime = ((performance.now() - quizStartTime) / 1000).toFixed(1);
@@ -1765,6 +1789,9 @@ function startTimeAttackCountdown() {
 }
 
 function timeAttackTimeOut() {
+  // Play incorrect sound for timeout
+  playIncorrectSound();
+  
   // Disable all buttons
   const buttons = [...answerButtons.querySelectorAll('button')];
   buttons.forEach(btn => {
@@ -1784,4 +1811,72 @@ function timeAttackTimeOut() {
   // Don't add to correct answers, proceed with penalty
   subtractTicksForWrong();
   setTimeout(nextQuestion, 1500);
+}
+
+// ================================
+// Help Modal Pause/Resume Functions
+// ================================
+function pauseAllTimersForHelp() {
+  if (!quizActive) return;
+  
+  // Store current states
+  pausedTimerStates.timeAttackCountdown = timeAttackCountdown;
+  pausedTimerStates.wasTimeAttackActive = timeAttackInterval !== null;
+  pausedTimerStates.wasTotalTimerActive = totalTimer && totalTimer.intervalId;
+  pausedTimerStates.wasMetronomeActive = metronomeInterval !== null;
+  
+  // Clear all active timers
+  clearTimeout(timer);
+  clearInterval(countdownInterval);
+  clearInterval(timeAttackInterval);
+  clearInterval(metronomeInterval);
+  if (totalTimer && totalTimer.intervalId) {
+    clearInterval(totalTimer.intervalId);
+    totalTimer.intervalId = null;
+  }
+  
+  // Reset interval variables
+  timeAttackInterval = null;
+  metronomeInterval = null;
+}
+
+function resumeAllTimersAfterHelp() {
+  if (!quizActive) return;
+  
+  // Resume Time Attack countdown if it was active
+  if (pausedTimerStates.wasTimeAttackActive) {
+    const timeModeIndicator = document.getElementById('time-mode-indicator');
+    const isTimeAttack = timeModeIndicator && timeModeIndicator.textContent === 'Time Attack';
+    
+    if (isTimeAttack && pausedTimerStates.timeAttackCountdown > 0) {
+      // Resume with the remaining time, don't reset to initial value
+      timeAttackCountdown = pausedTimerStates.timeAttackCountdown;
+      updateTimerDisplay(timeAttackCountdown, '');
+      
+      // Start countdown - tick sound will play once per second during countdown
+      timeAttackInterval = setInterval(() => {
+        timeAttackCountdown--;
+        updateTimerDisplay(timeAttackCountdown, '');
+        
+        // Play tick sound once per second
+        playTickSound();
+        
+        if (timeAttackCountdown <= 0) {
+          clearInterval(timeAttackInterval);
+          // Auto-fail the question if time runs out
+          timeAttackTimeOut();
+        }
+      }, 1000);
+    }
+  }
+  
+  // Resume BPM Challenge timer if it was active
+  if (pausedTimerStates.wasTotalTimerActive) {
+    startTotalTimer();
+  }
+  
+  // Resume metronome if it was active
+  if (pausedTimerStates.wasMetronomeActive) {
+    startMetronome();
+  }
 }

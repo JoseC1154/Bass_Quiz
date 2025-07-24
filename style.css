@@ -226,11 +226,21 @@ button:hover {
 .modal {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.25);
+  background: rgba(0,0,0,0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000; /* Highest, above quiz card */
+  z-index: 10001; /* Above quiz card but below results */
+}
+
+/* Prevent layout shifts when modal is open */
+body.modal-open {
+  overflow: hidden;
+}
+
+/* Ensure quiz card stays in place when modal is open */
+.card.full-width.modal-behind {
+  z-index: 9998 !important;
 }
 
 .scale-chart-card {
@@ -245,6 +255,7 @@ button:hover {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  z-index: 10002; /* Ensure it's above the modal background */
 }
 
 #close-scale-chart {
