@@ -226,11 +226,21 @@ button:hover {
 .modal {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.25);
+  background: rgba(0,0,0,0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000; /* Highest, above quiz card */
+  z-index: 10001; /* Above quiz card but below results */
+}
+
+/* Prevent layout shifts when modal is open */
+body.modal-open {
+  overflow: hidden;
+}
+
+/* Ensure quiz card stays in place when modal is open */
+.card.full-width.modal-behind {
+  z-index: 9998 !important;
 }
 
 .scale-chart-card {
@@ -245,6 +255,7 @@ button:hover {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  z-index: 10002; /* Ensure it's above the modal background */
 }
 
 #close-scale-chart {
@@ -856,6 +867,22 @@ body:has(.card.full-width) main {
   width: 100%;
   align-self: center;
 }
+
+/* --- Results Card Centering --- */
+#results-card {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10000; /* Higher than fullscreen quiz */
+  width: 90vw;
+  max-width: 500px;
+  margin: 0;
+}
+
+#results-card.hidden {
+  display: none;
+}
 /* --- Question Timer Styles --- */
 #question-timer {
   position: absolute;
@@ -899,12 +926,11 @@ body:has(.card.full-width) main {
 
 /* --- Hamburger Menu Styles --- */
 .header-controls {
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  width: 100% !important;
-  position: relative !important;
-  z-index: 100 !important;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  position: relative;
 }
 
 .title-container {
@@ -921,48 +947,41 @@ body:has(.card.full-width) main {
 }
 
 .time-mode-indicator {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: normal;
+  margin-top: 2px;
+}
+
+.input-method-indicator {
   font-size: 0.8rem;
-  color: #fff;
-  font-weight: bold;
-  margin-top: 4px;
-  background: linear-gradient(135deg, #28a745, #20c997);
-  padding: 4px 8px;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(40, 167, 69, 0.3);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #888;
+  font-weight: normal;
+  margin-top: 2px;
+  font-style: italic;
 }
 
 .menu-btn {
-  background: rgba(255, 255, 255, 0.95) !important;
-  border: 3px solid #000 !important;
-  cursor: pointer !important;
-  padding: 8px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  align-items: center !important;
-  width: 50px !important;
-  height: 50px !important;
-  position: absolute !important;
-  top: 10px !important;
-  left: 10px !important;
-  z-index: 10000 !important;
-  border-radius: 8px !important;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5) !important;
-  opacity: 1 !important;
-  visibility: visible !important;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  position: relative;
+  z-index: 1001;
 }
 
 .hamburger-line {
-  width: 24px !important;
-  height: 4px !important;
-  background-color: #000 !important;
-  margin: 3px 0 !important;
-  transition: 0.3s !important;
-  border-radius: 2px !important;
-  display: block !important;
+  width: 22px;
+  height: 2px;
+  background-color: #333;
+  margin: 2px 0;
+  transition: 0.3s;
+  border-radius: 1px;
 }
 
 .menu-btn:hover .hamburger-line {
@@ -1060,45 +1079,11 @@ body:has(.card.full-width) main {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(255, 255, 255, 0.9) !important;
-  border: 2px solid #ddd !important;
-  padding: 16px 24px !important;
-  text-align: center;
-  cursor: pointer;
-  font-size: 18px;
-  color: #333 !important;
-  transition: all 0.3s ease;
-  border-radius: 12px !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-  position: relative;
-  font-weight: 500;
-}
-
-.dropdown-button:hover {
-  background-color: rgba(0, 0, 0, 0.05) !important;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-}
-
-.dropdown-button.active {
-  background: linear-gradient(135deg, #28a745, #20c997) !important;
-  border-color: #28a745 !important;
-  color: white !important;
-  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4) !important;
-  animation: glow-green 2s ease-in-out infinite alternate;
-}
-
-.dropdown-button.active:hover {
-  background: linear-gradient(135deg, #218838, #1e7e34) !important;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(40, 167, 69, 0.5) !important;
 }
 
 .dropdown-arrow {
-  font-size: 14px;
-  font-weight: bold;
-  transition: transform 0.3s ease;
-  color: inherit;
+  font-size: 12px;
+  transition: transform 0.2s;
 }
 
 /* Input Method Section */
@@ -1120,13 +1105,15 @@ body:has(.card.full-width) main {
   letter-spacing: 1px;
 }
 
-.input-method-buttons {
+.input-method-buttons,
+.time-mode-buttons {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
 
-.input-method-btn {
+.input-method-btn,
+.time-mode-btn {
   background: rgba(255, 255, 255, 0.9);
   border: 2px solid #ddd;
   padding: 12px 8px;
@@ -1141,13 +1128,15 @@ body:has(.card.full-width) main {
   font-weight: 500;
 }
 
-.input-method-btn:hover {
+.input-method-btn:hover,
+.time-mode-btn:hover {
   background-color: rgba(0, 0, 0, 0.05);
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.input-method-btn.active {
+.input-method-btn.active,
+.time-mode-btn.active {
   background: linear-gradient(135deg, #28a745, #20c997);
   border-color: #28a745;
   color: white;
@@ -1155,13 +1144,15 @@ body:has(.card.full-width) main {
   animation: glow-green 2s ease-in-out infinite alternate;
 }
 
-.input-method-btn.active:hover {
+.input-method-btn.active:hover,
+.time-mode-btn.active:hover {
   background: linear-gradient(135deg, #218838, #1e7e34);
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(40, 167, 69, 0.5);
 }
 
-.input-method-btn:disabled {
+.input-method-btn:disabled,
+.time-mode-btn:disabled {
   background-color: #f8f9fa;
   border-color: #dee2e6;
   color: #6c757d;
@@ -1171,7 +1162,8 @@ body:has(.card.full-width) main {
   box-shadow: none;
 }
 
-.input-method-btn:disabled:hover {
+.input-method-btn:disabled:hover,
+.time-mode-btn:disabled:hover {
   background-color: #f8f9fa;
   border-color: #dee2e6;
   transform: none;
@@ -1190,7 +1182,6 @@ body:has(.card.full-width) main {
 
 .dropdown-button.active .dropdown-arrow {
   transform: rotate(180deg);
-  color: white;
 }
 
 /* Submenu styles */
@@ -1289,57 +1280,4 @@ body:has(.card.full-width) main {
   max-width: 300px;
   word-wrap: break-word;
   border-left: 4px solid rgba(255, 255, 255, 0.3);
-}
-
-/* --- Time Attack X Overlay --- */
-.time-attack-x {
-  position: fixed !important;
-  top: 50% !important;
-  left: 50% !important;
-  transform: translate(-50%, -50%) !important;
-  font-size: clamp(24rem, 60vw, 45rem) !important;
-  font-weight: 900 !important;
-  color: #ff0000 !important;
-  text-shadow: 
-    0 0 30px rgba(255, 0, 0, 0.8),
-    0 0 60px rgba(255, 0, 0, 0.6),
-    0 0 90px rgba(255, 0, 0, 0.4),
-    0 0 8px rgba(0, 0, 0, 0.9),
-    0 0 16px rgba(0, 0, 0, 0.7),
-    2px 2px 4px rgba(0, 0, 0, 0.8),
-    -2px -2px 4px rgba(0, 0, 0, 0.8),
-    2px -2px 4px rgba(0, 0, 0, 0.8),
-    -2px 2px 4px rgba(0, 0, 0, 0.8) !important;
-  z-index: 10003 !important;
-  pointer-events: none !important;
-  opacity: 0;
-  animation: none !important;
-}
-
-.time-attack-x.show {
-  display: block !important;
-  animation: timeAttackXFlash 1s ease-out forwards !important;
-}
-
-@keyframes timeAttackXFlash {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.5);
-  }
-  15% {
-    opacity: 0.7;
-    transform: translate(-50%, -50%) scale(1.2);
-  }
-  30% {
-    opacity: 0.65;
-    transform: translate(-50%, -50%) scale(1.0);
-  }
-  85% {
-    opacity: 0.6;
-    transform: translate(-50%, -50%) scale(1.0);
-  }
-  100% {
-    opacity: 0.55;
-    transform: translate(-50%, -50%) scale(0.8);
-  }
 }
