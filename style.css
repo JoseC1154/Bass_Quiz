@@ -230,7 +230,7 @@ button:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000; /* Highest, above quiz card */
+  z-index: 10002; /* Higher than menu button and quiz card, below Time Attack X */
 }
 
 .scale-chart-card {

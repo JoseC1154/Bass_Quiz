@@ -378,6 +378,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Show attack time container for Time Attack mode
     attackTimeContainer.classList.remove('hidden');
     
+    // Set a default time limit for Time Attack (5 seconds)
+    const attackTimeSelect = document.getElementById('attack-time-select');
+    if (!attackTimeSelect.value || attackTimeSelect.value === '') {
+      attackTimeSelect.value = '5';
+    }
+    
     // Update the time mode indicator
     const timeModeIndicator = document.getElementById('time-mode-indicator');
     timeModeIndicator.textContent = 'Time Attack';
@@ -388,6 +394,27 @@ document.addEventListener('DOMContentLoaded', () => {
     menuToggle.classList.remove('active');
     
     alert('Time Attack activated! Each question must be answered within the selected time limit.');
+  });
+
+  // Handle Practice Mode selection
+  document.getElementById('practice-mode-option').addEventListener('click', () => {
+    // Show attack time container for Practice Mode (optional time pressure)
+    attackTimeContainer.classList.remove('hidden');
+    
+    // Set "No Time Limit" as default for Practice Mode
+    const attackTimeSelect = document.getElementById('attack-time-select');
+    attackTimeSelect.value = '';
+    
+    // Update the time mode indicator
+    const timeModeIndicator = document.getElementById('time-mode-indicator');
+    timeModeIndicator.textContent = 'Practice Mode';
+    timeModeIndicator.classList.remove('hidden');
+    
+    // Close the menu
+    dropdownMenu.classList.add('hidden');
+    menuToggle.classList.remove('active');
+    
+    alert('Practice Mode activated! Practice with 600 ticks. Optionally set time limit per question.');
   });
 
   // Handle BPM Challenge selection
@@ -500,14 +527,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const helpScaleChart = document.getElementById('help-scale-chart');
     if (helpScaleChart) helpScaleChart.classList.add('hidden');
     isPaused = false;
-    showQuestion();
+    
+    // Restart all timers and sounds when resuming from help
+    resumeTotalTimer();  // Resume tick timer without resetting count
+    startMetronome();    // Restart metronome
+    showQuestion();      // Restart question timers if needed
   });
 
   helpBtn.addEventListener('click', () => {
     if (isPaused) return;
     isPaused = true;
+    
+    // Stop all timers and intervals
     clearTimeout(timer);
     clearInterval(countdownInterval);
+    clearInterval(timeAttackInterval);
+    clearInterval(metronomeInterval);
+    if (totalTimer && totalTimer.intervalId) {
+      clearInterval(totalTimer.intervalId);
+    }
+    
     const helpScaleChart = document.getElementById('help-scale-chart');
     const current = quizData[currentIndex];
     const inferredKey = (levelSelect.value === 'hard')
@@ -992,6 +1031,14 @@ function startQuiz() {
   quizStartTime = performance.now();
   quizActive = true;
   
+  // Check for Practice Mode and set totalTicks to 600
+  const timeModeIndicator = document.getElementById('time-mode-indicator');
+  const isPracticeMode = timeModeIndicator && timeModeIndicator.textContent === 'Practice Mode';
+  
+  if (isPracticeMode) {
+    totalTicks = 600;
+  }
+  
   // Ensure audio context is resumed
   if (audioCtx.state === 'suspended') {
     audioCtx.resume();
@@ -1064,11 +1111,13 @@ function showQuestion() {
   clearInterval(countdownInterval);
   clearInterval(timeAttackInterval);
   
-  // Check if we're in Time Attack mode
+  // Check if we're in Time Attack mode or Practice Mode with time pressure
   const timeModeIndicator = document.getElementById('time-mode-indicator');
   const isTimeAttack = timeModeIndicator && timeModeIndicator.textContent === 'Time Attack';
+  const isPracticeMode = timeModeIndicator && timeModeIndicator.textContent === 'Practice Mode';
   
-  if (isTimeAttack) {
+  // Start countdown for Time Attack or Practice Mode (if time is set)
+  if (isTimeAttack || (isPracticeMode && document.getElementById('attack-time-select').value)) {
     startTimeAttackCountdown();
   }
   
@@ -1100,8 +1149,10 @@ function checkAnswer(selected) {
     if (btn.textContent === selected && !isCorrect) btn.classList.add('incorrect');
   });
   if (isCorrect) {
+    playCorrectSound();
     addTicksForCorrect();
   } else {
+    playIncorrectSound(); // Play incorrect sound for wrong answer
     showTimeAttackX(); // Show large X overlay for wrong answer
     subtractTicksForWrong();
   }
@@ -1195,6 +1246,11 @@ function startMetronome() {
 // 6. Audio Feedback
 // ================================
 function playTone(freq, duration = 0.15, volume = 0.1) {
+  // Ensure audio context is resumed before playing sound
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  
   const oscillator = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
   oscillator.type = 'sine';
@@ -1213,6 +1269,11 @@ function playCorrectSound() {
   playTone(880, 0.15, 0.05);
 }
 function playIncorrectSound() {
+  // Ensure audio context is resumed before playing sound
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  
   const duration = 0.2;
   const tone1 = 880;
   const tone2 = tone1 / Math.pow(2, 1 / 12);
@@ -1238,6 +1299,11 @@ function playIncorrectSound() {
 
 // Play a short metronome tick sound
 function playTickSound() {
+  // Ensure audio context is resumed before playing sound
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  
   const oscillator = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
   oscillator.type = 'square';
@@ -1604,8 +1670,15 @@ function showInputMethodFeedback(inputName) {
 // 5.5. Total Timer (Tick-based Metronome)
 // ================================
 function startTotalTimer() {
-  // Reset tick and BPM at quiz start
-  totalTicks = 100;
+  // Check if Practice Mode is active and preserve the 600 ticks
+  const timeModeIndicator = document.getElementById('time-mode-indicator');
+  const isPracticeMode = timeModeIndicator && timeModeIndicator.textContent === 'Practice Mode';
+  
+  // Only reset ticks if not in Practice Mode (which sets 600 ticks)
+  if (!isPracticeMode) {
+    totalTicks = 100;
+  }
+  
   currentBpm = 180; //adjusted from 100 to 180
 
   updateDisplay();
@@ -1634,6 +1707,39 @@ function startTotalTimer() {
     const interval = (60 / currentBpm) * 1000;
     totalTimer.intervalId = setInterval(tickLoop, interval);
   }
+}
+
+// Resume the tick timer without resetting tick count (for help modal resume)
+function resumeTotalTimer() {
+  if (!quizActive || totalTicks <= 0) return;
+  
+  // Clear any existing timer first
+  if (totalTimer && totalTimer.intervalId) {
+    clearInterval(totalTimer.intervalId);
+  }
+  
+  function tickLoop() {
+    if (!quizActive || totalTicks <= 0) {
+      clearInterval(totalTimer.intervalId);
+      quizActive = false;
+      endQuiz();
+      return;
+    }
+
+    totalTicks--;
+    playTickSound();  // Play tick sound after decrement
+    updateDisplay();
+
+    // Removed BPM increase logic from here; BPM now only increases via addTicksForCorrect()
+
+    const interval = (60 / currentBpm) * 1000;
+    clearInterval(totalTimer.intervalId);
+    totalTimer.intervalId = setInterval(tickLoop, interval);
+  }
+
+  // Start the interval
+  const interval = (60 / currentBpm) * 1000;
+  totalTimer.intervalId = setInterval(tickLoop, interval);
 }
 
 function addTicksForCorrect() {
@@ -1672,7 +1778,17 @@ function subtractTicksForWrong() {
 // ================================
 function updateDisplay() {
   if (!totalTimer) return;
-  totalTimer.textContent = `🎵 Ticks: ${totalTicks} remaining | BPM: ${currentBpm}`;
+  
+  // Check for Practice Mode to customize the display
+  const timeModeIndicator = document.getElementById('time-mode-indicator');
+  const isPracticeMode = timeModeIndicator && timeModeIndicator.textContent === 'Practice Mode';
+  
+  if (isPracticeMode) {
+    totalTimer.textContent = `� Ticks: ${totalTicks} remaining | Practice Mode`;
+  } else {
+    totalTimer.textContent = `�🎵 Ticks: ${totalTicks} remaining | BPM: ${currentBpm}`;
+  }
+  
   totalTimer.style.color = totalTicks <= 5 ? 'red' : 'black';
 
   // Update fullscreen timer
@@ -1700,14 +1816,19 @@ function updateDisplay() {
 function updateFullscreenTimer() {
   if (!fullscreenTimer || !timerDisplay || !timerLabel) return;
   
-  // Check if we're in Time Attack mode or BPM Challenge mode
+  // Check if we're in Time Attack mode or Practice Mode
   const timeModeIndicator = document.getElementById('time-mode-indicator');
   const isTimeAttack = timeModeIndicator && timeModeIndicator.textContent === 'Time Attack';
+  const isPracticeMode = timeModeIndicator && timeModeIndicator.textContent === 'Practice Mode';
   
-  if (!isTimeAttack) {
+  if (!isTimeAttack && !isPracticeMode) {
     // BPM Challenge mode (default/normal mode) - show remaining ticks (number only)
     console.log('Updating ticks display to:', totalTicks); // Debug log
     updateTimerDisplay(totalTicks, '');
+  } else if (isPracticeMode) {
+    // Practice Mode - show remaining ticks with TICKS label
+    console.log('Updating Practice Mode ticks display to:', totalTicks); // Debug log
+    updateTimerDisplay(totalTicks, 'TICKS');
   }
   // For Time Attack mode, the timer is updated by startTimeAttackCountdown function
 }

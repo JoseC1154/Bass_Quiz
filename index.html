@@ -89,9 +89,10 @@
       <div class="card-section hidden" id="attack-time-container">
         <div class="setting-group">
           <select id="attack-time-select">
-            <option value="" disabled>Attack Time</option>
+            <option value="" disabled>Time Per Question</option>
+            <option value="" selected>No Time Limit</option>
             <option value="3">3 seconds</option>
-            <option value="5" selected>5 seconds</option>
+            <option value="5">5 seconds</option>
             <option value="8">8 seconds</option>
             <option value="10">10 seconds</option>
             <option value="15">15 seconds</option>
@@ -251,6 +252,7 @@
       </button>
       <div class="submenu hidden" id="time-mode-submenu">
         <button class="submenu-item" id="time-attack-option">Time Attack</button>
+        <button class="submenu-item" id="practice-mode-option">Practice Mode</button>
         <button class="submenu-item" id="bpm-challenge-option">BPM Challenge</button>
       </div>
       <button class="menu-item" id="menu-stats">Statistics</button>
