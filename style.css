@@ -408,7 +408,7 @@ button:active {
 /* --- 8. Responsive Overrides --- */
 @media (max-width: 600px) {
   main {
-    padding: 10px;
+    /* padding: 16px; */
   }
   .card {
     padding: 16px;
