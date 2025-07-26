@@ -51,6 +51,11 @@ const timerLabel = document.getElementById('timer-label');
 // Time Attack X overlay element
 const timeAttackX = document.getElementById('time-attack-x');
 
+// Fullscreen button elements
+const fullscreenBtn = document.getElementById('fullscreen-btn');
+const fullscreenTooltip = document.getElementById('fullscreen-tooltip');
+const fullscreenTooltipText = document.getElementById('fullscreen-tooltip-text');
+
 // ================================
 // 2. Time Attack X Overlay Function
 // ================================
@@ -353,13 +358,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Menu item handlers
   document.getElementById('menu-about').addEventListener('click', () => {
-    alert('Scale Driller v1.0\nA music theory training app for learning scales and their degrees.');
+    showCustomNotification('Scale Driller v1.0\n\nA music theory training app for learning scales and their degrees.', 'info', 0);
     dropdownMenu.classList.add('hidden');
     menuToggle.classList.remove('active');
   });
 
   document.getElementById('menu-help').addEventListener('click', () => {
-    alert('How to use:\n1. Select your training mode and settings\n2. Choose your instrument input type\n3. Start the quiz and answer questions\n4. Use the ? button during quiz for hints');
+    showCustomNotification('How to use:\n\n1. Select your training mode and settings\n2. Choose your instrument input type\n3. Start the quiz and answer questions\n4. Use the ? button during quiz for hints', 'info', 0);
     dropdownMenu.classList.add('hidden');
     menuToggle.classList.remove('active');
   });
@@ -374,6 +379,12 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('fullscreen-btn').addEventListener('click', () => {
     toggleFullscreen();
   });
+
+  // Fullscreen button tooltip handlers
+  setupFullscreenTooltip();
+
+  // Remove any title attributes that could cause tooltips
+  removeAllTitleAttributes();
 
   document.getElementById('menu-time-mode').addEventListener('click', () => {
     // Toggle the submenu
@@ -404,7 +415,7 @@ document.addEventListener('DOMContentLoaded', () => {
     dropdownMenu.classList.add('hidden');
     menuToggle.classList.remove('active');
     
-    alert('Time Attack activated! Each question must be answered within the selected time limit.');
+    showCustomNotification('Time Attack activated!\n\nEach question must be answered within the selected time limit.', 'success');
   });
 
   // Handle Practice Mode selection
@@ -425,7 +436,7 @@ document.addEventListener('DOMContentLoaded', () => {
     dropdownMenu.classList.add('hidden');
     menuToggle.classList.remove('active');
     
-    alert('Practice Mode activated! Practice with 600 ticks. Optionally set time limit per question.');
+    showCustomNotification('Practice Mode activated!\n\nPractice with 600 ticks. Optionally set time limit per question.', 'success');
   });
 
   // Handle BPM Challenge selection
@@ -442,7 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
     dropdownMenu.classList.add('hidden');
     menuToggle.classList.remove('active');
     
-    alert('BPM Challenge activated! Answer speed increases with tempo progression.');
+    showCustomNotification('BPM Challenge activated!\n\nAnswer speed increases with tempo progression.', 'success');
   });
 
   // Handle BPM Challenge selection
@@ -466,11 +477,11 @@ document.addEventListener('DOMContentLoaded', () => {
     dropdownMenu.classList.add('hidden');
     menuToggle.classList.remove('active');
     
-    alert('BPM Challenge activated! Answer speed increases with tempo progression.');
+    showCustomNotification('BPM Challenge activated!\n\nAnswer speed increases with tempo progression.', 'success');
   });
 
   document.getElementById('menu-stats').addEventListener('click', () => {
-    alert('Statistics feature coming soon!');
+    showCustomNotification('Statistics feature coming soon!', 'info');
     dropdownMenu.classList.add('hidden');
     menuToggle.classList.remove('active');
   });
@@ -645,7 +656,7 @@ function bindUIEvents() {
     clearTimeout(timer);
     clearInterval(countdownInterval);
     clearInterval(metronomeInterval);
-    clearInterval(timeAttackInterval); // Clear Time Attack interval
+    clearInterval(timeAttackInterval);
     if (totalTimer && totalTimer.intervalId) {
       clearInterval(totalTimer.intervalId);
     }
@@ -1058,7 +1069,7 @@ function startQuiz() {
   startTotalTimer();
   generateQuiz(levelSelect.value, 200);
   if (quizData.length === 0) {
-    alert("⚠️ No questions generated. Please check your settings.");
+    showCustomNotification("⚠️ No questions generated.\n\nPlease check your settings.", 'warning');
     return;
   }
   settingsCard.classList.add('hidden');
@@ -1760,7 +1771,7 @@ function addTicksForCorrect() {
     if (currentBpm >= 240) {
       levelStartBpm += 10;
       currentBpm = levelStartBpm;
-      alert(`🔥 Level Up! Now at BPM: ${currentBpm}`);
+      showCustomNotification(`🔥 Level Up!\n\nNow at BPM: ${currentBpm}`, 'success');
     } else {
       currentBpm += 10;
     }
@@ -1921,19 +1932,105 @@ function timeAttackTimeOut() {
 // Browser Fullscreen Functions
 // ================================
 
+function removeAllTitleAttributes() {
+  // Remove title attributes from all elements to prevent browser tooltips
+  document.querySelectorAll('[title]').forEach(element => {
+    element.removeAttribute('title');
+  });
+  
+  // Also remove any title attributes that might be added dynamically
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'title') {
+        mutation.target.removeAttribute('title');
+      }
+    });
+  });
+  
+  observer.observe(document.body, {
+    attributes: true,
+    subtree: true,
+    attributeFilter: ['title']
+  });
+}
+
+function setupFullscreenTooltip() {
+  if (!fullscreenBtn || !fullscreenTooltip) return;
+
+  let tooltipTimeout;
+
+  // Show tooltip on hover
+  fullscreenBtn.addEventListener('mouseenter', () => {
+    clearTimeout(tooltipTimeout);
+    updateTooltipText();
+    fullscreenTooltip.classList.remove('hidden');
+    setTimeout(() => {
+      fullscreenTooltip.classList.add('show');
+    }, 10);
+  });
+
+  // Hide tooltip on mouse leave
+  fullscreenBtn.addEventListener('mouseleave', () => {
+    fullscreenTooltip.classList.remove('show');
+    tooltipTimeout = setTimeout(() => {
+      fullscreenTooltip.classList.add('hidden');
+    }, 300);
+  });
+
+  // Hide tooltip on click
+  fullscreenBtn.addEventListener('click', () => {
+    fullscreenTooltip.classList.remove('show');
+    clearTimeout(tooltipTimeout);
+    tooltipTimeout = setTimeout(() => {
+      fullscreenTooltip.classList.add('hidden');
+    }, 100);
+  });
+
+  // Hide tooltip on any user interaction elsewhere
+  document.addEventListener('click', (e) => {
+    if (!fullscreenBtn.contains(e.target) && !fullscreenTooltip.contains(e.target)) {
+      fullscreenTooltip.classList.remove('show');
+      clearTimeout(tooltipTimeout);
+      tooltipTimeout = setTimeout(() => {
+        fullscreenTooltip.classList.add('hidden');
+      }, 300);
+    }
+  });
+
+  // Hide tooltip on touch (mobile)
+  document.addEventListener('touchstart', (e) => {
+    if (!fullscreenBtn.contains(e.target) && !fullscreenTooltip.contains(e.target)) {
+      fullscreenTooltip.classList.remove('show');
+      clearTimeout(tooltipTimeout);
+      tooltipTimeout = setTimeout(() => {
+        fullscreenTooltip.classList.add('hidden');
+      }, 300);
+    }
+  });
+}
+
+function updateTooltipText() {
+  if (!fullscreenTooltipText) return;
+  
+  const isFullscreen = !!document.fullscreenElement;
+  fullscreenTooltipText.textContent = isFullscreen ? 'Exit fullscreen mode' : 'Enter fullscreen mode';
+}
+
 function toggleFullscreen() {
   if (!document.fullscreenElement) {
     // Enter fullscreen
     document.documentElement.requestFullscreen().then(() => {
       updateFullscreenButton(true);
+      updateTooltipText();
     }).catch(err => {
       console.log('Error attempting to enable fullscreen:', err);
-      alert('Fullscreen not supported on this device/browser');
+      showCustomNotification('Fullscreen not supported on this device/browser', 'warning');
     });
   } else {
     // Exit fullscreen
     document.exitFullscreen().then(() => {
       updateFullscreenButton(false);
+      updateTooltipText();
     }).catch(err => {
       console.log('Error attempting to exit fullscreen:', err);
     });
@@ -1945,12 +2042,13 @@ function updateFullscreenButton(isFullscreen) {
   const fullscreenBtn = document.getElementById('menu-fullscreen');
   if (fullscreenBtn) {
     fullscreenBtn.textContent = isFullscreen ? '🔲 Exit Fullscreen' : '🔳 Fullscreen';
+ 
   }
   
   // Update YouTube-style button
   const youtubeBtn = document.getElementById('fullscreen-btn');
   if (youtubeBtn) {
-    youtubeBtn.title = isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen';
+    // Don't set title attribute to prevent browser tooltips that interrupt fullscreen
     youtubeBtn.setAttribute('aria-label', isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen');
     
     if (isFullscreen) {
@@ -1974,4 +2072,5 @@ function updateFullscreenButton(isFullscreen) {
 // Listen for fullscreen changes (including when user presses ESC)
 document.addEventListener('fullscreenchange', () => {
   updateFullscreenButton(!!document.fullscreenElement);
+  updateTooltipText();
 });

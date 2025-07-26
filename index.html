@@ -14,6 +14,46 @@
       min-height: 95vh;
       display: flex;
       flex-direction: column;
+      width: 100vw;
+      height: 100vh;
+      top: 0;
+      left: 0;
+    }
+    .fullscreen-btn {
+      z-index: 2147483647 !important;
+      position: fixed !important;
+      bottom: 20px !important;
+      right: 20px !important;
+    }
+    .fullscreen-tooltip {
+      position: fixed !important;
+      bottom: 70px !important;
+      right: 20px !important;
+      z-index: 2147483646 !important;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 14px;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      pointer-events: auto;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      white-space: nowrap;
+    }
+    .fullscreen-tooltip.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .fullscreen-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      right: 24px;
+      border: 6px solid transparent;
+      border-top-color: #1a1a1a;
     }
   </style>
   <script>
@@ -131,19 +171,12 @@
       <!-- Instrument Input Icons -->
       <div class="card-section" id="input-type-group">
         <div class="input-icons">
-          <img src="images/icon_keys.png" alt="Keys Icon" class="input-icon selected" data-type="keys" title="Keys" />
-          <img src="images/icon_piano.png" alt="Piano Icon" class="input-icon" data-type="piano" title="Piano" />
-          <img src="images/icon_bass.png" alt="Bass Icon" class="input-icon" data-type="bass" title="Bass" />
-          <img src="images/icon_guitar.png" alt="Guitar Icon" class="input-icon" data-type="guitar" title="Guitar" />
+          <img src="images/icon_keys.png" alt="Keys Icon" class="input-icon selected" data-type="keys" />
+          <img src="images/icon_piano.png" alt="Piano Icon" class="input-icon" data-type="piano" />
+          <img src="images/icon_bass.png" alt="Bass Icon" class="input-icon" data-type="bass" />
+          <img src="images/icon_guitar.png" alt="Guitar Icon" class="input-icon" data-type="guitar" />
         </div>
       </div>
-      
-      <!-- Fullscreen Button -->
-      <button id="fullscreen-btn" class="fullscreen-btn" title="Enter fullscreen" aria-label="Toggle fullscreen">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
-        </svg>
-      </button>
     </div>
     </section>
     
@@ -240,16 +273,16 @@
       <div class="menu-section">
         <div class="menu-section-title">Input Method</div>
         <div class="input-method-buttons">
-          <button class="input-method-btn active" id="touch-input-btn" data-input="touch" title="Touch/Click Interface">
+          <button class="input-method-btn active" id="touch-input-btn" data-input="touch">
             📱 Touch
           </button>
-          <button class="input-method-btn" id="midi-input-btn" data-input="midi" title="MIDI Keyboard/Controller">
+          <button class="input-method-btn" id="midi-input-btn" data-input="midi">
             🎹 MIDI
           </button>
-          <button class="input-method-btn" id="mic-input-btn" data-input="audio" title="Microphone/Audio Input">
+          <button class="input-method-btn" id="mic-input-btn" data-input="audio">
             🎤 Mic
           </button>
-          <button class="input-method-btn" id="cable-input-btn" data-input="instrument" title="Instrument Cable (Audio Interface)">
+          <button class="input-method-btn" id="cable-input-btn" data-input="instrument">
             🎸 Cable
           </button>
         </div>
@@ -280,6 +313,18 @@
   <div id="orientation-hint" class="hidden">
     📱 Rotate your device for a better experience!
   </div>
+
+  <!-- Fullscreen Button Tooltip -->
+  <div id="fullscreen-tooltip" class="fullscreen-tooltip hidden">
+    <span id="fullscreen-tooltip-text">Enter fullscreen mode</span>
+  </div>
+
+  <!-- Fullscreen Button (Always Visible) -->
+  <button id="fullscreen-btn" class="fullscreen-btn" aria-label="Toggle fullscreen">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+    </svg>
+  </button>
 
   <script src="script.js"></script>
 </body>
