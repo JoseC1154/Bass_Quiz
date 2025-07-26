@@ -53,4 +53,3 @@ I created this to train myself about keys and their placement on different instr
 4. tritone
 
 5. Training mode where you can select the degrees for training.
-
