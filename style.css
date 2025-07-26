@@ -1428,3 +1428,49 @@ body:has(.card.full-width) main {
   max-height: 100vh;
   overflow-y: auto;
 }
+
+/* --- YouTube-style Fullscreen Button --- */
+.fullscreen-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.7);
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 100;
+  opacity: 0.8;
+}
+
+.fullscreen-btn:hover {
+  background: rgba(0, 0, 0, 0.9);
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.fullscreen-btn:active {
+  transform: scale(0.95);
+}
+
+.fullscreen-btn svg {
+  transition: transform 0.2s ease;
+}
+
+/* Exit fullscreen icon (when in fullscreen mode) */
+.fullscreen-btn.exit svg {
+  transform: rotate(180deg);
+}
+
+/* Hide button when in fullscreen modes */
+:fullscreen .fullscreen-btn,
+:-webkit-full-screen .fullscreen-btn,
+:-moz-full-screen .fullscreen-btn {
+  display: none;
+}
