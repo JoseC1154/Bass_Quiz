@@ -147,6 +147,7 @@ body:has(.card.full-width) main {
 
 .card-body {
   position: relative;
+  margin: 20px;
   z-index: 5; /* Ensure card body content appears above topShade */
 }
 
@@ -407,7 +408,7 @@ button:active {
 /* --- 8. Responsive Overrides --- */
 @media (max-width: 600px) {
   main {
-    padding: 10px;
+    /* padding: 16px; */
   }
   .card {
     padding: 16px;
@@ -908,7 +909,7 @@ body:has(.card.full-width) main {
 }
 
 .title-container {
-  position: absolute;
+  position: inherit;
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
@@ -936,7 +937,7 @@ body:has(.card.full-width) main {
 
 .menu-btn {
   background: rgba(255, 255, 255, 0.95) !important;
-  border: 3px solid #000 !important;
+  /* border: 3px solid #000 !important; */
   cursor: pointer !important;
   padding: 8px !important;
   display: flex !important;
@@ -950,7 +951,7 @@ body:has(.card.full-width) main {
   left: 10px !important;
   z-index: 10000 !important;
   border-radius: 8px !important;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
   opacity: 1 !important;
   visibility: visible !important;
 }
@@ -1342,4 +1343,88 @@ body:has(.card.full-width) main {
     opacity: 0.55;
     transform: translate(-50%, -50%) scale(0.8);
   }
+}
+
+/* --- Browser Fullscreen Styles --- */
+:fullscreen {
+  background: rgb(46, 46, 17) url('background.png') no-repeat center center fixed;
+  background-size: cover;
+}
+
+:fullscreen body {
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+}
+
+:fullscreen main {
+  width: 100vw;
+  max-width: none;
+  padding: 10px;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+:fullscreen .card {
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
+/* Webkit browsers (Safari, Chrome) */
+:-webkit-full-screen {
+  background: rgb(46, 46, 17) url('background.png') no-repeat center center fixed;
+  background-size: cover;
+}
+
+:-webkit-full-screen body {
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+}
+
+:-webkit-full-screen main {
+  width: 100vw;
+  max-width: none;
+  padding: 10px;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+:-webkit-full-screen .card {
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
+/* Mozilla browsers (Firefox) */
+:-moz-full-screen {
+  background: rgb(46, 46, 17) url('background.png') no-repeat center center fixed;
+  background-size: cover;
+}
+
+:-moz-full-screen body {
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+}
+
+:-moz-full-screen main {
+  width: 100vw;
+  max-width: none;
+  padding: 10px;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+:-moz-full-screen .card {
+  max-height: 100vh;
+  overflow-y: auto;
 }

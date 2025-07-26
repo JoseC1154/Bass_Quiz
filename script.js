@@ -364,6 +364,12 @@ document.addEventListener('DOMContentLoaded', () => {
     menuToggle.classList.remove('active');
   });
 
+  document.getElementById('menu-fullscreen').addEventListener('click', () => {
+    toggleFullscreen();
+    dropdownMenu.classList.add('hidden');
+    menuToggle.classList.remove('active');
+  });
+
   document.getElementById('menu-time-mode').addEventListener('click', () => {
     // Toggle the submenu
     const submenu = document.getElementById('time-mode-submenu');
@@ -1905,3 +1911,38 @@ function timeAttackTimeOut() {
   subtractTicksForWrong();
   setTimeout(nextQuestion, 1500);
 }
+
+// ================================
+// Browser Fullscreen Functions
+// ================================
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    // Enter fullscreen
+    document.documentElement.requestFullscreen().then(() => {
+      updateFullscreenButton(true);
+    }).catch(err => {
+      console.log('Error attempting to enable fullscreen:', err);
+      alert('Fullscreen not supported on this device/browser');
+    });
+  } else {
+    // Exit fullscreen
+    document.exitFullscreen().then(() => {
+      updateFullscreenButton(false);
+    }).catch(err => {
+      console.log('Error attempting to exit fullscreen:', err);
+    });
+  }
+}
+
+function updateFullscreenButton(isFullscreen) {
+  const fullscreenBtn = document.getElementById('menu-fullscreen');
+  if (fullscreenBtn) {
+    fullscreenBtn.textContent = isFullscreen ? '🔲 Exit Fullscreen' : '🔳 Fullscreen';
+  }
+}
+
+// Listen for fullscreen changes (including when user presses ESC)
+document.addEventListener('fullscreenchange', () => {
+  updateFullscreenButton(!!document.fullscreenElement);
+});
