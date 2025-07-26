@@ -908,7 +908,7 @@ body:has(.card.full-width) main {
 }
 
 .title-container {
-  position: absolute;
+  position: inherit;
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
@@ -936,7 +936,7 @@ body:has(.card.full-width) main {
 
 .menu-btn {
   background: rgba(255, 255, 255, 0.95) !important;
-  border: 3px solid #000 !important;
+  /* border: 3px solid #000 !important; */
   cursor: pointer !important;
   padding: 8px !important;
   display: flex !important;
@@ -950,7 +950,7 @@ body:has(.card.full-width) main {
   left: 10px !important;
   z-index: 10000 !important;
   border-radius: 8px !important;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
   opacity: 1 !important;
   visibility: visible !important;
 }
