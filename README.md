@@ -37,6 +37,8 @@ I created this to train myself about keys and their placement on different instr
 
 15. Get rid of Card background.
 
+16. Swipe a scale in help mode.
+
 
 //-----------------------
 //Future Training Modes
@@ -44,7 +46,7 @@ I created this to train myself about keys and their placement on different instr
 
 1. Chord Mode
 
-2. Chronological Notes
+2. Chronological Notes "How many Semitone ...."
 
 3. What chord has a C (CHor)
 
