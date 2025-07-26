@@ -147,6 +147,7 @@ body:has(.card.full-width) main {
 
 .card-body {
   position: relative;
+  margin: 20px;
   z-index: 5; /* Ensure card body content appears above topShade */
 }
 
