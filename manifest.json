@@ -2,20 +2,20 @@
   "name": "Scale Driller",
   "short_name": "ScaleDriller",
   "description": "Bass and guitar scale training app",
-  "start_url": "/",
+  "start_url": "./",
   "display": "fullscreen",
   "background_color": "#1a1a1a",
   "theme_color": "#333",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%23333'/%3E%3Ctext x='96' y='120' font-family='Arial' font-size='80' fill='white' text-anchor='middle'%3E🎵%3C/text%3E%3C/svg%3E",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/svg+xml"
     },
     {
-      "src": "icon-512.png",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23333'/%3E%3Ctext x='256' y='320' font-family='Arial' font-size='200' fill='white' text-anchor='middle'%3E🎵%3C/text%3E%3C/svg%3E",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/svg+xml"
     }
   ]
 }
