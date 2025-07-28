@@ -1049,12 +1049,18 @@ document.querySelectorAll('.input-icon').forEach(icon => {
 });
 
 function startQuiz() {
+  // Validate that a proper training mode is selected
+  const timeModeIndicator = document.getElementById('time-mode-indicator');
+  if (!timeModeIndicator || timeModeIndicator.classList.contains('hidden')) {
+    showCustomNotification('⚠️ Please select a training mode first!\n\nUse the menu (☰) to choose Time Attack, Practice Mode, or BPM Challenge.', 'warning');
+    return;
+  }
+
   resetQuiz();
   quizStartTime = performance.now();
   quizActive = true;
   
   // Check for Practice Mode and set totalTicks to 600
-  const timeModeIndicator = document.getElementById('time-mode-indicator');
   const isPracticeMode = timeModeIndicator && timeModeIndicator.textContent === 'Practice Mode';
   
   if (isPracticeMode) {
@@ -2023,6 +2029,7 @@ function toggleFullscreen() {
       updateFullscreenButton(true);
       updateTooltipText();
     }).catch(err => {
+
       console.log('Error attempting to enable fullscreen:', err);
       showCustomNotification('Fullscreen not supported on this device/browser', 'warning');
     });

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Scale Driller</title>
   <link rel="manifest" href="./manifest.json">
-  <meta name="theme-color" content="#333">
+  <meta name="theme-color" content="#333">I 
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Scale Driller">
@@ -60,6 +60,35 @@
       border: 6px solid transparent;
       border-top-color: #1a1a1a;
     }
+    
+    .mode-icons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      padding: 10px;
+    }
+    
+    .mode-icon {
+      width: 60px;
+      height: 60px;
+      cursor: pointer;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      opacity: 0.6;
+      filter: grayscale(100%);
+    }
+    
+    .mode-icon:hover {
+      opacity: 0.8;
+      transform: scale(1.05);
+    }
+    
+    .mode-icon.selected {
+      opacity: 1;
+      filter: grayscale(0%);
+      box-shadow: 0 0 20px #00ff00, 0 0 40px #00ff0040;
+      transform: scale(1.1);
+    }
   </style>
   <script>
     function setVhUnit() {
@@ -94,11 +123,20 @@
       
       <!-- Level Selection -->
     <div class="card-body">
+      <!-- Mode Selection Icons -->
+      <div class="card-section" id="mode-select-group">
+        <div class="mode-icons">
+          <img src="images/icon_practiceMode.png" alt="Practice Mode" class="mode-icon selected" data-mode="practice" />
+          <img src="images/icon_timeAttack.png" alt="Time Attack" class="mode-icon" data-mode="time-attack" />
+          <img src="images/icon_bpmChallenge.png" alt="BPM Challenge" class="mode-icon" data-mode="bpm-challenge" />
+        </div>
+      </div>
+      
       <div class="card-section">
         <div class="setting-group">
           <select id="level-select">
-            <option value="" disabled selected>Training Mode</option>
-            <option value="easy">Easy</option>
+            <option value="" disabled>Training Mode</option>
+            <option value="easy" selected>Easy</option>
             <option value="intermediate">Intermediate</option>
             <option value="hard">Hard</option>
             <option value="degree-training">Degree Training</option>
@@ -332,5 +370,62 @@
   </button>
 
   <script src="script.js"></script>
+  <script>
+    // Add mode selection functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const modeIcons = document.querySelectorAll('.mode-icon');
+      const levelSelect = document.getElementById('level-select');
+      
+      function updateVisibleSettings() {
+        const selectedMode = document.querySelector('.mode-icon.selected')?.dataset.mode || 'practice';
+        const selectedLevel = levelSelect.value;
+        
+        // Get all conditional containers
+        const attackTimeContainer = document.getElementById('attack-time-container');
+        const keySelectContainer = document.getElementById('key-select-container');
+        const degreeSelectContainer = document.getElementById('degree-select-container');
+        const timeModeIndicator = document.getElementById('time-mode-indicator');
+        
+        // Reset all containers to hidden
+        attackTimeContainer.classList.add('hidden');
+        keySelectContainer.classList.add('hidden');
+        degreeSelectContainer.classList.add('hidden');
+        timeModeIndicator.classList.add('hidden');
+        
+        // Show settings based on mode
+        if (selectedMode === 'time-attack') {
+          attackTimeContainer.classList.remove('hidden');
+          timeModeIndicator.textContent = 'Time Attack';
+          timeModeIndicator.classList.remove('hidden');
+        } else if (selectedMode === 'bpm-challenge') {
+          timeModeIndicator.textContent = 'BPM Challenge';
+          timeModeIndicator.classList.remove('hidden');
+        }
+        
+        // Show settings based on level (regardless of mode)
+        if (selectedLevel === 'degree-training') {
+          keySelectContainer.classList.remove('hidden');
+          degreeSelectContainer.classList.remove('hidden');
+        }
+      }
+      
+      modeIcons.forEach(icon => {
+        icon.addEventListener('click', function() {
+          // Remove selected class from all icons
+          modeIcons.forEach(i => i.classList.remove('selected'));
+          // Add selected class to clicked icon
+          this.classList.add('selected');
+          
+          updateVisibleSettings();
+        });
+      });
+      
+      // Also listen for level changes
+      levelSelect.addEventListener('change', updateVisibleSettings);
+      
+      // Initialize on page load
+      updateVisibleSettings();
+    });
+  </script>
 </body>
 </html>
