@@ -1,0 +1,27 @@
+{
+  "dependencies": {
+    "pitchy": "^4.1.0"
+  },
+  "name": "bass_quiz",
+  "version": "1.0.0",
+  "description": "Scale Driller is a browser-based music theory training app for learning key and note placement on instruments such as bass, guitar, and piano. The app is fully client-side, requiring no backend or build step—just open `index.html` in your browser.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "esbuild js/audio-input.js --bundle --outfile=dist/audio-input.bundle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JoseC1154/Bass_Quiz.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JoseC1154/Bass_Quiz/issues"
+  },
+  "homepage": "https://github.com/JoseC1154/Bass_Quiz#readme",
+  "devDependencies": {
+    "esbuild": "^0.25.8"
+  }
+}

@@ -1,55 +1,58 @@
-# Bass_Quiz
-https://josec1154.github.io/Bass_Quiz/
+# Scale Driller
 
-I created this to train myself about keys and their placement on different instrument, try it out, it might help you with your journey.
+Scale Driller is a browser-based music theory training app for learning key and note placement on instruments such as bass, guitar, and piano. The app is fully client-side, requiring no backend or build step—just open `index.html` in your browser.
 
-//---------------------
-//Future Updates
-//---------------------
+## Features
+- **Quiz Modes:** Practice, Time Attack, and BPM Challenge
+- **Instrument UIs:** Virtual interfaces for piano, bass, guitar, MIDI, and audio input
+- **Accessibility:** ARIA roles and labels for improved accessibility
+- **Responsive Design:** Mobile-friendly and touch-optimized
+- **Manual Testing:** No automated tests; test by opening in a browser
 
-1. Next I would like the quiz to start with 30 metronome ticks instead of seconds, every question you get right gives you bonus ticks but also increases the speed of the metronome when you a question wrong you lose ticks. after 30 seconds the user gets to a new level where the bpm is 10 bpm faster than the previous level. The starting bpm is set to 40 bpm the user gets to 120 they win.
+## How It Works
+- Select your quiz mode, level, key, scale type, and input method from the settings card
+- Start the quiz to answer questions about scale degrees, note positions, or key relationships
+- Use the virtual instrument UIs or connect MIDI/audio input for interactive play
+- Get instant feedback and track your best score
 
-2. A dificulty bar.
+## Scales and Notes
+- **Supported Keys:** C, D, E, F, G, A, B, F#, Ab, Bb, Db, Eb
+- **Note Names:** C, Db, D, Eb, E, F, F#, G, Ab, A, Bb, B
+- **Scale Construction:**
+  - Major: `[2, 2, 1, 2, 2, 2, 1]` (whole/half steps)
+  - Minor: `[2, 1, 2, 2, 1, 2, 2]`
+- **Quiz Logic:**
+  - Questions ask for the degree of a scale in a given key, or the key for a given note/degree
+  - Options are generated from the scale notes and shuffled
 
-3. fix score: Correct and Incorrect not working.
+## Project Structure
+- `index.html` — Main entry point and UI layout
+- `style.css` — Main styles (BEM/clear class naming)
+- `js/` — Modular JavaScript:
+  - `dom-manager.js`: All DOM/UI changes (use this for UI updates)
+  - `game.js`, `quiz-manager.js`, `audio-manager.js`, `timer-manager.js`: Core logic
+  - `app.js`: App startup and event wiring
+  - `state.js`: State management
+  - `ui-components.js`: UI helpers
+- `images/` — Icons and instrument images
 
-4.fix Quiz complete card not exiting and displaying under when it should be overlayed above settings.
+## Developer Conventions
+- **No frameworks or build tools** — pure vanilla JS, HTML, CSS
+- **All DOM access via `DOMManager`** — do not use `document.querySelector` outside this class
+- **Assets are local** — no external dependencies
+- **Manual testing** — open `index.html` in your browser
 
-5.Create setting tab.
+## Planned Features & Roadmap
+- Tick-based metronome for quiz timing
+- Difficulty bar and improved score tracking
+- More instrument UIs and training modes (chord mode, tritone, etc.)
+- Visual and accessibility improvements
 
-6. work on bass /  guitar UI.
+## Getting Started
+1. Clone or download this repository
+2. Open `index.html` in your browser
+3. Select your settings and start training!
 
-7. Creat moving visual background for quiz and a way for the user to tell what level they are on.
+---
 
-8. Fix the quiz question "6th degree of the C (Major)" .
-
-9. Icons for setting that don't fit on screens.
-
-10. Mode Summary.
-
-11. Piano key bevel edge and shadow.
-
-12. better viewing of training question and ticks.
-
-13. key name hide setting.
-
-14. User score record.
-
-15. Get rid of Card background.
-
-16. Swipe a scale in help mode.
-
-
-//-----------------------
-//Future Training Modes
-//-----------------------
-
-1. Chord Mode
-
-2. Chronological Notes "How many Semitone ...."
-
-3. What chord has a C (CHor)
-
-4. tritone
-
-5. Training mode where you can select the degrees for training.
+_See `.github/copilot-instructions.md` for AI agent and contributor guidelines._
