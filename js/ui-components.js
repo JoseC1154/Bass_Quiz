@@ -1,3 +1,24 @@
+// Utility: Enable/disable note input for all instrument UIs
+function setNoteInputEnabled(enabled) {
+  // Piano keys
+  const pianoKeys = document.querySelectorAll('#piano-ui .piano-key');
+  pianoKeys.forEach(key => {
+    key.style.pointerEvents = enabled ? '' : 'none';
+    key.style.opacity = enabled ? '' : '0.5';
+  });
+  // Bass frets
+  const bassFrets = document.querySelectorAll('#bass-ui .fret');
+  bassFrets.forEach(fret => {
+    fret.style.pointerEvents = enabled ? '' : 'none';
+    fret.style.opacity = enabled ? '' : '0.5';
+  });
+  // Guitar frets
+  const guitarFrets = document.querySelectorAll('#guitar-ui .fret');
+  guitarFrets.forEach(fret => {
+    fret.style.pointerEvents = enabled ? '' : 'none';
+    fret.style.opacity = enabled ? '' : '0.5';
+  });
+}
 function createPianoUI() {
   const baseOctave = 4; // or 3, depending on your desired starting octave
   const pianoUI = document.getElementById('piano-ui');

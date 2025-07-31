@@ -1,3 +1,11 @@
+// Expose piano answer handler globally for UI
+document.addEventListener('DOMContentLoaded', () => {
+  window.quizPianoAnswerHandler = note => {
+    if (window.game && window.game.quiz && typeof window.game.quiz.handlePianoAnswer === 'function') {
+      window.game.quiz.handlePianoAnswer(note);
+    }
+  };
+});
 let game, audioManager, notificationManager;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -6,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   notificationManager = game.notification;
   // Expose handleNoteInput globally for instrument UIs
   window.handleNoteInput = (...args) => game.handleNoteInput(...args);
+  // Remove legacy help button logic; Game.showHelp() now manages help card content and visibility.
 
   // Input Mode Indicator logic
   const inputModeIndicator = document.getElementById('input-mode-indicator');

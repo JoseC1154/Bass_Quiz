@@ -6,6 +6,36 @@ class TimerManager {
     this.timeouts = new Map();
   }
 
+  // Pause all intervals and timeouts, but remember their remaining time
+  pause() {
+    // Store remaining time for timeouts
+    this._pausedTimeouts = [];
+    this._pausedIntervals = [];
+    // Pause timeouts
+    this.timeouts.forEach((timeoutId, name) => {
+      clearTimeout(timeoutId);
+      // No way to get remaining time for setTimeout, so just clear
+      // Optionally, could store timestamp and remaining time for more advanced logic
+      this._pausedTimeouts.push(name);
+    });
+    this.timeouts.clear();
+    // Pause intervals
+    this.intervals.forEach((intervalId, name) => {
+      clearInterval(intervalId);
+      this._pausedIntervals.push(name);
+    });
+    this.intervals.clear();
+  }
+
+  // Resume all paused intervals and timeouts (restarts them, does not restore exact timing)
+  resume() {
+    // For this implementation, just restart main timer if quiz is active
+    if (this.state.quiz.active && typeof this.start === 'function') {
+      this.start();
+    }
+    // Optionally, could restore other intervals/timeouts if needed
+  }
+
   setInterval(name, callback, delay) {
     this.clearInterval(name);
     const intervalId = setInterval(callback, delay);

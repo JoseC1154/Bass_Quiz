@@ -1,3 +1,101 @@
+.piano-key.correct {
+  background: var(--success-primary) !important;
+  color: #fff !important;
+  box-shadow: 0 0 8px 2px var(--success-primary);
+  z-index: 10;
+}
+.piano-key.incorrect {
+  background: var(--error-primary) !important;
+  color: #fff !important;
+  box-shadow: 0 0 8px 2px var(--error-primary);
+  z-index: 10;
+}
+.piano-key.possible-correct {
+  box-shadow: 0 0 0 2px var(--success-primary);
+  background: linear-gradient(90deg, #eaffea 60%, #fff 100%);
+}
+#answer-buttons button.no-hover,
+#answer-buttons button.no-hover:hover,
+#answer-buttons button.no-hover:focus {
+  background-color: #fbffe0 !important;
+  color: #000 !important;
+  transform: none !important;
+  cursor: not-allowed !important;
+  pointer-events: none;
+}
+.close-btn.no-hover,
+.close-btn.no-hover:hover,
+.close-btn.no-hover:focus {
+  color: #333 !important;
+  background: transparent !important;
+  transform: none !important;
+  cursor: not-allowed !important;
+  pointer-events: none;
+}
+/* Help Card Modal Overlay */
+#helpCardOverlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 9998;
+  display: none;
+}
+#helpCard:not(.hidden) ~ #helpCardOverlay {
+  display: block;
+}
+
+/* Help Card Modal Styling */
+#helpCard {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  padding: 32px 24px 24px 24px;
+  min-width: 320px;
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  display: none;
+}
+#helpCard:not(.hidden) {
+  display: block;
+}
+/* Help Card Modal Overlay */
+#helpCardOverlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 9998;
+  display: none;
+}
+#helpCard:not(.hidden) ~ #helpCardOverlay {
+  display: block;
+}
+
+/* Help Card Modal Styling */
+#helpCard {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  padding: 32px 24px 24px 24px;
+  min-width: 320px;
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  display: none;
+}
+#helpCard:not(.hidden) {
+  display: block;
+}
 /* === Custom Piano Flexbox & Octave Layout === */
 #piano-ui {
   display: flex;
@@ -1669,4 +1767,37 @@ button:active {
   background: #444;
   box-shadow: 0 2px 8px #ffd70080;
   transform: translateX(-50%) scaleY(0.95);
+}
+
+
+
+
+
+
+
+
+
+
+
+}  display: block;#helpCard:not(.hidden) ~ #helpCardOverlay {}  display: none;  z-index: 9998;  background: rgba(0,0,0,0.35);  top: 0; left: 0; right: 0; bottom: 0;  position: fixed;#helpCardOverlay {
+/* === Help Card Styles === */
+#helpCard {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  padding: 32px 24px 24px 24px;
+  min-width: 320px;
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  display: none;
+}
+
+#helpCard:not(.hidden) {
+  display: block;
 }

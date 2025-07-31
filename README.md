@@ -8,10 +8,15 @@ Scale Driller is a browser-based music theory training app for learning key and 
 - **Accessibility:** ARIA roles and labels for improved accessibility
 - **Responsive Design:** Mobile-friendly and touch-optimized
 - **Manual Testing:** No automated tests; test by opening in a browser
+- **Help Button:** Pause the quiz and display the current scale with note degrees
+- **Input Tester:** Test MIDI and audio inputs before starting a quiz
+- **Offline Support:** Service worker for caching and running the app offline
 
 ## How It Works
 - Select your quiz mode, level, key, scale type, and input method from the settings card
 - Start the quiz to answer questions about scale degrees, note positions, or key relationships
+- Use the Help button during the quiz to pause and review the scale with note degrees
+- Use the Input Tester to verify MIDI or audio input before starting a quiz
 - Use the virtual instrument UIs or connect MIDI/audio input for interactive play
 - Get instant feedback and track your best score
 
@@ -43,7 +48,6 @@ Scale Driller is a browser-based music theory training app for learning key and 
 - **Manual testing** — open `index.html` in your browser
 
 ## Planned Features & Roadmap
-- Tick-based metronome for quiz timing
 - Difficulty bar and improved score tracking
 - More instrument UIs and training modes (chord mode, tritone, etc.)
 - Visual and accessibility improvements

@@ -27,6 +27,7 @@ class DOMManager {
       answerButtons: '#answer-buttons',
       totalTimer: '#total-timer',
       helpBtn: '#help-btn',
+      helpCard: '#helpCard',
       closeQuizBtn: '#close-quiz',
       playAgainBtn: '#play-again',
       pianoUI: '#piano-ui',

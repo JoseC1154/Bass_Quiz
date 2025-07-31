@@ -56,3 +56,12 @@ It is a **static web app using only HTML, CSS, and vanilla JavaScript**. All log
 - Show quiz card:  
   ```javascript
   domManager.show('quizCard')
+  ```
+
+## Piano UI Quiz Answer Highlighting
+
+- When a quiz is active, clicking a piano key will select it as an answer.
+- All possible correct keys (e.g. enharmonics, all correct octaves) will highlight green (`.correct`).
+- If a wrong key is selected, it will highlight red (`.incorrect`).
+- All keys are disabled after a selection.
+- Answer buttons (if present) are also highlighted and disabled.

@@ -1,9 +1,99 @@
 class QuizManager {
+  // Called by piano UI when a key is selected as an answer
+  handlePianoAnswer(note) {
+    const currentQuestion = this.state.quiz.data[this.state.quiz.currentIndex];
+    if (!currentQuestion) return;
+    // Find all correct answers (handle enharmonics, octaves, etc. if needed)
+    const correctNotes = [];
+    if (Array.isArray(currentQuestion.correctNotes)) {
+      correctNotes.push(...currentQuestion.correctNotes);
+    } else if (currentQuestion.answer) {
+      correctNotes.push(currentQuestion.answer);
+    }
+    // Highlight all possible correct keys
+    const allKeys = document.querySelectorAll('#piano-ui .piano-key');
+    allKeys.forEach(key => {
+      key.classList.remove('correct', 'incorrect', 'selected');
+      if (correctNotes.includes(key.dataset.note)) {
+        key.classList.add('correct');
+      }
+    });
+    // Highlight selected key as incorrect if not correct
+    if (!correctNotes.includes(note)) {
+      const selectedKey = document.querySelector(`#piano-ui .piano-key[data-note="${note}"]`);
+      if (selectedKey) selectedKey.classList.add('incorrect');
+    }
+    // Optionally: lock further input, or allow multiple attempts
+    // Disable all keys after selection
+    allKeys.forEach(key => key.style.pointerEvents = 'none');
+    // Also highlight answer buttons if present
+    if (this.dom.elements.answerButtons) {
+      const btns = this.dom.elements.answerButtons.querySelectorAll('button');
+      btns.forEach(btn => {
+        btn.disabled = true;
+        if (correctNotes.includes(btn.textContent)) btn.classList.add('correct');
+        if (btn.textContent === note && !correctNotes.includes(note)) btn.classList.add('incorrect');
+      });
+    }
+    // Play feedback sound
+    if (correctNotes.includes(note)) {
+      this.audio.playCorrectSound();
+    } else {
+      this.audio.playIncorrectSound();
+    }
+  }
   constructor(gameState, domManager, timerManager, audioManager) {
     this.state = gameState;
     this.dom = domManager;
     this.timer = timerManager;
     this.audio = audioManager;
+  }
+
+  /**
+   * Returns HTML for the help card: current scale and note degrees.
+   */
+  getCurrentHelpContent() {
+    // Try to get current question's key and scale
+    let key = null;
+    let scaleType = 'major';
+    let scale = [];
+    let degree = null;
+    // Try to get from current question if available
+    const current = this.state.quiz.data[this.state.quiz.currentIndex];
+    console.log('[Help Debug] current question:', current);
+    if (current) {
+      // Try to extract key and degree from question data
+      key = current.key || (current.question && current.question.key) || null;
+      degree = current.degree || (current.question && current.question.degree) || null;
+      // Try to get scale type from UI if present
+      const scaleTypeElem = document.getElementById('scale-type');
+      if (scaleTypeElem) scaleType = scaleTypeElem.value;
+    }
+    // Fallback: get from UI
+    if (!key) {
+      const keySelect = document.getElementById('key-select');
+      if (keySelect) key = keySelect.value;
+    }
+    // Compute scale
+    if (key && typeof this.getScale === 'function') {
+      scale = this.getScale(key);
+    }
+    console.log('[Help Debug] key:', key, 'scaleType:', scaleType, 'scale:', scale, 'degree:', degree);
+    // Build HTML
+    let html = `<div style="font-size:1.2em;margin-bottom:8px;"><strong>Help: Scale & Degrees</strong></div>`;
+    if (key && scale.length) {
+      html += `<div><b>Key:</b> ${key} (${scaleType})</div>`;
+      html += `<div><b>Scale:</b> ${scale.join(' - ')}</div>`;
+      html += `<div style='margin-top:8px;'><b>Degrees:</b></div>`;
+      html += `<ol style='padding-left:1.2em;'>`;
+      scale.forEach((note, i) => {
+        html += `<li><b>${i+1}</b>: ${note}</li>`;
+      });
+      html += `</ol>`;
+    } else {
+      html += `<div>Scale information not available.</div>`;
+    }
+    return html;
   }
 
   generate(level, count) {
@@ -19,7 +109,6 @@ class QuizManager {
     
     for (let i = 0; i < count; i++) {
       let degree, key;
-      
       if (level === 'degree-training') {
         degree = selectedDegree;
         key = this.randomChoice(CONFIG.keys);
@@ -27,20 +116,19 @@ class QuizManager {
         degree = Math.floor(Math.random() * 7) + 1;
         key = (level === 'easy') ? fixedKey : this.randomChoice(CONFIG.keys);
       }
-      
       const scale = this.getScale(key);
       const isDegreeLevel = ['easy', 'intermediate', 'degree-training'].includes(level);
-      
       if (isDegreeLevel) {
         let options = scale.filter(n => n !== scale[degree - 1]);
         options = this.shuffle(options).slice(0, 4);
         options.push(scale[degree - 1]);
         options = this.shuffle(options);
-        
         this.state.quiz.data.push({
           question: `What is degree ${degree} in the key of ${key}?`,
           answer: scale[degree - 1],
-          options: options
+          options: options,
+          key: key,
+          degree: degree
         });
       } else if (level === 'hard') {
         const note = scale[degree - 1];
@@ -48,11 +136,12 @@ class QuizManager {
         options = this.shuffle(options).slice(0, 4);
         options.push(key);
         options = this.shuffle(options);
-        
         this.state.quiz.data.push({
           question: `${note} is the ${degree} degree of what key?`,
           answer: key,
-          options: options
+          options: options,
+          key: key,
+          degree: degree
         });
       }
     }
@@ -105,6 +194,20 @@ class QuizManager {
       };
       this.dom.elements.answerButtons.appendChild(btn);
     });
+
+    // Highlight possible correct piano keys for this question (if any)
+    setTimeout(() => {
+      if (Array.isArray(currentQuestion.correctNotes)) {
+        const allKeys = document.querySelectorAll('#piano-ui .piano-key');
+        allKeys.forEach(key => {
+          if (currentQuestion.correctNotes.includes(key.dataset.note)) {
+            key.classList.add('possible-correct');
+          } else {
+            key.classList.remove('possible-correct');
+          }
+        });
+      }
+    }, 100);
   }
 
   checkAnswer(selected) {

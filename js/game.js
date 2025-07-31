@@ -1,9 +1,12 @@
 class Game {
+  // Block note input while help is open
+  helpOpen = false;
   /**
    * Handles note input from instrument UIs (e.g., piano, bass, guitar).
    * @param {string} note - The note name (e.g., 'C4', 'F#3')
    */
   handleNoteInput(note) {
+    if (this.helpOpen) return; // Block input while help is open
     // For now, just log the note. Later, this can check answers, update UI, etc.
     console.log('Note input:', note);
     // Example: highlight the note, check answer, play sound, etc.
@@ -279,14 +282,82 @@ class Game {
   }
 
   showHelp() {
+    // Disable quiz close button and suppress hover effect while help is open
+    if (this.dom.elements.closeQuizBtn) {
+      this.dom.elements.closeQuizBtn.disabled = true;
+      this.dom.elements.closeQuizBtn.classList.add('no-hover');
+    }
+    // Pause the quiz
+    if (typeof this.timer.pause === 'function') {
+      this.timer.pause();
+    }
+    this.helpOpen = true;
+    // Disable note input if utility exists
+    if (typeof setNoteInputEnabled === 'function') setNoteInputEnabled(false);
+    // Disable answer buttons and suppress hover effect
+    const answerBtns = this.dom.elements.answerButtons?.querySelectorAll('button');
+    if (answerBtns) answerBtns.forEach(btn => {
+      btn.disabled = true;
+      btn.classList.add('no-hover');
+    });
     // Show the help card/modal if it exists
-    const helpCard = document.getElementById('helpCard');
+    const helpCard = this.dom.elements.helpCard || document.getElementById('helpCard');
     if (helpCard) {
+      // Get current scale and note degrees from quizManager
+      if (typeof this.quiz.getCurrentHelpContent === 'function') {
+        const helpContent = this.quiz.getCurrentHelpContent();
+        if (helpContent) {
+          if (typeof this.dom.setHTML === 'function') {
+            this.dom.setHTML('helpCard', helpContent);
+          } else {
+            helpCard.innerHTML = helpContent;
+          }
+        }
+      }
       helpCard.classList.remove('hidden');
+      // Add close button if not present, styled like close-quiz
+      let closeBtn = helpCard.querySelector('#closeHelpBtn');
+      if (!closeBtn) {
+        closeBtn = document.createElement('button');
+        closeBtn.id = 'closeHelpBtn';
+        closeBtn.className = 'close-btn';
+        closeBtn.setAttribute('aria-label', 'Close Help');
+        closeBtn.innerHTML = '✖';
+        closeBtn.onclick = () => this.closeHelp();
+        helpCard.insertBefore(closeBtn, helpCard.firstChild);
+      } else {
+        closeBtn.onclick = () => this.closeHelp();
+      }
     } else {
       // fallback: show a notification if helpCard is missing
       this.notification.show('Help content not available.', 'info');
     }
+  }
+
+  closeHelp() {
+    // Re-enable quiz close button and restore hover effect
+    if (this.dom.elements.closeQuizBtn) {
+      this.dom.elements.closeQuizBtn.disabled = false;
+      this.dom.elements.closeQuizBtn.classList.remove('no-hover');
+    }
+    // Hide the help card/modal
+    const helpCard = this.dom.elements.helpCard || document.getElementById('helpCard');
+    if (helpCard) {
+      helpCard.classList.add('hidden');
+    }
+    // Resume the quiz
+    if (typeof this.timer.resume === 'function') {
+      this.timer.resume();
+    }
+    this.helpOpen = false;
+    // Re-enable note input if utility exists
+    if (typeof setNoteInputEnabled === 'function') setNoteInputEnabled(true);
+    // Re-enable answer buttons and restore hover effect
+    const answerBtns = this.dom.elements.answerButtons?.querySelectorAll('button');
+    if (answerBtns) answerBtns.forEach(btn => {
+      btn.disabled = false;
+      btn.classList.remove('no-hover');
+    });
   }
 
   toggleFullscreen() {
