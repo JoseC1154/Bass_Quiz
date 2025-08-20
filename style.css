@@ -11,8 +11,10 @@
   z-index: 10;
 }
 .piano-key.possible-correct {
-  box-shadow: 0 0 0 2px var(--success-primary);
-  background: linear-gradient(90deg, #eaffea 60%, #fff 100%);
+  outline: 2px solid var(--success-primary);
+  outline-offset: -2px;
+  background: inherit;
+  box-shadow: none;
 }
 #answer-buttons button.no-hover,
 #answer-buttons button.no-hover:hover,
@@ -1778,26 +1780,3 @@ button:active {
 
 
 
-
-}  display: block;#helpCard:not(.hidden) ~ #helpCardOverlay {}  display: none;  z-index: 9998;  background: rgba(0,0,0,0.35);  top: 0; left: 0; right: 0; bottom: 0;  position: fixed;#helpCardOverlay {
-/* === Help Card Styles === */
-#helpCard {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 9999;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
-  padding: 32px 24px 24px 24px;
-  min-width: 320px;
-  max-width: 90vw;
-  max-height: 80vh;
-  overflow-y: auto;
-  display: none;
-}
-
-#helpCard:not(.hidden) {
-  display: block;
-}

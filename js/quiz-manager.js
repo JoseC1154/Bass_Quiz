@@ -118,20 +118,32 @@ class QuizManager {
       }
       const scale = this.getScale(key);
       const isDegreeLevel = ['easy', 'intermediate', 'degree-training'].includes(level);
+      // Find all octaves of the correct note for piano UI
+      let correctNotes = [];
       if (isDegreeLevel) {
-        let options = scale.filter(n => n !== scale[degree - 1]);
+        const correctNote = scale[degree - 1];
+        // Find all possible octaves for this note on the piano UI
+        for (let octave = 1; octave <= 7; octave++) {
+          correctNotes.push(correctNote + octave);
+        }
+        let options = scale.filter(n => n !== correctNote);
         options = this.shuffle(options).slice(0, 4);
-        options.push(scale[degree - 1]);
+        options.push(correctNote);
         options = this.shuffle(options);
         this.state.quiz.data.push({
           question: `What is degree ${degree} in the key of ${key}?`,
-          answer: scale[degree - 1],
+          answer: correctNote,
           options: options,
           key: key,
-          degree: degree
+          degree: degree,
+          correctNotes: correctNotes
         });
       } else if (level === 'hard') {
         const note = scale[degree - 1];
+        // Find all possible octaves for this note
+        for (let octave = 1; octave <= 7; octave++) {
+          correctNotes.push(note + octave);
+        }
         let options = CONFIG.keys.filter(k => k !== key);
         options = this.shuffle(options).slice(0, 4);
         options.push(key);
@@ -141,7 +153,8 @@ class QuizManager {
           answer: key,
           options: options,
           key: key,
-          degree: degree
+          degree: degree,
+          correctNotes: correctNotes
         });
       }
     }

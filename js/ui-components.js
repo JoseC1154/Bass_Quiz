@@ -94,7 +94,11 @@ function createPianoUI() {
     whiteKey.style.fontSize = `${fontSizeWhite}px`;
     whiteKey.style.position = 'absolute';
     whiteKey.style.left = `${i * keyWidth}px`;
-    whiteKey.addEventListener('click', () => handleNoteInput(noteWithOctave));
+    whiteKey.addEventListener('click', () => {
+      if (window.quizPianoAnswerHandler) {
+        window.quizPianoAnswerHandler(noteWithOctave);
+      }
+    });
     whiteLayer.appendChild(whiteKey);
     whiteKeyPositions.push(i * keyWidth);
   }
@@ -124,7 +128,9 @@ function createPianoUI() {
       blackKey.style.left = `${center + 42}px`;
       blackKey.addEventListener('click', (e) => {
         e.stopPropagation();
-        handleNoteInput(noteWithOctave);
+        if (window.quizPianoAnswerHandler) {
+          window.quizPianoAnswerHandler(noteWithOctave);
+        }
       });
       blackLayer.appendChild(blackKey);
     }
