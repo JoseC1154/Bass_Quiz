@@ -11,12 +11,37 @@ Make safe, high-quality improvements to Bass_Quiz that help bass guitar players 
 
 ## AI Workflow Rules
 - Inspect real repository files before suggesting changes.
-- Never invent filenames, functions, or features.
+- Never invent filenames, functions, classes, routes, or features.
+- Never reference filenames unless confirmed in repository.
 - Prefer existing architecture over parallel rewrites.
 - Explain plan before large edits.
 - Use smallest safe patch first.
 - If user says step-by-step, give one step only and wait.
 - If context is incomplete, inspect code instead of assuming.
+- If uncertain, say uncertain instead of guessing.
+- Read AGENTS.md before major tasks.
+
+## Prompt Execution Order
+1. Inspect actual repository structure.
+2. Identify files truly involved.
+3. Summarize current behavior.
+4. Propose smallest safe change.
+5. Validate result.
+6. Report evidence.
+
+## Preferred Prompt Types
+Best results usually come from:
+- inspect this repo and locate X
+- find where feature Y is controlled
+n- compare files involved in Z flow
+- propose minimal patch for bug X
+- explain current architecture before edits
+- identify duplicate or stale logic
+
+Avoid generic prompts like:
+- improve everything
+- rewrite app
+- make it better
 
 ## Task Intake (Required)
 Before editing code, summarize:
