@@ -1,7 +1,7 @@
 # AGENTS.md
 
 ## Mission
-Make safe, high-quality improvements to this repository without breaking existing behavior. Prefer focused changes, preserve current UX where possible, and keep performance in mind.
+Make safe, high-quality improvements to Bass_Quiz that help bass guitar players learn faster without breaking existing behavior. Prefer focused changes, preserve current UX where possible, and keep gameplay responsive on desktop and mobile.
 
 ## Branch Rules
 - Work only on the current branch unless explicitly told otherwise.
@@ -24,26 +24,39 @@ If information is missing, inspect repository files first before guessing.
 - Inspect existing code paths before editing.
 - Reuse current patterns when reasonable.
 - Avoid duplicate logic, dead code, and unnecessary dependencies.
-- Keep UI responsive across desktop/tablet/mobile.
-- Preserve backward compatibility for saved configs/layouts when possible.
+- Keep UI responsive across desktop, tablet, and mobile.
+- Preserve saved scores, settings, and progress where possible.
+- Keep learning flow fast, clear, and fun.
 
 ## Architecture Discipline
 - Search for an existing implementation before creating a new one.
 - Extend or repair existing systems when possible.
-- Do not create parallel button creation flows.
+- Do not create parallel quiz engines.
+- Do not create duplicate scoring systems.
 - Do not create duplicate state stores.
-- Do not create duplicate config schemas.
 - Prefer replacing stale logic over running two systems side by side.
 - If duplication is unavoidable, explain migration and cleanup path.
 
-## Regression Safety
-Before changing shared logic:
-- Identify dependent systems and reused code paths.
-- List behaviors that must remain unchanged.
-- Prefer surgical fixes over broad rewrites.
-- Preserve save/load compatibility.
-- Preserve preset and config compatibility.
-- If risk is high, split work into smaller validated steps.
+## Bass Player Product Focus
+Prioritize features that specifically help bass players:
+- fretboard note recognition
+- interval and number-system drills
+- key signature fluency
+- scale degree recall
+- chord tone targeting
+- rhythm and timing drills
+- ear training opportunities
+- 4-string and 5-string support
+- realistic practice speed progression
+- clear right/wrong feedback
+
+## Quiz Content Rules
+- Music theory must be accurate.
+- Bass fretboard positions must be accurate.
+- Prefer practical musician language over academic jargon.
+- Questions should become harder progressively.
+- Reward speed and accuracy.
+- Avoid repetitive question loops.
 
 ## Refactor Continuity
 When session context is incomplete:
@@ -60,27 +73,29 @@ Prefer:
 - targeted edits
 - preserving working code
 - incremental cleanup with validation
+- improving player experience
 
 Avoid:
 - unnecessary full file rewrites
 - style churn during bug fixes
 - moving code without purpose
 - replacing stable systems without evidence
+- adding generic features unrelated to bass players
 
 ## Validation Rules (Required)
 Before marking any task complete, run relevant validation for the area changed.
 
 ### Smoke Test Matrix
-- MIDI logic / control dispatch / toggle / learn:
-  npm run test:midi
+- Quiz logic / answers / scoring:
+  run project test command if available
 
-- UI / editor / pages / layout / save-load flows:
-  npm run test:smoke
+- UI / layout / mobile responsiveness:
+  open app locally and verify manually
 
-- Broad, risky, backend, or multi-area changes:
-  npm test
+- Storage / save-load / settings:
+  test refresh persistence manually
 
-- Syntax-only fallback when full tests are blocked:
+- Syntax-only fallback:
   node --check <changed file>
 
 ## Validation Expectation
@@ -89,7 +104,7 @@ Before marking any task complete, run relevant validation for the area changed.
 - If no automated test exists, perform a lightweight smoke check and report it.
 
 ## Environment Blockers
-If tests fail because of cloud/runtime issues (native modules, OS mismatch, missing devices, invalid ELF header, unavailable hardware):
+If tests fail because of runtime issues, missing packages, browser limits, or local environment mismatch:
 - Mark as BLOCKED BY ENVIRONMENT (not feature failed)
 - Still run all non-blocked checks
 - Clearly separate:
@@ -102,10 +117,8 @@ At the end of every task include:
 
 ### Files Changed
 - file/path
-- file/path
 
 ### Validation Run
-- command
 - command
 
 ### Results
@@ -115,21 +128,21 @@ At the end of every task include:
 ### Remaining Risk
 - none / short note
 
-## JCButtonDeck Priority Areas
+## Bass_Quiz Priority Areas
 When relevant, pay extra attention to:
-- MIDI duplicate sends
-- toggle state persistence
-- trigger-scoped actionStack execution
-- page creation consistency
-- grid drag/drop collisions
-- save/load regressions
-- backend route stability
-- NDI / monitor performance
-- hidden-tab CPU/network waste
-- editor usability
-- preset/library overwrite consistency
-- duplicate control creation paths
-- model/session continuity during refactors
+- answer correctness
+n- timer accuracy
+- score tracking
+- streak systems
+- difficulty progression
+- mobile tap targets
+- bass fretboard visuals
+- theory accuracy
+- duplicate questions
+- localStorage regressions
+- audio latency if sound is used
+- accessibility and readability
+- fast game startup
 
 ## Testing Discipline
 - A task is incomplete if relevant validation was not run.
