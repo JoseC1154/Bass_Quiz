@@ -9,6 +9,15 @@ Make safe, high-quality improvements to Bass_Quiz that help bass guitar players 
 - Before changes, check current branch and status.
 - Keep commits focused and descriptive.
 
+## AI Workflow Rules
+- Inspect real repository files before suggesting changes.
+- Never invent filenames, functions, or features.
+- Prefer existing architecture over parallel rewrites.
+- Explain plan before large edits.
+- Use smallest safe patch first.
+- If user says step-by-step, give one step only and wait.
+- If context is incomplete, inspect code instead of assuming.
+
 ## Task Intake (Required)
 Before editing code, summarize:
 - requested outcome
@@ -131,7 +140,7 @@ At the end of every task include:
 ## Bass_Quiz Priority Areas
 When relevant, pay extra attention to:
 - answer correctness
-n- timer accuracy
+- timer accuracy
 - score tracking
 - streak systems
 - difficulty progression
